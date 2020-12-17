@@ -1,0 +1,77 @@
+page-devices {
+
+  .no-items {
+    margin-top: 30px;
+    color: #666;
+    text-align: center;
+  }
+
+  .no-devices {
+    display: flex;
+    flex-direction: column;
+    padding-top: 0;
+    text-align: center;
+
+    .add-button {
+      justify-content: center;
+      padding-bottom: 0;
+
+      button {
+        color: #000000;
+        background-color: #f3cc00;
+      }
+    }
+  }
+
+  .applying-search {
+    margin-top: 30px;
+    color: #666;
+    text-align: center;
+  }
+
+  h2 {
+    .shared {
+      background-color: #555555;
+      color: #ffffff;
+      padding: 1px 5px 1px 5px;
+      border-radius: 2px;
+      font-size: 0.8em;
+
+      &.with-other-users {
+        background-color: #ff8d8d;
+      }
+    }
+  }
+
+  .highlighted {
+    background-color: color($colors, highlight) !important;
+    h2 {
+      color: #333;
+    }
+  }
+
+  .highlighted-with-alert {
+    h2 {
+      &:before {
+        content: ' \25CF';
+        font-size: 18px;
+        color: color($colors, danger);
+        padding-right: 5px;
+      }
+    }
+  }
+
+  .shared {
+    background-color: rgba(189, 185, 189, 0.2);
+  }
+
+  .light-input {
+    input {
+      box-shadow: 0px 0px 5px 0 #f3cc00 !important;
+    }
+  }
+
+  ion-header {
+    background-color: #f8f8f8;
+  }
+}

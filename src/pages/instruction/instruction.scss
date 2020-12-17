@@ -1,0 +1,31 @@
+.instruction-page {
+
+  iframe {
+    padding-top: 10px;
+    width: 90%;
+    margin-left: 5%;
+    margin-right: 5%;
+    height: 360px;
+  }
+
+  ul {
+    list-style: none;
+    padding-left: 5px;
+
+    li {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+  }
+
+  .open-settings {
+    font-weight: bold;
+    border-bottom: 1px dotted #666;
+  }
+
+  .small {
+    font-size: 0.8em;
+    color: #666;
+    padding-left: 16px;
+  }
+}

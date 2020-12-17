@@ -1,0 +1,77 @@
+<ion-header>
+  <ion-navbar>
+
+    <button ion-button menuToggle icon-only>
+      <ion-icon name='menu'></ion-icon>
+    </button>
+
+    <ion-title>Alert</ion-title>
+
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-list *ngIf="alert">
+    <ion-list-header>
+      <h2>
+        <ng-container *ngIf="!alert.multipleAlerts">{{ alert.rule.name }}</ng-container>
+        <ng-container *ngIf="alert.multipleAlerts">GPS Logs</ng-container>
+        <small>
+          {{ alert.createdAt | amTimeAgo }}
+        </small>
+      </h2>
+    </ion-list-header>
+
+    <button ion-item (click)="goDevicePage(alert.device.id)">
+      <h2>Device</h2>
+
+      <ion-note item-right>
+        {{ alert.device.name }}
+      </ion-note>
+    </button>
+
+    <ng-container *ngIf="!alert.multipleAlerts">
+
+      <button *ngIf="alert.rule" ion-item (click)="goRulePage(alert.device.id, alert.rule.id)">
+        <h2>Rule</h2>
+
+        <ion-note item-right>
+          {{ alert.rule.name }}
+        </ion-note>
+      </button>
+
+    </ng-container>
+
+    <ng-container *ngIf="alert.multipleAlerts">
+
+      <ng-container *ngFor="let bulkAlert of alert.alerts">
+
+        <button *ngIf="bulkAlert.rule" ion-item (click)="goRulePage(alert.device.id, bulkAlert.rule.id)">
+          <h2>Rule</h2>
+
+          <div>
+            <div *ngFor="let condition of bulkAlert.conditions">
+              <strong *ngIf="condition.result">
+                {{ condition.explanation }}
+              </strong>
+            </div>
+          </div>
+
+          <ion-note item-right>
+            {{ bulkAlert.rule.name }}
+          </ion-note>
+        </button>
+
+      </ng-container>
+
+    </ng-container>
+
+    <button ion-item detail-none (click)="removeAlert()">
+      <p ion-text color="danger">Remove alert</p>
+    </button>
+
+    <!--{{ alert | json }}-->
+  </ion-list>
+
+</ion-content>

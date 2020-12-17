@@ -1,0 +1,20 @@
+support-page {
+
+  .info-text-block {
+    text-align: center;
+    color: color($colors, gray);
+    font-size: 12px;
+    padding: 5px;
+    margin: 15px 0 30px 0;
+  }
+
+  .submitted-text-block {
+    text-align: center;
+    font-size: 16px;
+    padding: 50px 5px 5px 5px;
+  }
+
+  .attach-screenshot {
+    color: color($colors, primary);
+  }
+}

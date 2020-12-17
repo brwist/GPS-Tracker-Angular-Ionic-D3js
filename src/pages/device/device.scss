@@ -1,0 +1,102 @@
+page-device {
+  #map {
+    height: 300px;
+
+    &.map-padding-ios {
+      margin-top: 5em;
+    }
+  }
+
+  .centered-text-block {
+    padding-bottom: 20px;
+  }
+
+  .firmware-update-circle:before {
+    content: ' \25CF';
+    font-size: 1em;
+    color: color($colors, primary);
+  }
+
+  .feature-list {
+    margin-bottom: 10px;
+
+    .label {
+      ion-icon {
+        font-size: 24px;
+        margin-right: 15px;
+      }
+    }
+  }
+
+  .tracking-mode, .dates, .tracking-options, .charts, .tracks, .rules, .sharing {
+
+    ion-label {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    div {
+      display: flex;
+      align-items: center;
+    }
+
+    .mode {
+      margin-right: 10px;
+      margin-bottom: 2px;
+
+      &:before {
+        content: ' \25E6';
+        font-size: 24px;
+      }
+
+      &.mode-normal {
+        &:before {
+          color: #0000ff;
+        }
+      }
+
+      &.mode-hybrid {
+        &:before {
+          color: #ff0000;
+        }
+      }
+
+      &.mode-gps {
+        &:before {
+          color: #000000;
+        }
+      }
+    }
+
+    ion-icon.item-icon {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    ion-note {
+      padding-left: 10px;
+      padding-right: 10px;
+
+      ion-icon[name="ios-help-circle-outline"] {
+        font-size: 1.5em;
+        font-weight: bold;
+      }
+    }
+  }
+
+  .tracking-mode {
+    div {
+      font-weight: bold;
+    }
+
+    background-color: rgba(50, 50, 50, 0.15);
+  }
+}
+
+.night-theme {
+
+  .tracking-mode {
+
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+}

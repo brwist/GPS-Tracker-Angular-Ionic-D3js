@@ -1,0 +1,131 @@
+<ion-header>
+  <ion-navbar>
+
+    <button ion-button menuToggle icon-only>
+      <ion-icon name='menu'></ion-icon>
+    </button>
+
+    <ion-title>Trakkit</ion-title>
+
+    <ion-buttons end>
+      <button ion-button icon-only (click)="presentPopover($event)">
+        <ion-icon name="more"></ion-icon>
+      </button>
+    </ion-buttons>  
+  </ion-navbar>
+
+  <ion-searchbar
+    [ngClass]="{ 'light-input': searchString && searchString.length > 0 }"
+    [ngModel]="searchString" 
+    (ionInput)="searchItems($event)" 
+    (ionClear)="hideKeyboard()"
+  ></ion-searchbar> 
+</ion-header>
+
+<ion-content>
+
+  <ion-refresher (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div *ngIf="applyingSearch" class="applying-search">
+    <ion-spinner></ion-spinner>
+  </div>
+
+    <ion-list *ngIf="firstAlerts?.length > 0">
+        <div
+            *ngFor="let firstAlert of firstAlerts;"
+            class="first-alert"
+            (click)="goDevicePage(firstAlert.deviceId)"
+        >
+            <div class="description">
+                <h6>First Alert</h6>
+
+                <p>{{ firstAlert.deviceName }} seen after {{ firstAlert.seenAfter }} hours.</p>
+            </div>
+
+            <div
+                class="dismiss"
+                (click)="dismissAlert($event, firstAlert.deviceId)"
+            >Dismiss</div>
+        </div>
+    </ion-list>
+
+
+    <div *ngIf="devices.length === 0 && !applyingSearch && searchString" class="no-items">  
+        No devices found
+    </div>
+
+  <ion-list *ngIf="devices.length > 0">
+
+    <ion-item-sliding *ngFor="let device of devices" #slidingItem>
+
+      <button ion-item (click)="goDevicePage(device.id)"
+              [ngClass]="{'highlighted': isHighlighted(device), 'highlighted-with-alert': isHighlightedWithAlert(device), 'shared': device.sharedAccess}">
+
+        <ion-thumbnail item-left *ngIf="device.lastTrack">
+          <img [src]="getTrackMapUrl(device.lastTrack)">
+        </ion-thumbnail>
+
+        <ion-thumbnail item-left *ngIf="!device.lastTrack">
+          <img src="assets/img/no-location.png">
+        </ion-thumbnail>
+
+        <h2>
+          {{ device.name }}
+          <span *ngIf="device.sharedAccess" class="shared">SHARED</span>
+          <span *ngIf="!device.sharedAccess && device.sharedWith && device.sharedWith.length > 0"
+                class="shared with-other-users">SHARED</span>
+        </h2>
+
+        <p>
+          {{ device.mac }}
+          <span *ngIf="device.battery === 'L'">(Line)</span>
+          <span *ngIf="device.battery === 'K'">(Cable Kit)</span>
+          <span
+            *ngIf="device.battery && device.battery !== 'L' && device.battery !== 'K'">({{ device.battery }} %)</span>
+        </p>
+
+        <p *ngIf="device.lastSeen">Last seen: {{ device.lastSeen | amTimeAgo }}</p>
+
+      </button>
+
+      <ion-item-options>
+        <button ion-button color="danger" (click)="removeDevice(device, slidingItem)" [disabled]="device.sharedAccess">
+          <ion-icon name="close"></ion-icon>
+          Delete
+        </button>
+      </ion-item-options>
+
+    </ion-item-sliding>
+
+  </ion-list>
+
+
+  <div *ngIf="!applyingSearch && !searchString && !devicesLoading" class="no-devices">
+
+    <div class="add-button">
+
+      <hr>
+
+      <button
+        *ngIf="showButton"
+        ion-button
+        color="dark"
+        (click)="goCreateDevicePage()"
+        type="button"
+      >
+        <ion-icon name="add"></ion-icon>
+        &nbsp;
+        Add A Trakkit to Your Account
+      </button>
+
+    </div>
+
+  </div>
+
+  <ion-infinite-scroll (ionInfinite)="doInfinite($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+</ion-content>

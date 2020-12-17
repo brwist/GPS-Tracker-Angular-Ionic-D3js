@@ -1,0 +1,8 @@
+page-alerts-and-notifications {
+
+  .unread-circle:before {
+    content: ' \25CF';
+    font-size: 14px;
+    color: color($colors, primary);
+  }
+}

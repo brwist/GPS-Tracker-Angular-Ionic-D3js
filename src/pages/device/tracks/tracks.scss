@@ -1,0 +1,19 @@
+page-tracks {
+
+  h2.track-title{
+    font-size: 0.9em;
+  }
+
+  .track-time {
+    font-size: 0.9em;
+    color: color($colors, grey);
+  }
+
+  .highlighted {
+    background-color: color($colors, highlight);
+  }
+
+  .ntc-number {
+    font-size: 0.6em;
+  }
+}

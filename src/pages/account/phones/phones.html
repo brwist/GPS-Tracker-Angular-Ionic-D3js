@@ -1,0 +1,61 @@
+<ion-header>
+  <ion-navbar>
+
+    <button ion-button menuToggle icon-only>
+      <ion-icon name='menu'></ion-icon>
+    </button>
+
+    <ion-title>Phone numbers</ion-title>
+
+    <ion-buttons *ngIf="user.phone" end>
+      <button ion-button (click)="add()" color="primary">
+        New Phone
+      </button>
+    </ion-buttons>
+
+  </ion-navbar>
+</ion-header>
+
+<ion-content *ngIf="user" class="outer-content">
+
+  <ion-list>
+
+    <ion-list-header>Primary phone</ion-list-header>
+
+    <button *ngIf="user.phone" ion-item (click)="goChangePhonePage()">
+      {{ user.phone }}
+      <span *ngIf="!user.phoneVerified" item-end>Verification pending</span>
+      <span *ngIf="user.phoneVerified" item-end>Active</span>
+    </button>
+
+    <button *ngIf="!user.phone" ion-item (click)="goChangePhonePage()">
+      Set phone number
+    </button>
+
+  </ion-list>
+
+  <ion-list *ngIf="user.phones.length > 0">
+
+    <ion-list-header>Extra phones</ion-list-header>
+
+    <ion-item-sliding *ngFor="let phone of user.phones" #itemSliding>
+
+      <ion-item>
+        {{ phone.value }}
+
+        <span *ngIf="phone.status === 'new'" item-end>Verification pending</span>
+        <span *ngIf="phone.status === 'active'" item-end>Active</span>
+      </ion-item>
+
+      <ion-item-options side="right">
+        <button ion-button color="danger" (click)="remove(phone, itemSliding)">
+          <ion-icon name="trash"></ion-icon>
+          Remove
+        </button>
+      </ion-item-options>
+
+    </ion-item-sliding>
+
+  </ion-list>
+
+</ion-content>

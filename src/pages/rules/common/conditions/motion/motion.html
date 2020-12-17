@@ -1,0 +1,34 @@
+<ion-header>
+  <ion-navbar>
+
+    <ion-title>Motion condition</ion-title>
+
+    <ion-buttons end>
+      <button ion-button (click)="save()" color="primary">
+        Save
+      </button>
+    </ion-buttons>
+
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="outer-content">
+
+  <ion-list>
+    <ion-item>
+      <ion-label>Motion</ion-label>
+      <ion-select [(ngModel)]="motionOption" [disabled]="!condition.enabled">
+        <ion-option [value]="'any-motion'">Any motion</ion-option>
+        <ion-option [value]="'motion-level-2'">Motion Level 2</ion-option>
+        <ion-option [value]="'motion-level-3'">Motion Level 3</ion-option>
+        <ion-option [value]="'motion-level-4'">Motion Level 4</ion-option>
+        <ion-option [value]="'motion-level-5'">Motion Level 5</ion-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label>Enabled</ion-label>
+      <ion-toggle color="secondary" [(ngModel)]="condition.enabled"></ion-toggle>
+    </ion-item>
+  </ion-list>
+
+</ion-content>

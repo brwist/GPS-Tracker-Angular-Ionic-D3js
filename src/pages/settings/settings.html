@@ -1,0 +1,72 @@
+<ion-header>
+  <ion-navbar>
+
+    <button ion-button menuToggle icon-only>
+      <ion-icon name='menu'></ion-icon>
+    </button>
+
+    <ion-title>Settings</ion-title>
+
+  </ion-navbar>
+</ion-header>
+
+<ion-content *ngIf="settings" class="outer-content">
+
+  <!--<ion-list>-->
+  <!--<ion-list-header>Map settings</ion-list-header>-->
+  <!--<button ion-item (click)="changeMapReloadInterval()">-->
+  <!--Map reload interval-->
+  <!--<span item-right>{{ settings.mapReloadInterval / 1000 }} seconds</span>-->
+  <!--</button>-->
+  <!--</ion-list>-->
+
+  <ion-list>
+    <ion-list-header>Sound notifications</ion-list-header>
+    <button ion-item (click)="changeNewTrackRingtone()">
+      New Track
+      <span *ngIf="settings.newTrackRingtone" item-right>{{ settings.newTrackRingtone.Name }}</span>
+      <span *ngIf="!settings.newTrackRingtone" item-right>None</span>
+    </button>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header>Map settings</ion-list-header>
+    <!--<ion-item>-->
+    <!--<ion-label>Bucket points loading</ion-label>-->
+    <!--<ion-toggle color="secondary" [(ngModel)]="bucketPointLoading"></ion-toggle>-->
+    <!--</ion-item>-->
+    <!--<ion-item *ngIf="bucketPointLoading === false">-->
+    <ion-item>
+      <ion-label>Clusterize data points</ion-label>
+      <ion-toggle color="secondary" [(ngModel)]="clusterizeDeviceMap"></ion-toggle>
+    </ion-item>
+    <ion-item>
+      <ion-label>Night map</ion-label>
+      <ion-toggle color="secondary" [(ngModel)]="nightModeEnabled"></ion-toggle>
+    </ion-item>
+    <ion-item *ngIf="nightModeEnabled">
+      <ion-label>Start</ion-label>
+      <ion-datetime displayFormat="h:mm a" [(ngModel)]="nightModeStart"></ion-datetime>
+    </ion-item>
+    <ion-item *ngIf="nightModeEnabled">
+      <ion-label>End</ion-label>
+      <ion-datetime displayFormat="h:mm a" [(ngModel)]="nightModeEnd"></ion-datetime>
+    </ion-item>
+  </ion-list>
+
+  <ion-list>
+    <ion-list-header>Debug</ion-list-header>
+    <ion-item>
+      <ion-label>Show device debug data</ion-label>
+      <ion-toggle color="secondary" [(ngModel)]="showDeviceDebug"></ion-toggle>
+    </ion-item>
+  </ion-list>
+
+  <ion-list showWhen="android">
+    <ion-list-header>System Notifications</ion-list-header>
+    <button ion-item (click)="openSystemNotificationsSettingsPage()">
+      Settings
+    </button>
+  </ion-list>
+
+</ion-content>

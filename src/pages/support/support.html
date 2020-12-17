@@ -1,0 +1,113 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>{{ title }}</ion-title>
+    <ion-buttons *ngIf="!submitted" end>
+      <button ion-button (click)="submit()">
+        Submit
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content *ngIf="!submitted" class="outer-content">
+
+  <div class="info-text-block">
+    We appreciate that you've taken the time to write us.
+    Please leave a message for our support team. We will contact you very soon!
+  </div>
+
+  <ion-list>
+
+    <ion-item>
+      <ion-label>Request type</ion-label>
+      <ion-select [(ngModel)]="ticket.type">
+        <ion-option value="problem">Problem</ion-option>
+        <ion-option value="question">Question</ion-option>
+        <ion-option value="task">Proposal</ion-option>
+      </ion-select>
+    </ion-item>
+
+  </ion-list>
+
+  <ion-list>
+
+    <ion-list-header>Your name</ion-list-header>
+
+    <ion-item>
+      <ion-input [(ngModel)]="ticket.name"></ion-input>
+    </ion-item>
+
+  </ion-list>
+
+  <ion-list>
+
+    <ion-list-header>E-mail</ion-list-header>
+
+    <ion-item>
+      <ion-input [(ngModel)]="ticket.email"></ion-input>
+    </ion-item>
+
+  </ion-list>
+
+  <ion-list>
+
+    <ion-list-header>Subject</ion-list-header>
+
+    <ion-item>
+      <ion-input [(ngModel)]="ticket.subject"></ion-input>
+    </ion-item>
+
+  </ion-list>
+
+  <ion-list>
+
+    <ion-list-header>Message</ion-list-header>
+
+    <ion-item>
+      <ion-textarea [(ngModel)]="ticket.message" rows="4"></ion-textarea>
+    </ion-item>
+
+  </ion-list>
+
+  <ion-list>
+
+    <ion-item-sliding #slidingItem>
+
+      <!--<button ion-item detail-none (click)="attachScreenshot()" class="attach-screenshot">-->
+
+        <!--Attach a screenshot-->
+
+        <!--<p *ngIf="imgBase64">-->
+          <!--screenshot.png-->
+        <!--</p>-->
+
+        <!--<ion-thumbnail item-right *ngIf="imgBase64">-->
+          <!--<img [src]="imgBase64"/>-->
+        <!--</ion-thumbnail>-->
+
+      <!--</button>-->
+
+      <ion-item-options *ngIf="ticket.screenshotBase64">
+        <button ion-button color="danger" (click)="removeScreenshot(slidingItem)">
+          <ion-icon name="trash"></ion-icon>
+          Delete
+        </button>
+      </ion-item-options>
+
+    </ion-item-sliding>
+
+  </ion-list>
+
+</ion-content>
+
+<ion-content *ngIf="submitted">
+
+  <div class="submitted-text-block">
+    <h5>Thank you for contacting us!</h5>
+    <p>You are very important to us. We will contact you as soon as we review your message.</p>
+  </div>
+
+</ion-content>

@@ -1,0 +1,66 @@
+<ion-header>
+  <ion-navbar>
+
+    <button ion-button menuToggle icon-only>
+      <ion-icon name='menu'></ion-icon>
+    </button>
+
+    <ion-title *ngIf="!device">Rules</ion-title>
+    <ion-title *ngIf="device">{{ device.name }}'s rules</ion-title>
+
+    <ion-buttons end>
+      <button ion-button icon-only (click)="presentPopover($event)">
+        <ion-icon name="more"></ion-icon>
+      </button>
+    </ion-buttons>
+
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-refresher (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div *ngIf="rules.length === 0" class="centered-text-block">
+    No Rules found
+  </div>
+
+  <ion-list>
+
+    <ion-item-sliding *ngFor="let rule of rules" #slidingItem>
+
+      <button ion-item (click)="goEditRulePage(rule.id)">
+        <h2>
+          <span *ngIf="rule.enabled" class="enabled-circle"></span>
+          <span *ngIf="!rule.enabled" class="disabled-circle"></span>
+          {{ rule.name }}
+        </h2>
+        <p>Associated devices: {{ rule.devices.length }}</p>
+      </button>
+
+      <ion-item-options side="right">
+        <button ion-button color="primary" (click)="enableRule(rule, slidingItem)" *ngIf="!rule.enabled">
+          <ion-icon name="power"></ion-icon>
+          Enable
+        </button>
+        <button ion-button style="background-color: #888" (click)="disableRule(rule, slidingItem)" *ngIf="rule.enabled">
+          <ion-icon name="power"></ion-icon>
+          Disable
+        </button>
+        <button ion-button color="danger" (click)="removeRule(rule, slidingItem)">
+          <ion-icon name="trash"></ion-icon>
+          Delete
+        </button>
+      </ion-item-options>
+
+    </ion-item-sliding>
+
+  </ion-list>
+
+  <ion-infinite-scroll (ionInfinite)="doInfinite($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+</ion-content>

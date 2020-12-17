@@ -1,0 +1,33 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>TRAKKIT Update</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content *ngIf="firmwareUpdateInfo" class="outer-content" padding>
+  <h1>
+    {{ firmwareUpdateInfo.version.title }}
+    <small>{{ firmwareUpdateInfo.version.tag }} ({{ firmwareUpdateInfo.version.updatedAt | date }})</small>
+  </h1>
+
+  <div class="md5-hash">
+    MD5: {{ firmwareUpdateInfo.version.md5 }}
+  </div>
+
+  <div [innerHTML]="firmwareUpdateInfo.version.description"></div>
+
+  <div class="update-guide">
+    <h2>Firmware updates</h2>
+
+    When new firmware is released, users will be prompted to connect the device via USB cable to a power
+    source and authorize the update. This update must be performed within range of one of the home networks.
+    Once the update is under way, both the blue and yellow LEDs will blink rapidly until the update has completed.
+
+    <br>
+
+    <div class="update-guide-image">
+      <img src="assets/img/firmware-update-device.png">
+    </div>
+  </div>
+
+</ion-content>

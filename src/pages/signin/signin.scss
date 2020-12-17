@@ -1,0 +1,13 @@
+page-signin {
+  .error {
+    color: #e20020;
+    text-align: center;
+    padding: 5px 10px 5px 10px;
+  }
+
+  .sign-up-message {
+    font-size: 0.9em;
+    color: color($colors, gray);
+    text-align: center;
+  }
+}

@@ -1,0 +1,51 @@
+<ion-header>
+  <ion-navbar>
+
+    <ion-title>Email action</ion-title>
+
+    <ion-buttons end>
+      <button ion-button (click)="save()" color="primary">
+        Save
+      </button>
+    </ion-buttons>
+
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="outer-content">
+
+  <ion-list>
+    <ion-item>
+      <ion-label>Email address</ion-label>
+      <ion-select [(ngModel)]="action.data.email" [disabled]="!action.enabled">
+        <ion-option *ngFor="let email of emails" [value]="email">{{ email }}</ion-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label>Message title</ion-label>
+      <ion-input [(ngModel)]="action.data.title" [disabled]="!action.enabled"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>Device string</ion-label>
+      <ion-input [(ngModel)]="action.data.deviceString" [disabled]="!action.enabled"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>Collect duration</ion-label>
+      <ion-select [(ngModel)]="collectDurationUnit">
+        <ion-option value="send-immediately">Send immediately</ion-option>
+        <ion-option value="Minutes">Minutes</ion-option>
+        <ion-option value="Hours">Hours</ion-option>
+        <ion-option value="Days">Days</ion-option>
+      </ion-select>
+    </ion-item>
+    <ion-item *ngIf="collectDurationUnit !== 'send-immediately'">
+      <ion-label>{{ collectDurationUnit }}</ion-label>
+      <ion-input [(ngModel)]="collectDuration" [disabled]="!action.enabled"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>Enabled</ion-label>
+      <ion-toggle color="secondary" [(ngModel)]="action.enabled"></ion-toggle>
+    </ion-item>
+  </ion-list>
+
+</ion-content>

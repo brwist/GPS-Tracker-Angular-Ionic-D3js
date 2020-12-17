@@ -1,0 +1,350 @@
+<ion-header>
+  <ion-navbar>
+
+    <ion-title>{{ device ? device.name : 'Loading..' }}</ion-title>
+
+    <ion-buttons end>
+      <button ion-button icon-only (click)="goEditDevicePage()" [disabled]="device && device.sharedAccess"
+              color="primary">
+        <ion-icon name="options"></ion-icon>
+      </button>
+    </ion-buttons>
+
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="outer-content">
+
+    <div
+        *ngIf="firstAlert && firstAlert.seenAfter && firstAlert.enabled && !firstAlert.dismiss"
+        class="first-alert"
+    >
+        <div class="description">
+            <h6>First Alert</h6>
+    
+            <p>{{ device.name }} seen after {{ firstAlert.seenAfter }} hours.</p>
+        </div>
+    
+        <div
+            class="dismiss"
+            (click)="dismissAlert()"
+        >Dismiss</div>
+    </div>
+
+  <div [ngClass]="{'map-padding-ios': mapPaddingiOS}" id="map" *ngIf="!noMapMessage"></div>
+
+  <div class="centered-text-block" *ngIf="noMapMessage">{{ noMapMessage }}</div>
+
+  <ion-list *ngIf="device">
+    <ion-item>
+      <ion-label>Show GPS Logs</ion-label>
+      <ion-toggle color="secondary" [(ngModel)]="showGPSLogs"></ion-toggle>
+    </ion-item>
+    <ion-item detail-none class="dates">
+      <div (click)="presentDateSettings()">
+        {{ dateRangeString }}
+      </div>
+      <ion-note item-right (click)="showDatesHelp()">
+        <ion-icon color="primary" name="ios-help-circle-outline" class="icon"></ion-icon>
+      </ion-note>
+    </ion-item>
+  </ion-list>
+
+  <ion-list>
+    <ion-item *ngIf="showTrackingModeButton" detail-none class="tracking-mode">
+      <div (click)="changeStatusCode()">
+        <span *ngIf="device.code.value === 1" class="mode mode-normal"></span>
+        <span *ngIf="device.code.value === 5" class="mode mode-hybrid"></span>
+        <span *ngIf="device.code.value === 4" class="mode mode-gps"></span>
+        Mode: {{ deviceStatusCodeString }}
+      </div>
+      <ion-note item-right (click)="showItemHelp('tracking-modes')">
+        <ion-icon color="primary" name="ios-help-circle-outline" class="icon"></ion-icon>
+      </ion-note>
+    </ion-item>
+    <ion-item *ngIf="device && shownTrack">
+      <ion-label>Show Details</ion-label>
+      <ion-toggle color="secondary" [(ngModel)]="showTelemetry"></ion-toggle>
+    </ion-item>
+  </ion-list>
+
+  <ion-list *ngIf="device && shownTrack && showTelemetry">
+
+    <ion-item>
+      <h2>MAC</h2>
+
+      <ion-note item-right>
+        {{ device.mac }}
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <h2>Time</h2>
+
+      <ion-note item-right>
+        {{ shownTrack.timestamp | amDateFormat: 'dddd, MMMM Do, h:mm:ss a' }}
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="shownTrack.location">
+      <h2>Latitude</h2>
+
+      <ion-note item-right>
+        {{ shownTrack.location.coordinates[1] }}
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="shownTrack.location">
+      <h2>Longitude</h2>
+
+      <ion-note item-right>
+        {{ shownTrack.location.coordinates[0] }}
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="shownTrack.gpsTime">
+      <h2>GPS Time</h2>
+
+      <ion-note item-right>
+        {{ shownTrack.gpsTime | amDateFormat: 'dddd, MMMM Do, h:mm:ss a' }}
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="isNumber(shownTrack.direction)">
+      <h2>Direction</h2>
+
+      <ion-note item-right>
+        {{ shownTrack.direction }}°
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="isNumber(shownTrack.altitude)">
+      <h2>Altitude</h2>
+
+      <ion-note item-right>
+        {{ shownTrack.altitude }}
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <h2>Battery</h2>
+
+      <ion-note item-right>
+        <span *ngIf="isNumeric(shownTrack.battery)">{{ shownTrack.battery }} %</span>
+        <span *ngIf="shownTrack.battery === 'K'">Cable Kit</span>
+        <span *ngIf="shownTrack.battery === 'L'">Line powered</span>
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="shownTrack && shownTrack.battery === 'K' && isNumber(shownTrack.volts)">
+      <h2>Volts</h2>
+
+      <ion-note item-right>
+        {{ shownTrack.volts }}
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <h2>Motion</h2>
+
+      <ion-note item-right>
+        {{ shownTrack.motion }}
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <h2>Speed</h2>
+
+      <ion-note item-right>
+        {{ shownTrack.speed }} mph
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <h2>Temperature</h2>
+
+      <ion-note item-right>
+        {{ shownTrack.temperature }} °F
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="shownTrack && shownTrack.battery === 'K' && isNumber(shownTrack.ntc1)">
+      <h2>NTC1</h2>
+
+      <ion-note item-right>
+        {{ shownTrack.ntc1 }} °F
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="shownTrack && shownTrack.battery === 'K' && isNumber(shownTrack.ntc2)">
+      <h2>NTC2</h2>
+
+      <ion-note item-right>
+        {{ shownTrack.ntc2 }} °F
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="shownTrack && shownTrack.battery === 'K' && isNumber(shownTrack.ntc3)">
+      <h2>NTC3</h2>
+
+      <ion-note item-right>
+        {{ shownTrack.ntc3 }} °F
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <h2>Firmware</h2>
+
+      <ion-note item-right>
+        {{ device.firmware }}
+      </ion-note>
+    </ion-item>
+
+  </ion-list>
+
+  <ion-list *ngIf="device">
+
+    <button *ngIf="firmwareUpdateInfo && firmwareUpdateInfo.updateAvailable" ion-item (click)="openLatestVersionPage()">
+      <h2>
+        <span class="firmware-update-circle"></span>
+        Firmware update available
+      </h2>
+
+      <ion-note item-right>
+        {{ firmwareUpdateInfo.version.tag }}
+      </ion-note>
+    </button>
+
+  </ion-list>
+
+  <ion-list class="feature-list">
+    <ion-item detail-none class="rules">
+      <div (click)="goDeviceRulesPage()">
+        <ion-icon color="primary" item-left name="list" class="icon item-icon"></ion-icon>
+        Rules
+      </div>
+      <ion-note item-right (click)="showItemHelp('rules')">
+        <ion-icon color="primary" name="ios-help-circle-outline" class="icon"></ion-icon>
+      </ion-note>
+    </ion-item>
+  </ion-list>
+
+  <ion-list class="feature-list">
+    <ion-item detail-none class="tracks">
+      <div (click)="goDeviceTracksPage()">
+        <ion-icon color="primary" item-left name="pin" class="icon item-icon"></ion-icon>
+        Tracks
+      </div>
+      <ion-note item-right (click)="showItemHelp('tracks')">
+        <ion-icon color="primary" name="ios-help-circle-outline" class="icon"></ion-icon>
+      </ion-note>
+    </ion-item>
+  </ion-list>
+
+  <ion-list class="feature-list">
+    <ion-item detail-none class="charts">
+      <div (click)="goDeviceChartsPage()">
+        <ion-icon color="primary" item-left name="stats" class="icon item-icon"></ion-icon>
+        Charts
+      </div>
+      <ion-note item-right (click)="showItemHelp('charts')">
+        <ion-icon color="primary" name="ios-help-circle-outline" class="icon"></ion-icon>
+      </ion-note>
+    </ion-item>
+  </ion-list>
+
+  <ion-list *ngIf="device" class="tracking-options feature-list">
+    <ion-item detail-none>
+      <div (click)="openDeviceTrackingOptionsModal()">
+        <ion-icon color="primary" item-left name="eye" class="icon item-icon"></ion-icon>
+        Tracking options
+      </div>
+      <ion-note item-right (click)="showItemHelp('tracking-options', device.sharedAccess)">
+        <ion-icon color="primary" name="ios-help-circle-outline" class="icon"></ion-icon>
+      </ion-note>
+    </ion-item>
+  </ion-list>
+
+  <ion-list *ngIf="device && !device.sharedAccess" class="sharing feature-list">
+    <ion-item detail-none>
+      <div (click)="openDeviceSharingPage()">
+        <ion-icon color="primary" item-left name="share" class="icon item-icon"></ion-icon>
+        Sharing
+      </div>
+      <ion-note item-right (click)="showItemHelp('sharing', device.sharedAccess)">
+        <ion-icon color="primary" name="ios-help-circle-outline" class="icon"></ion-icon>
+      </ion-note>
+    </ion-item>
+  </ion-list>
+
+  <ion-list *ngIf="settings && settings.showDeviceDebug && geoPositionData">
+
+    <ion-list-header>Mobile device location</ion-list-header>
+
+    <ion-item *ngIf="geoPositionData.coords">
+      <h2>latitude</h2>
+
+      <ion-note item-right>
+        {{ geoPositionData.coords.latitude }}
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="geoPositionData.coords">
+      <h2>longitude</h2>
+
+      <ion-note item-right>
+        {{ geoPositionData.coords.longitude }}
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="geoPositionData.coords">
+      <h2>accuracy</h2>
+
+      <ion-note item-right>
+        {{ geoPositionData.coords.accuracy }}
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="geoPositionData.coords">
+      <h2>altitude</h2>
+
+      <ion-note item-right>
+        {{ geoPositionData.coords.altitude }}
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="geoPositionData.coords">
+      <h2>heading</h2>
+
+      <ion-note item-right>
+        {{ geoPositionData.coords.heading }}
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="geoPositionData.coords">
+      <h2>speed</h2>
+
+      <ion-note item-right>
+        {{ geoPositionData.coords.speed }}
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="geoPositionData.coords">
+      <h2>altitudeAccuracy</h2>
+
+      <ion-note item-right>
+        {{ geoPositionData.coords.altitudeAccuracy }}
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="geoPositionData.timestamp">
+      <h2>GPS timestamp</h2>
+
+      <ion-note item-right>
+        {{ geoPositionData.timestamp }}
+      </ion-note>
+    </ion-item>
+
+  </ion-list>
+
+</ion-content>

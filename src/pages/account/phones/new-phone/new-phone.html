@@ -1,0 +1,41 @@
+<ion-header>
+  <ion-navbar>
+
+    <ion-buttons start>
+      <button ion-button (click)="dismiss()">
+        Cancel
+      </button>
+    </ion-buttons>
+
+    <ion-title>New Phone</ion-title>
+
+    <ion-buttons end>
+      <button ion-button (click)="save()">
+        Save
+      </button>
+    </ion-buttons>
+
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="outer-content">
+
+  <ion-list>
+
+    <ion-item>
+      <ion-label>Country code</ion-label>
+      <ion-select [(ngModel)]="callingCode" class="calling-code">
+        <ion-option *ngFor="let country of countries" [value]="country.callingCode">
+          +{{ country.callingCode }} {{ country.name }}
+        </ion-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Phone number</ion-label>
+      <ion-input [(ngModel)]="phone"></ion-input>
+    </ion-item>
+
+  </ion-list>
+
+</ion-content>

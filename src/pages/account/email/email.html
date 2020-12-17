@@ -1,0 +1,29 @@
+<ion-header>
+  <ion-navbar>
+
+    <button ion-button menuToggle icon-only>
+      <ion-icon name='menu'></ion-icon>
+    </button>
+
+    <ion-title>Change primary E-mail</ion-title>
+
+    <ion-buttons end>
+      <button ion-button (click)="changeEmail()" color="primary">
+        Change
+      </button>
+    </ion-buttons>
+
+  </ion-navbar>
+</ion-header>
+
+<ion-content *ngIf="user" class="outer-content">
+
+  <ion-list>
+    <ion-list-header>New E-mail</ion-list-header>
+    <ion-item>
+      <ion-input type="text" [(ngModel)]="changeEmailData.newEmail"></ion-input>
+    </ion-item>
+
+  </ion-list>
+
+</ion-content>

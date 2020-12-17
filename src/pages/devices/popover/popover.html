@@ -1,0 +1,44 @@
+<ion-list>
+
+  <button ion-item detail-none (click)="newDevice()">
+    <ion-icon item-start name="add"></ion-icon>
+    Add New Device
+  </button>
+
+</ion-list>
+
+<ion-list>
+
+  <ion-list-header>Sorting</ion-list-header>
+
+  <button ion-item detail-none (click)="sort('lastSeen', 'asc')" [class.active]="isActive('lastSeen', 'asc')">
+    <ion-icon item-start name="arrow-round-down"></ion-icon>
+    Last seen
+  </button>
+
+  <button ion-item detail-none (click)="sort('lastSeen', 'desc')" [class.active]="isActive('lastSeen', 'desc')">
+    <ion-icon item-start name="arrow-round-up"></ion-icon>
+    Last seen
+  </button>
+
+  <button ion-item detail-none (click)="sort('firmware', 'asc')" [class.active]="isActive('firmware', 'asc')">
+    <ion-icon item-start name="arrow-round-down"></ion-icon>
+    Firmware
+  </button>
+
+  <button ion-item detail-none (click)="sort('firmware', 'desc')" [class.active]="isActive('firmware', 'desc')">
+    <ion-icon item-start name="arrow-round-up"></ion-icon>
+    Firmware
+  </button>
+
+  <button ion-item detail-none (click)="sort('createdAt', 'asc')" [class.active]="isActive('createdAt', 'asc')">
+    <ion-icon item-start name="arrow-round-down"></ion-icon>
+    Date added
+  </button>
+
+  <button ion-item detail-none (click)="sort('createdAt', 'desc')" [class.active]="isActive('createdAt', 'desc')">
+    <ion-icon item-start name="arrow-round-up"></ion-icon>
+    Date added
+  </button>
+
+</ion-list>

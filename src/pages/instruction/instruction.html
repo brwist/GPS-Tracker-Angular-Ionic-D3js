@@ -1,0 +1,46 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle icon-only>
+      <ion-icon name='menu'></ion-icon>
+    </button>
+    <ion-title>{{ title }}</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="instruction-page outer-content" padding>
+
+  <h5>How to Put Trakkit In Config Mode</h5>
+
+  <iframe src="https://www.youtube.com/embed/PBoMm72ExJ8" frameborder="0"
+          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+  <h5>How to Upload GPS Logs using Your Phone</h5>
+
+  <ul>
+    <li>
+      1. Enable Personal Hotspot on your Phone. Click <span class="open-settings" (click)="openSettings()">Here</span>
+      to configure.
+    </li>
+    <li>
+      2. Add new Home network Profile (using Hotspot SSID and Password) on Trakkit Setup page.<br>
+      <span class="small">see How to Put Trakkit in Config Mode (above)</span>
+    </li>
+    <li>
+      3. Now you can Enable Personal Hotspot to update GPS Logs.<br>
+      <span class="small">(Very little data is used, will not impact your data plan)</span>
+    </li>
+  </ul>
+
+  <h5>Turn on Your Wi-Fi Hotspot</h5>
+
+  <ul>
+    <li>
+      Your Phone's Hotspot can be used for your Trakkit to check-in, or upload GPS Logs, and do Firmware upgrades, etc.
+    </li>
+    <li>
+      Click <span class="open-settings" (click)="openSettings()">Here</span> to Open Your Wi-Fi Settings
+    </li>
+  </ul>
+
+</ion-content>
+

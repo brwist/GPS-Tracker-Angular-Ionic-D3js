@@ -1,0 +1,32 @@
+<ion-header>
+  <ion-navbar>
+
+    <ion-title>Email notification</ion-title>
+
+    <ion-buttons end>
+      <button ion-button (click)="save()" color="primary">
+        Save
+      </button>
+    </ion-buttons>
+
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="outer-content">
+
+  <ion-list>
+    <ion-item>
+      <ion-label>Email address</ion-label>
+      <ion-input [(ngModel)]="notification.data.email" [disabled]="!notification.enabled"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>Message title</ion-label>
+      <ion-input [(ngModel)]="notification.data.title" [disabled]="!notification.enabled"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>Enabled</ion-label>
+      <ion-toggle color="secondary" [(ngModel)]="notification.enabled"></ion-toggle>
+    </ion-item>
+  </ion-list>
+
+</ion-content>

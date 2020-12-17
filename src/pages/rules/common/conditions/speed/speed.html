@@ -1,0 +1,35 @@
+<ion-header>
+  <ion-navbar>
+
+    <ion-title>Speed condition</ion-title>
+
+    <ion-buttons end>
+      <button ion-button (click)="save()" color="primary">
+        Save
+      </button>
+    </ion-buttons>
+
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="outer-content">
+
+  <ion-list>
+    <ion-item>
+      <ion-label>Operator</ion-label>
+      <ion-select [(ngModel)]="condition.operator" [disabled]="!condition.enabled">
+        <ion-option value="greaterThan">Greater then</ion-option>
+        <ion-option value="lessThan">Less then</ion-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label>Value</ion-label>
+      <ion-input [(ngModel)]="condition.value" [disabled]="!condition.enabled"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>Enabled</ion-label>
+      <ion-toggle color="secondary" [(ngModel)]="condition.enabled"></ion-toggle>
+    </ion-item>
+  </ion-list>
+
+</ion-content>

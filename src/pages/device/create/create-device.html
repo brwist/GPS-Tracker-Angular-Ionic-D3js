@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Add New Device</ion-title>
+    <ion-buttons end>
+      <button ion-button icon-only (click)="add()" color="primary">
+        Save
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+
+    <ion-item>
+      <ion-label stacked>Name</ion-label>
+      <ion-input type="text" [(ngModel)]="device.name" #nameInput></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label stacked>MAC Address</ion-label>
+      <ion-input type="text" [(ngModel)]="device.mac"></ion-input>
+    </ion-item>
+
+  </ion-list>
+</ion-content>

@@ -1,0 +1,36 @@
+{
+  "extends": "tslint:recommended",
+  "rules": {
+    "curly": [
+      "error",
+      "multi"
+    ],
+    "max-line-length": {
+      "severity": "error",
+      "options": 180
+    },
+    "max-classes-per-file": [
+      true,
+      10
+    ],
+    "no-console": false,
+    "trailing-comma": {
+      "options": {
+        "multiline": "never",
+        "singleline": "never"
+      }
+    },
+    "quotemark": {
+      "options": [
+        "single",
+        "avoid-escape"
+      ]
+    },
+    "object-literal-sort-keys": false,
+    "ordered-imports": false,
+    "no-shadowed-variable": false,
+    "space-before-function-paren": [
+      "always"
+    ]
+  }
+}

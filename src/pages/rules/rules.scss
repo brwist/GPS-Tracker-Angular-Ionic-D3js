@@ -1,0 +1,21 @@
+page-rules {
+
+  ion-item-options {
+
+    .button[icon-only] {
+      min-width: 60px;
+    }
+  }
+
+  .enabled-circle:before {
+    content: ' \25CF';
+    font-size: 14px;
+    color: color($colors, secondary);
+  }
+
+  .disabled-circle:before {
+    content: ' \25CF';
+    font-size: 14px;
+    color: color($colors, gray);
+  }
+}

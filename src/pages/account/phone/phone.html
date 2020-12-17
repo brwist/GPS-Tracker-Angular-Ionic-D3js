@@ -1,0 +1,41 @@
+<ion-header>
+  <ion-navbar>
+
+    <button ion-button menuToggle icon-only>
+      <ion-icon name='menu'></ion-icon>
+    </button>
+
+    <ion-title *ngIf="phone">Change primary phone</ion-title>
+    <ion-title *ngIf="!phone">Set primary phone</ion-title>
+
+    <ion-buttons end>
+      <button ion-button (click)="changePhone()" color="primary">
+        <span *ngIf="phone">Change</span>
+        <span *ngIf="!phone">Save</span>
+      </button>
+    </ion-buttons>
+
+  </ion-navbar>
+</ion-header>
+
+<ion-content *ngIf="user" class="outer-content">
+
+  <ion-list>
+
+    <ion-item>
+      <ion-label>Country code</ion-label>
+      <ion-select [(ngModel)]="callingCode" class="calling-code">
+        <ion-option *ngFor="let country of countries" [value]="country.callingCode">
+          +{{ country.callingCode }} {{ country.name }}
+        </ion-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Phone number</ion-label>
+      <ion-input type="text" [(ngModel)]="newPhone"></ion-input>
+    </ion-item>
+
+  </ion-list>
+
+</ion-content>

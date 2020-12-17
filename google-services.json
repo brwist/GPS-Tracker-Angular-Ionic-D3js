@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "183146379735",
+    "firebase_url": "https://trakkit-4d585.firebaseio.com",
+    "project_id": "trakkit-4d585",
+    "storage_bucket": "trakkit-4d585.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:183146379735:android:ed86ce3f3b6a4d1d",
+        "android_client_info": {
+          "package_name": "com.zedly.trakkit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "183146379735-tevnbd54cc09h9vhhd5vujfo9dh8s6as.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA7L14i_2lT3SCUUfq5TMfB3kzktuxGcN0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

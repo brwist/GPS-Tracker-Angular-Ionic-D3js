@@ -1,0 +1,39 @@
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Share</ion-title>
+
+    <ion-buttons end>
+      <button ion-button (click)="openShareWithUserPage()">
+        Add user
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+
+</ion-header>
+
+<ion-content>
+
+  <ion-list>
+
+    <ion-item-sliding *ngFor="let sharedWith of device.sharedWith" #slidingItem>
+
+      <button ion-item (click)="goEditRulePage(rule.id)">
+        <h2>
+          {{ sharedWith.user.email }}
+        </h2>
+        <p>{{ sharedWith.createdAt | amDateFormat: 'dddd, MMMM Do, h:mm:ss a' }}</p>
+      </button>
+
+      <ion-item-options side="right">
+        <button ion-button color="danger" (click)="stopSharing(sharedWith, slidingItem)">
+          <ion-icon name="close"></ion-icon>
+          Stop sharing
+        </button>
+      </ion-item-options>
+
+    </ion-item-sliding>
+
+  </ion-list>
+
+</ion-content>

@@ -1,0 +1,26 @@
+page-latest-version {
+  h1 {
+    font-size: 1.5em;
+  }
+
+  .md5-hash {
+    font-family: "Courier New", serif;
+    font-size: 0.8em;
+  }
+
+  .update-guide {
+    margin-top: 30px;
+    text-align: justify;
+
+    h2 {
+      font-size: 1.2em;
+    }
+    .update-guide-image {
+      margin-top: 20px;
+      text-align: center;
+      img {
+        width: 50%;
+      }
+    }
+  }
+}

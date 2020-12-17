@@ -1,0 +1,110 @@
+<ion-header>
+  <ion-navbar>
+
+    <ion-buttons start>
+      <button ion-button (click)="dismiss()">Cancel</button>
+    </ion-buttons>
+
+    <ion-title>Date settings</ion-title>
+
+    <ion-buttons end>
+      <button ion-button (click)="save()" color="primary">
+        Save
+      </button>
+    </ion-buttons>
+
+  </ion-navbar>
+
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="dateSettings.type" (ionChange)="segmentChanged($event)">
+      <ion-segment-button [value]="'day'">Day</ion-segment-button>
+      <ion-segment-button [value]="'week'">Week</ion-segment-button>
+      <ion-segment-button [value]="'month'">Month</ion-segment-button>
+      <ion-segment-button [value]="'custom'">Custom</ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+
+</ion-header>
+
+<ion-content class="outer-content">
+
+  <div [ngSwitch]="dateSettings.type">
+    <ion-list *ngSwitchCase="'day'">
+      <button ion-item detail-none (click)="setDateRange('today')">
+        <h2>Today</h2>
+        <p>{{ today }}</p>
+        <ion-icon *ngIf="dateSettings.value === 'today'" item-right name="checkmark"></ion-icon>
+      </button>
+      <button ion-item detail-none (click)="setDateRange('yesterday')">
+        <h2>Yesterday</h2>
+        <p>{{ yesterday }}</p>
+        <ion-icon *ngIf="dateSettings.value === 'yesterday'" item-right name="checkmark"></ion-icon>
+      </button>
+      <button ion-item detail-none (click)="setDateRange('last3Days')">
+        <h2>Last 3 days</h2>
+        <p>{{ last3Days }}</p>
+        <ion-icon *ngIf="dateSettings.value === 'last3Days'" item-right name="checkmark"></ion-icon>
+      </button>
+    </ion-list>
+    <ion-list *ngSwitchCase="'week'">
+      <button ion-item detail-none (click)="setDateRange('last7Days')">
+        <h2>Last 7 days</h2>
+        <p>{{ last7Days }}</p>
+        <ion-icon *ngIf="dateSettings.value === 'last7Days'" item-right name="checkmark"></ion-icon>
+      </button>
+      <button ion-item detail-none (click)="setDateRange('last14Days')">
+        <h2>Last 14 days</h2>
+        <p>{{ last14Days }}</p>
+        <ion-icon *ngIf="dateSettings.value === 'last14Days'" item-right name="checkmark"></ion-icon>
+      </button>
+      <button ion-item detail-none (click)="setDateRange('thisWeek')">
+        <h2>This week</h2>
+        <p>{{ thisWeek }}</p>
+        <ion-icon *ngIf="dateSettings.value === 'thisWeek'" item-right name="checkmark"></ion-icon>
+      </button>
+      <button ion-item detail-none (click)="setDateRange('lastWeek')">
+        <h2>Last week</h2>
+        <p>{{ lastWeek }}</p>
+        <ion-icon *ngIf="dateSettings.value === 'lastWeek'" item-right name="checkmark"></ion-icon>
+      </button>
+    </ion-list>
+    <ion-list *ngSwitchCase="'month'">
+      <button ion-item detail-none (click)="setDateRange('last30Days')">
+        <h2>Last 30 days</h2>
+        <p>{{ last30Days }}</p>
+        <ion-icon *ngIf="dateSettings.value === 'last30Days'" item-right name="checkmark"></ion-icon>
+      </button>
+      <button ion-item detail-none (click)="setDateRange('last60Days')">
+        <h2>Last 60 days</h2>
+        <p>{{ last60Days }}</p>
+        <ion-icon *ngIf="dateSettings.value === 'last60Days'" item-right name="checkmark"></ion-icon>
+      </button>
+      <button ion-item detail-none (click)="setDateRange('last90Days')">
+        <h2>Last 90 days</h2>
+        <p>{{ last90Days }}</p>
+        <ion-icon *ngIf="dateSettings.value === 'last90Days'" item-right name="checkmark"></ion-icon>
+      </button>
+      <button ion-item detail-none (click)="setDateRange('thisMonth')">
+        <h2>This month</h2>
+        <p>{{ thisMonth }}</p>
+        <ion-icon *ngIf="dateSettings.value === 'thisMonth'" item-right name="checkmark"></ion-icon>
+      </button>
+      <button ion-item detail-none (click)="setDateRange('lastMonth')">
+        <h2>Last month</h2>
+        <p>{{ lastMonth }}</p>
+        <ion-icon *ngIf="dateSettings.value === 'lastMonth'" item-right name="checkmark"></ion-icon>
+      </button>
+    </ion-list>
+    <ion-list *ngSwitchCase="'custom'">
+      <button ion-item detail-none (click)="selectCustomDateStart()">
+        <h2>Start date</h2>
+        <span item-right>{{ dateStart }}</span>
+      </button>
+      <button ion-item detail-none (click)="selectCustomDateEnd()">
+        <h2>End date</h2>
+        <span item-right>{{ dateEnd }}</span>
+      </button>
+    </ion-list>
+  </div>
+
+</ion-content>

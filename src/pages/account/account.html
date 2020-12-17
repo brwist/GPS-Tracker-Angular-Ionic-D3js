@@ -1,0 +1,64 @@
+<ion-header>
+  <ion-navbar>
+
+    <button ion-button menuToggle icon-only>
+      <ion-icon name='menu'></ion-icon>
+    </button>
+
+    <ion-title>Account</ion-title>
+
+  </ion-navbar>
+</ion-header>
+
+<ion-content *ngIf="user" class="outer-content">
+
+  <ion-list>
+    <ion-list-header>Personal information</ion-list-header>
+    <button ion-item (click)="goAccountEditPage()">
+      Edit
+    </button>
+  </ion-list>
+
+  <ion-list>
+    <button ion-item (click)="goEmailsPage()">
+      E-mail Addresses
+    </button>
+  </ion-list>
+
+  <ion-list>
+    <button ion-item (click)="goPhonesPage()">
+      Phone numbers
+    </button>
+  </ion-list>
+
+  <ion-list>
+    <button ion-item (click)="goChangePasswordPage()">
+      Change password
+    </button>
+  </ion-list>
+
+  <ion-list>
+    <button ion-item detail-none (click)="logOut()" class="logout">
+      Sign Out
+    </button>
+  </ion-list>
+
+</ion-content>
+
+<ion-content *ngIf="!user" class="outer-content">
+
+  <ion-list>
+    <button ion-item detail-none (click)="signIn()">
+      <ion-icon color="primary" item-left name="log-in"></ion-icon>
+      Sign In
+    </button>
+  </ion-list>
+
+  <ion-list>
+    <button ion-item detail-none (click)="signUp()">
+      <ion-icon color="primary" item-left name="log-in"></ion-icon>
+      Sign Up
+    </button>
+  </ion-list>
+
+</ion-content>

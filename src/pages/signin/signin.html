@@ -1,0 +1,69 @@
+<ion-header>
+  <ion-navbar>
+
+    <button ion-button menuToggle icon-only>
+      <ion-icon name='menu'></ion-icon>
+    </button>
+
+    <ion-title>Trakkit</ion-title>
+
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+
+  <ion-list>
+
+    <form #loginForm="ngForm" novalidate>
+      <ion-item>
+        <ion-label stacked>Username</ion-label>
+        <ion-input type="text" [(ngModel)]="authData.username" #username="ngModel" spellcheck="false"
+                   name="username" autocapitalize="off" required></ion-input>
+      </ion-item>
+      <p ion-text [hidden]="username.valid || submitted == false" color="danger" padding-left>
+        Username is required
+      </p>
+
+      <ion-item>
+        <ion-label stacked>Password</ion-label>
+        <ion-input type="password" [(ngModel)]="authData.password" #password="ngModel" required
+                   name="password"></ion-input>
+      </ion-item>
+      <p ion-text [hidden]="password.valid || submitted == false" color="danger" padding-left>
+        Password is required
+      </p>
+
+      <ion-item>
+        <ion-label>Remember password</ion-label>
+        <ion-checkbox [(ngModel)]="rememberPassword" name="rememberPassword"></ion-checkbox>
+      </ion-item>
+
+      <ion-item *ngIf="error">
+        <div class="error">{{ error }}</div>
+      </ion-item>
+
+      <div padding>
+        <button ion-button color="primary" (click)="signIn(loginForm)" type="submit" [disabled]="signInInProgress">
+          Sign In
+        </button>
+      </div>
+
+      <button ion-item (click)="recoverAccess()">
+        Forgot a password?
+      </button>
+
+    </form>
+
+  </ion-list>
+
+  <p class="sign-up-message">
+    If you have never had a Trakkit account account please sign up
+  </p>
+
+  <div padding>
+    <button ion-button color="secondary" block (click)="pushSignUpPage()">
+      Sign Up
+    </button>
+  </div>
+
+</ion-content>

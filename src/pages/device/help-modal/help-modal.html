@@ -1,0 +1,122 @@
+<ion-header>
+  <ion-navbar>
+
+    <ion-title>
+      <ng-container *ngIf="feature === 'tracking-modes'">Trakkit Modes</ng-container>
+      <ng-container *ngIf="feature === 'rules'">Rules</ng-container>
+      <ng-container *ngIf="feature === 'tracks'">Tracks</ng-container>
+      <ng-container *ngIf="feature === 'charts'">Charts</ng-container>
+      <ng-container *ngIf="feature === 'tracking-options'">Tracking Options</ng-container>
+      <ng-container *ngIf="feature === 'sharing'">Sharing</ng-container>
+    </ion-title>
+
+    <ion-buttons end>
+      <button ion-button (click)="dismiss()">Ok</button>
+    </ion-buttons>
+
+  </ion-navbar>
+
+</ion-header>
+
+<ion-content class="outer-content" padding>
+
+  <ng-container *ngIf="feature === 'tracking-modes'">
+
+    <h5>WiFi Tracking (Default)</h5>
+
+    <p>
+      While motion is detected, Trakkit checks for WiFi every 2 minutes.
+      <br>
+      If an open WiFi is found, Trakkit records and shows its WiFi position (<span class="blue">blue</span> dots).
+      <br>
+      This is the estimated position based on the location of the WiFi source. GPS is not used.
+      <br>
+      Typical battery life is 2 months.
+    </p>
+
+    <h5>GPS Tracking</h5>
+
+    <p>
+      Trakkit checks for WiFi every 2 minutes.
+      <br>
+      If an open WiFi is found, Trakkit records and shows its GPS position (<span class="red">red</span> dots).
+      <br>
+      If Trakkit cannot get a GPS position (it is cloudy, rainy, etc) then it resolves on an estimated position based on
+      the location of the WiFi source (<span class="blue">blue</span> dots).
+      <br>
+      Typical battery life less than a month.
+    </p>
+
+    <h5>GPS Logging</h5>
+
+    <p>
+      Logs Trakkit’s GPS position every minute, while moving.
+      <br>
+      When Trakkit senses no motion, it checks for WiFi and if it finds one it will try to check in
+      (you'll see a <span class="red">red</span> dot if position is GPS based or <span class="blue">blue</span>
+      dot if position is WiFi based).
+      <br>
+      When you reach a Home WiFi, previously configured, Trakkit uploads all its GPS Logging data
+      (<span class="black">black</span> dots).
+      <br>
+      Logging Data includes: Time, Location, Speed, Heading, Motion Level, and Temperature
+      <br>
+      Typical battery life is 2 months.
+    </p>
+
+  </ng-container>
+
+  <ng-container *ngIf="feature === 'rules'">
+
+    <h5>Rule Configuration</h5>
+    <p>
+      Add Rules that will trigger Alerts.
+      <br>
+      For example, you can set Motion Alerts, Geo-Fence (Inside or Outside), Speed, or Temperature Alerts
+    </p>
+
+  </ng-container>
+
+  <ng-container *ngIf="feature === 'tracks'">
+
+    <h5>Tracks Data</h5>
+    <p>
+      This shows your raw tracks data.
+      <br>
+    </p>
+
+  </ng-container>
+
+  <ng-container *ngIf="feature === 'charts'">
+
+    <h5>View Charts</h5>
+    <p>
+      View Charts of your Battery level or Temperature.
+      <br>
+    </p>
+
+  </ng-container>
+
+  <ng-container *ngIf="feature === 'tracking-options'">
+
+    <h5>Tracking Options Configuration</h5>
+    <p>
+      Set Alerts every time a new track is recorded.
+      <br>
+    </p>
+
+  </ng-container>
+
+  <ng-container *ngIf="feature === 'sharing'">
+
+    <h5>Sharing</h5>
+    <p>
+      This feature allows you to Share your Trakkit information with a friend who also has the Trakkit App installed.
+      <br>
+      Once you share your Trakkit with them, they will be able to set Rules and Trigger Alerts, but will not be able
+      to change or Edit any of your settings.
+    </p>
+
+  </ng-container>
+
+</ion-content>

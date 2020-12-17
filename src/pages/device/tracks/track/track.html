@@ -1,0 +1,131 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Track</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="outer-content">
+
+  <div class="static-map">
+    <img [src]="getTrackMapUrl()">
+  </div>
+
+  <ion-list>
+
+    <ion-list-header>{{ track.id }}</ion-list-header>
+
+    <ion-item>
+      <h2>Time</h2>
+
+      <ion-note item-right>
+
+        <ng-container *ngIf="track.source !== 10">
+          {{ track.timestamp | amDateFormat: 'M/DD/YYYY, h:mm:ss a' }}
+        </ng-container>
+        <ng-container *ngIf="track.source === 10">
+          {{ track.gpsTime | amDateFormat: 'M/DD/YYYY, h:mm:ss a' }}
+        </ng-container>
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="track.location">
+      <h2>Latitude</h2>
+
+      <ion-note item-right>
+        {{ track.location.coordinates[1] }}
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="track.location">
+      <h2>Longitude</h2>
+
+      <ion-note item-right>
+        {{ track.location.coordinates[0] }}
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="isNumber(track.direction)">
+      <h2>Direction</h2>
+
+      <ion-note item-right>
+        {{ track.direction }}°
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="isNumber(track.altitude)">
+      <h2>Altitude</h2>
+
+      <ion-note item-right>
+        {{ track.altitude }}
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="track.battery">
+      <h2>Battery</h2>
+
+      <ion-note item-right>
+        <span *ngIf="isNumeric(track.battery)">{{ track.battery }} %</span>
+        <span *ngIf="track.battery === 'K'">Cable Kit</span>
+        <span *ngIf="track.battery === 'L'">Line powered</span>
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="track && track.battery === 'K' && isNumber(track.volts)">
+      <h2>Volts</h2>
+
+      <ion-note item-right>
+        {{ track.volts }}
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <h2>Motion</h2>
+
+      <ion-note item-right>
+        {{ track.motion }}
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <h2>Speed</h2>
+
+      <ion-note item-right>
+        {{ track.speed }} mph
+      </ion-note>
+    </ion-item>
+
+    <ion-item>
+      <h2>Temperature</h2>
+
+      <ion-note item-right>
+        {{ track.temperature }} °F
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="track && track.battery === 'K' && isNumber(track.ntc1)">
+      <h2>NTC1</h2>
+
+      <ion-note item-right>
+        {{ track.ntc1 }} °F
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="track && track.battery === 'K' && isNumber(track.ntc2)">
+      <h2>NTC2</h2>
+
+      <ion-note item-right>
+        {{ track.ntc2 }} °F
+      </ion-note>
+    </ion-item>
+
+    <ion-item *ngIf="track && track.battery === 'K' && isNumber(track.ntc3)">
+      <h2>NTC3</h2>
+
+      <ion-note item-right>
+        {{ track.ntc3 }} °F
+      </ion-note>
+    </ion-item>
+
+  </ion-list>
+
+</ion-content>

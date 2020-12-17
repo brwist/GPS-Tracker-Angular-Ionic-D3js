@@ -1,0 +1,99 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>{{device.name}}'s tracks</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-refresher (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div *ngIf="tracks.length === 0" class="centered-text-block">
+    No tracks found
+  </div>
+
+  <ion-list>
+
+    <button ion-item *ngFor="let track of tracks" [ngClass]="{'highlighted': isHighlighted(track)}"
+            (click)="openTrackPage(track)">
+      <h2 class="track-title">
+
+        <span *ngIf="track.location">
+          {{ track.location.coordinates[1] }}, {{ track.location.coordinates[0] }}
+        </span>
+
+        <span *ngIf="!track.location">
+          Location unknown
+        </span>
+
+        <small *ngIf="track.altitude">
+          altitude: {{ track.altitude }}
+        </small>
+
+      </h2>
+
+      <p class="track-time">
+        <ng-container *ngIf="track.source !== 10">
+          {{ track.timestamp | amDateFormat: 'M/DD/YYYY, h:mm:ss a' }}
+        </ng-container>
+        <ng-container *ngIf="track.source === 10">
+          {{ track.gpsTime | amDateFormat: 'M/DD/YYYY, h:mm:ss a' }}
+        </ng-container>
+      </p>
+
+      <p>
+        <ion-icon name="speedometer"></ion-icon>
+        {{ track.speed }} mph (motion: {{ track.motion }})
+
+        &nbsp;&nbsp;
+
+        <ion-icon name="thermometer"></ion-icon>
+        {{ track.temperature }} °F
+
+        &nbsp;&nbsp;
+
+        <ion-icon name="battery-charging"></ion-icon>
+        <span *ngIf="track.battery === 'L'">L</span>
+        <span *ngIf="track.battery === 'K'">K</span>
+        <span *ngIf="track.battery && track.battery !== 'L' && track.battery !== 'K'">{{ track.battery }} %</span>
+
+        &nbsp;&nbsp;
+
+        <ng-container *ngIf="isNumber(track.direction)">
+          {{ track.direction }}°
+        </ng-container>
+
+        <!--<ng-container *ngIf="true">-->
+        <!--Source: {{ track.source }}-->
+        <!--</ng-container>-->
+      </p>
+
+      <p *ngIf="track.battery === 'K'">
+        <span *ngIf="isNumber(track.volts)">Volts: {{ track.volts }} &nbsp;&nbsp;</span>
+
+        <span *ngIf="isNumber(track.ntc1)">
+          <ion-icon name="thermometer"></ion-icon><span class="ntc-number">1</span> {{ track.ntc1 }}°F
+          &nbsp;&nbsp;
+        </span>
+
+        <span *ngIf="isNumber(track.ntc2)">
+          <ion-icon name="thermometer"></ion-icon><span class="ntc-number">2</span> {{ track.ntc2 }}°F
+          &nbsp;&nbsp;
+        </span>
+
+        <span *ngIf="isNumber(track.ntc3)">
+          <ion-icon name="thermometer"></ion-icon><span class="ntc-number">3</span> {{ track.ntc3 }}°F
+        </span>
+      </p>
+
+    </button>
+
+  </ion-list>
+
+  <ion-infinite-scroll (ionInfinite)="doInfinite($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+</ion-content>

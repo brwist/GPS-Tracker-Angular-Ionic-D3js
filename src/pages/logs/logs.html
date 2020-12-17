@@ -1,0 +1,14 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle icon-only>
+      <ion-icon name='menu'></ion-icon>
+    </button>
+    <ion-title>{{ title }}</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="logs-app-page">
+
+  <pre><span *ngFor="let log of logs">{{ log.timeStamp }}: [{{ levelString(log.level) }}] {{ log.message }}</span></pre>
+
+</ion-content>

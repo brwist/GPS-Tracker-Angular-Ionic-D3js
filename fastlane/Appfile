@@ -1,0 +1,9 @@
+app_identifier("com.zedly.trakkit") # The bundle identifier of your app
+apple_id("bushevuv@gmail.com") # Your Apple email address
+
+team_id("4FNY35WWJ7") # Developer Portal Team ID
+
+itc_team_id("118622400")
+
+# For more information about the Appfile, see:
+#     https://docs.fastlane.tools/advanced/#appfile

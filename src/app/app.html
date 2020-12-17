@@ -1,0 +1,87 @@
+<ion-menu [content]="content" [class]="selectedTheme">
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>TRAKKIT</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content class="outer-content">
+
+    <ion-list *ngIf="isAuthenticated">
+      <ion-list-header>Devices</ion-list-header>
+      <button ion-item menuClose (click)="openDevicesPage()">
+        <ion-icon color="primary" name="locate" item-left></ion-icon>
+        Devices
+      </button>
+      <button ion-item menuClose (click)="openRulesPage()">
+        <ion-icon color="primary" name="list" item-left></ion-icon>
+        Rules
+      </button>
+      <button ion-item menuClose (click)="openAlertsAndNotificationsPage()">
+        <ion-icon color="primary" name="alert" item-left></ion-icon>
+        Alerts
+      </button>
+    </ion-list>
+
+    <ion-list *ngIf="isAuthenticated">
+      <ion-list-header>Account</ion-list-header>
+      <button ion-item menuClose (click)="openAccountPage()">
+        <ion-icon color="primary" name="person" item-left></ion-icon>
+        Account
+      </button>
+    </ion-list>
+
+    <ion-list *ngIf="isAuthenticated">
+      <ion-list-header>Settings</ion-list-header>
+      <button ion-item menuClose (click)="openSettingsPage()">
+        <ion-icon color="primary" name="settings" item-left></ion-icon>
+        Settings
+      </button>
+    </ion-list>
+
+    <ion-list>
+      <button ion-item menuClose (click)="openTrakkitConfigPage()">
+        <ion-icon color="primary" name="hammer" item-left></ion-icon>
+        Configure Trakkit
+      </button>
+    </ion-list>
+
+    <ion-list>
+      <button ion-item menuClose (click)="openInstructionPage()">
+        <ion-icon color="primary" name="wifi" item-left></ion-icon>
+        Help
+      </button>
+    </ion-list>
+
+    <ion-list>
+      <button ion-item menuClose (click)="openSupportPage()">
+        <ion-icon color="primary" name="help-buoy" item-left></ion-icon>
+        Support
+      </button>
+    </ion-list>
+
+    <ion-list>
+      <button ion-item menuClose (click)="openAboutPage()">
+        <ion-icon color="primary" name="information" item-left></ion-icon>
+        About
+      </button>
+    </ion-list>
+
+    <ion-list>
+      <button ion-item menuClose (click)="openLogsPage()">
+        <ion-icon color="primary" name="list" item-left></ion-icon>
+        Logs
+      </button>
+    </ion-list>
+
+  </ion-content>
+
+</ion-menu>
+
+<div *ngIf="!isOnline" class="offline">
+  <ion-icon name="md-alert"></ion-icon>
+  &nbsp;
+  No Internet Connection
+</div>
+
+<ion-nav [root]="rootPage" #content swipeBackEnabled="false" [class]="selectedTheme"></ion-nav>

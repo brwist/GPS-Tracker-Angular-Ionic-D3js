@@ -1,0 +1,42 @@
+<ion-header>
+  <ion-navbar>
+
+    <ion-buttons start>
+      <button ion-button (click)="dismiss()">
+        Cancel
+      </button>
+    </ion-buttons>
+
+    <ion-title>Rington</ion-title>
+
+    <ion-buttons end>
+      <button ion-button (click)="save()">
+        Save
+      </button>
+    </ion-buttons>
+
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-list>
+
+    <button ion-item detail-none (click)="selectRingtone()">
+      <h2>None</h2>
+      <span *ngIf="!ringtone" item-right>
+        <ion-icon name="checkmark"></ion-icon>
+      </span>
+    </button>
+
+    <button ion-item detail-none *ngFor="let rin of ringtones" (click)="selectRingtone(rin)">
+      <h2>{{ rin.Name }}</h2>
+      <span *ngIf="ringtone && rin.Name === ringtone.Name" item-right>
+        <ion-icon name="checkmark"></ion-icon>
+      </span>
+    </button>
+
+  </ion-list>
+
+
+</ion-content>

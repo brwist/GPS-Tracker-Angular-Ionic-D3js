@@ -1,0 +1,53 @@
+<ion-header>
+  <ion-navbar>
+
+    <ion-buttons start>
+      <button ion-button (click)="dismiss()">
+        Cancel
+      </button>
+    </ion-buttons>
+
+    <ion-title>Time Zone</ion-title>
+
+    <ion-buttons end>
+      <button ion-button (click)="save()">
+        Save
+      </button>
+    </ion-buttons>
+
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="outer-content">
+
+  <ion-searchbar (ionInput)="refineTimeZones($event)"></ion-searchbar>
+
+  <ion-list>
+
+    <ion-list-header>Suggested</ion-list-header>
+
+    <button ion-item detail-none (click)="selectTimeZone(deviceTimeZone)">
+      <h2>
+        {{ deviceTimeZone.name }}
+      </h2>
+      <span *ngIf="timeZone && deviceTimeZone.name === timeZone" item-right>
+        <ion-icon name="checkmark"></ion-icon>
+      </span>
+    </button>
+
+  </ion-list>
+
+  <ion-list>
+
+    <button ion-item detail-none *ngFor="let tz of timezones" (click)="selectTimeZone(tz)">
+      <h2>
+        (GMT{{ tz.offset }}) {{ tz.name }}
+      </h2>
+      <span *ngIf="timeZone && tz.name === timeZone" item-right>
+        <ion-icon name="checkmark"></ion-icon>
+      </span>
+    </button>
+
+  </ion-list>
+
+</ion-content>

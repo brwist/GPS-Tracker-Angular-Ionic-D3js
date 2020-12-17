@@ -1,0 +1,145 @@
+// http://ionicframework.com/docs/v2/theming/
+
+// App Global Sass
+// --------------------------------------------------
+// Put style rules here that you want to apply globally. These
+// styles are for the entire app and not just one component.
+// Additionally, this file can be also used as an entry point
+// to import other Sass files to be included in the output CSS.
+//
+// Shared Sass variables, which can be used to adjust Ionic's
+// default Sass variables, belong in "theme/variables.scss".
+//
+// To declare rules for a specific mode, create a child rule
+// for the .md, .ios, or .wp mode classes. The mode class is
+// automatically applied to the <body> element in the app.
+
+.centered-text-block {
+  padding-top: 30px;
+  text-align: center;
+  color: color($colors, gray);
+  font-size: 12px;
+}
+
+.action-sheet-button.cancel-button {
+  font-weight: 600;
+}
+
+.day-theme {
+  // Nothing special
+}
+
+.night-theme {
+
+  /** iOS */
+  .toolbar-background-ios {
+    background: #242424;
+  }
+  .toolbar-title-ios {
+    color: #fff;
+  }
+  .bar-button-default-ios {
+    color: #fff;
+  }
+  .content-ios {
+    color: #fff;
+    background-color: #191919;
+  }
+  .list-ios {
+    background-color: #242424;
+  }
+  .list-header-ios {
+    color: #fff;
+    border-color: #000;
+  }
+  .list-ios > .item-block:first-child {
+    border-color: #000;
+  }
+  .item-ios {
+    color: #fff;
+    background-color: #242424;
+  }
+  .list-ios .item-block .item-inner {
+    border-color: #000;
+  }
+  .list-ios > .item-block:last-child {
+    border-color: #000;
+  }
+  .toggle-ios .toggle-inner {
+    background-color: #242424;
+  }
+
+  /** Android */
+  .toolbar-background-md {
+    background: #242424;
+  }
+  .toolbar-title-md {
+    color: #fff;
+  }
+  .bar-button-default-md {
+    color: #fff;
+  }
+  .content-md {
+    color: #fff;
+    background-color: #191919;
+  }
+  .list-md {
+    background-color: #242424;
+  }
+  .list-header-md {
+    color: #fff;
+    border-color: #000;
+  }
+  .list-md > .item-block:first-child {
+    border-color: #000;
+  }
+  .item-md {
+    color: #fff;
+    background-color: #242424;
+  }
+  .list-md .item-block .item-inner {
+    border-color: #000;
+  }
+  .list-md > .item-block:last-child {
+    border-color: #000;
+  }
+  .toggle-md .toggle-inner {
+    background-color: #242424;
+  }
+}
+
+.offline {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 99999;
+  display: flex;
+  padding: 10px;
+  border-radius: 5px;
+  background: #dedede;
+  color: #424242;
+  font-weight: bold;
+}
+
+/** global styte to first alert @TODO move it ot first alert banner component**/
+.first-alert {
+    display: flex;
+    align-items: center;
+    -webkit-justify-content: space-around; /* Safari */
+    justify-content: space-around;
+    background-color: #fbb44c;
+    border-top: 1px solid #df8f50;
+    border-bottom: 1px solid #df8f50;
+
+    .dismiss {
+        color: #995a32;
+    }
+
+    .description {
+        width: 200px;
+    }
+
+    &:not(:last-child) {
+        margin-bottom: 2px;
+    }
+}

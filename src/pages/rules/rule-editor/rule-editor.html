@@ -1,0 +1,152 @@
+<ion-header>
+  <ion-navbar>
+
+    <ion-title>Rule editor</ion-title>
+
+    <ion-buttons end>
+      <button ion-button (click)="save()" color="primary">
+        Save
+      </button>
+    </ion-buttons>
+
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="outer-content">
+
+  <div *ngIf="rule">
+
+    <ion-list>
+      <ion-list-header>General</ion-list-header>
+
+      <ion-item>
+        <ion-label>Name</ion-label>
+        <ion-input type="text" [(ngModel)]="rule.name"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Enabled</ion-label>
+        <ion-toggle color="secondary" [(ngModel)]="rule.enabled"></ion-toggle>
+      </ion-item>
+
+    </ion-list>
+
+    <ion-list>
+
+      <ion-item-group padding-top>
+        <ion-item-divider color="light">
+
+          Conditions
+
+          <button ion-button item-right outline (click)="matchConditionsAlertPresent()"
+                  class="disable-hover item-button button button-outline">
+            <span class="button-inner">{{ match.toUpperCase() }}</span>
+            <div class="button-effect"></div>
+          </button>
+
+          <button ion-button item-right outline (click)="addCondition()"
+                  class="disable-hover item-button button button-outline">
+            <span class="button-inner">Add condition</span>
+            <div class="button-effect"></div>
+          </button>
+
+        </ion-item-divider>
+
+        <div padding *ngIf="conditions.length === 0">No conditions</div>
+
+        <ion-item-sliding *ngFor="let condition of conditions" #slidingItem>
+
+          <button ion-item (click)="goEditConditionPage(condition)">
+            <h2>{{ condition.getExplanation() }}</h2>
+            <p ion-text color="secondary" *ngIf="condition.enabled">Enabled</p>
+            <p ion-text color="danger" *ngIf="!condition.enabled">Disabled</p>
+          </button>
+
+          <ion-item-options>
+            <button ion-button color="primary" (click)="enableCondition(condition, slidingItem)"
+                    *ngIf="!condition.enabled">
+              <ion-icon name="switch"></ion-icon>
+              Enable
+            </button>
+            <button ion-button color="warning" (click)="disableCondition(condition, slidingItem)"
+                    *ngIf="condition.enabled">
+              <ion-icon name="switch"></ion-icon>
+              Disable
+            </button>
+            <button ion-button color="danger" (click)="removeCondition(condition)">
+              <ion-icon name="close"></ion-icon>
+              Delete
+            </button>
+          </ion-item-options>
+
+        </ion-item-sliding>
+
+      </ion-item-group>
+
+      <ion-item-group padding-top>
+
+        <ion-item-divider color="light">
+
+          Actions
+
+          <button ion-button item-right outline (click)="addAction()"
+                  class="disable-hover item-button button button-outline">
+            <span class="button-inner">Add action</span>
+            <div class="button-effect"></div>
+          </button>
+
+        </ion-item-divider>
+
+        <div padding *ngIf="actions.length === 0">No actions</div>
+
+        <ion-item-sliding *ngFor="let action of actions" #slidingItem>
+
+          <button ion-item (click)="goEditActionPage(action)">
+            <h2>{{ action.getExplanation() }}</h2>
+            <p ion-text color="secondary" *ngIf="action.enabled">Enabled</p>
+            <p ion-text color="danger" *ngIf="!action.enabled">Disabled</p>
+            <span *ngIf="action.collectDuration !== 0" item-right class="collect-duration">
+              Collect duration: {{ collectDurationToString(action.collectDuration) }}
+            </span>
+          </button>
+
+          <ion-item-options>
+            <button ion-button color="primary" (click)="enableAction(action, slidingItem)" *ngIf="!action.enabled">
+              <ion-icon name="switch"></ion-icon>
+              Enable
+            </button>
+            <button ion-button color="warning" (click)="disableAction(action, slidingItem)" *ngIf="action.enabled">
+              <ion-icon name="switch"></ion-icon>
+              Disable
+            </button>
+            <button ion-button color="danger" (click)="removeAction(action)">
+              <ion-icon name="close"></ion-icon>
+              Delete
+            </button>
+          </ion-item-options>
+
+        </ion-item-sliding>
+
+      </ion-item-group>
+
+    </ion-list>
+
+    <ion-list>
+      <ion-list-header>Associated devices</ion-list-header>
+
+      <ion-searchbar
+        [placeholder]="'Search devices'"
+        (ionInput)="searchDevices($event)"></ion-searchbar>
+
+      <ion-item *ngFor="let device of devices">
+        <ion-label>{{ device.name }}</ion-label>
+        <ion-toggle color="secondary" [checked]="isDeviceSelected(device)"
+                    (ionChange)="toggleDeviceSelection($event, device)"></ion-toggle>
+      </ion-item>
+    </ion-list>
+
+    <!--<div>{{ rule.devices | json }}</div>-->
+
+  </div>
+
+</ion-content>

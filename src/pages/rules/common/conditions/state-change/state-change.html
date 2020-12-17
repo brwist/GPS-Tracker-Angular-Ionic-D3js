@@ -1,0 +1,47 @@
+<ion-header>
+  <ion-navbar>
+
+    <ion-title>State change condition</ion-title>
+
+    <ion-buttons end>
+      <button ion-button (click)="save()" color="primary">
+        Save
+      </button>
+    </ion-buttons>
+
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="outer-content">
+
+  <ion-list>
+    <ion-item>
+      <ion-label>Operator</ion-label>
+      <ion-select [(ngModel)]="condition.operator" [disabled]="!condition.enabled">
+        <ion-option value="changeState">State Changed</ion-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>From state</ion-label>
+      <ion-select [(ngModel)]="condition.value.fromState" [disabled]="!condition.enabled">
+        <ion-option value="">Any</ion-option>
+        <ion-option *ngFor="let state of states" value="{{ state.abbr }}">{{ state.name }}</ion-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>To state</ion-label>
+      <ion-select [(ngModel)]="condition.value.toState" [disabled]="!condition.enabled">
+        <ion-option value="">Any</ion-option>
+        <ion-option *ngFor="let state of states" value="{{ state.abbr }}">{{ state.name }}</ion-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Enabled</ion-label>
+      <ion-toggle color="secondary" [(ngModel)]="condition.enabled"></ion-toggle>
+    </ion-item>
+  </ion-list>
+
+</ion-content>

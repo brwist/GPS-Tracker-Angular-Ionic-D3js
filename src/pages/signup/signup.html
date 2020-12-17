@@ -1,0 +1,88 @@
+<ion-header>
+  <ion-navbar>
+
+    <button ion-button menuToggle icon-only>
+      <ion-icon name='menu'></ion-icon>
+    </button>
+
+    <ion-title>Sign Up</ion-title>
+
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="outer-content">
+
+  <ion-list>
+
+    <ion-list-header>First name</ion-list-header>
+
+    <ion-item>
+      <ion-input [(ngModel)]="signUpData.firstName" type="text" placeholder="First Name"></ion-input>
+    </ion-item>
+
+  </ion-list>
+
+  <ion-list>
+
+    <ion-list-header>Last name</ion-list-header>
+
+    <ion-item>
+      <ion-input [(ngModel)]="signUpData.lastName" type="text" placeholder="Last Name"></ion-input>
+    </ion-item>
+
+  </ion-list>
+
+  <ion-list>
+
+    <ion-list-header>Contact information</ion-list-header>
+
+    <ion-item>
+      <ion-label>E-mail</ion-label>
+      <ion-input [(ngModel)]="signUpData.email" type="email"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Country code</ion-label>
+      <ion-select [(ngModel)]="callingCode" class="calling-code">
+        <ion-option *ngFor="let country of countries" [value]="country.callingCode">
+          +{{ country.callingCode }} {{ country.name }}
+        </ion-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Phone number</ion-label>
+      <ion-input type="text" [(ngModel)]="phone"></ion-input>
+    </ion-item>
+
+  </ion-list>
+
+  <ion-list>
+
+    <ion-list-header>
+      Password
+      <span class="help">(minimum 6 characters)</span>
+    </ion-list-header>
+
+    <ion-item>
+      <ion-input [(ngModel)]="signUpData.password" type="password" placeholder="Type password"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-input [(ngModel)]="signUpData.passwordConfirmation" type="password"
+                 placeholder="Repeat password"></ion-input>
+    </ion-item>
+
+  </ion-list>
+
+  <div *ngIf="error" padding>
+    <div class="error">{{ error }}</div>
+  </div>
+
+  <div padding>
+    <button ion-button color="primary" (click)="signUp()" [disabled]="signUpInProgress">
+      Sign Up
+    </button>
+  </div>
+
+</ion-content>

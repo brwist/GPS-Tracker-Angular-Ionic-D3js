@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle icon-only>
+      <ion-icon name='menu'></ion-icon>
+    </button>
+    <ion-title>{{ title }}</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="about-app-page">
+
+  <p class="about-app-text-block">
+    <strong>{{ appName }}</strong> - GPS Tracking application
+  </p>
+
+  <ion-list>
+
+    <ion-item>
+      <h2>Version</h2>
+
+      <ion-note item-right>
+        {{ versionCode }} ({{ versionNumber }})
+      </ion-note>
+    </ion-item>
+
+  </ion-list>
+
+</ion-content>

@@ -1,0 +1,57 @@
+<ion-header>
+  <ion-navbar>
+
+    <button ion-button menuToggle icon-only>
+      <ion-icon name='menu'></ion-icon>
+    </button>
+
+    <ion-title>E-mail addresses</ion-title>
+
+    <ion-buttons end>
+      <button ion-button (click)="add()" color="primary">
+        New E-mail
+      </button>
+    </ion-buttons>
+
+  </ion-navbar>
+</ion-header>
+
+<ion-content *ngIf="user" class="outer-content">
+
+  <ion-list>
+
+    <ion-list-header>Primary E-mail</ion-list-header>
+
+    <button ion-item (click)="goChangeEmailPage()">
+      {{ user.email }}
+      <span *ngIf="!user.emailVerified" item-end>Verification pending</span>
+      <span *ngIf="user.emailVerified" item-end>Active</span>
+    </button>
+
+  </ion-list>
+
+  <ion-list>
+
+    <ion-list-header>Extra addresses</ion-list-header>
+
+    <ion-item-sliding *ngFor="let email of user.emails" #itemSliding>
+
+      <ion-item>
+        {{ email.value }}
+
+        <span *ngIf="email.status === 'new'" item-end>Verification pending</span>
+        <span *ngIf="email.status === 'active'" item-end>Active</span>
+      </ion-item>
+
+      <ion-item-options side="right">
+        <button ion-button color="danger" (click)="remove(email, itemSliding)">
+          <ion-icon name="trash"></ion-icon>
+          Remove
+        </button>
+      </ion-item-options>
+
+    </ion-item-sliding>
+
+  </ion-list>
+
+</ion-content>

@@ -1,0 +1,8 @@
+rules-popover-page {
+
+  ion-list:last-of-type {
+    &.list-ios, &.list-md {
+      margin-bottom: 0;
+    }
+  }
+}

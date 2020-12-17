@@ -1,0 +1,14 @@
+{
+    "aps": {
+        "alert": "Testing.. (9)",
+        "badge": 1,
+        "sound": "default",
+        "notificationType": "rule",
+        "category": "notification",
+        "payLoad": {
+            "notificationType": "notification",
+            "deviceId": "5996ed4c522e5f000182dd08",
+            "content-available": 1
+        }
+    }
+}

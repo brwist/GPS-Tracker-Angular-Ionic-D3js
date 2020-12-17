@@ -1,0 +1,45 @@
+<ion-header>
+  <ion-navbar>
+
+    <button ion-button menuToggle icon-only>
+      <ion-icon name='menu'></ion-icon>
+    </button>
+
+    <ion-title>Personal info</ion-title>
+
+    <ion-buttons end>
+      <button ion-button (click)="save()" color="primary">
+        Save
+      </button>
+    </ion-buttons>
+
+  </ion-navbar>
+</ion-header>
+
+<ion-content *ngIf="user" class="outer-content">
+
+  <ion-list>
+
+    <ion-list-header>User name</ion-list-header>
+
+    <ion-item>
+      <ion-label>First name</ion-label>
+      <ion-input [type]="'text'" [(ngModel)]="user.firstName"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Last name</ion-label>
+      <ion-input [type]="'text'" [(ngModel)]="user.lastName"></ion-input>
+    </ion-item>
+  </ion-list>
+
+  <ion-list>
+
+    <button ion-item detail-none (click)="openTimeZonePicker()">
+      Time Zone
+      <span item-right>{{ user.timeZone }}</span>
+    </button>
+
+  </ion-list>
+
+</ion-content>

@@ -1,0 +1,48 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle icon-only>
+      <ion-icon name='menu'></ion-icon>
+    </button>
+    <ion-title>{{ title }}</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="trakkit-config-page outer-content" padding>
+
+  <ng-container *ngIf="isConnecting">
+
+    <div class="connecting">
+      Connecting...
+    </div>
+
+  </ng-container>
+
+  <ng-container *ngIf="!isConnecting">
+
+    <div *ngIf="error" class="error">
+      Not Connected to Trakkit...<br><br>
+      Ensure that your Phone is connected to your Trakkit's Wi-Fi (SSID: Trakkit-XXXX).
+      <br><br><br>
+      Click <span class="open-settings" (click)="openSettings()">Here</span> to Open Wi-Fi Settings.
+      <br><br><br><br>
+
+      <button ion-button color="default" (click)="tryOpenConfigPage()" type="button">
+        <ion-icon name='refresh'></ion-icon>
+        &nbsp;
+        Retry
+      </button>
+
+    </div>
+
+    <div *ngIf="!error">
+
+      <button ion-button color="primary" (click)="tryOpenConfigPage()" type="button">
+        Open settings
+      </button>
+
+    </div>
+
+  </ng-container>
+
+</ion-content>
+

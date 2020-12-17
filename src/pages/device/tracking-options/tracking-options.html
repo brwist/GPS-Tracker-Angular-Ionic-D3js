@@ -1,0 +1,90 @@
+<ion-header>
+  <ion-navbar>
+
+    <ion-buttons *ngIf="!pushed" start>
+      <button ion-button (click)="dismiss()">Cancel</button>
+    </ion-buttons>
+
+    <ion-title>Device Tracking options</ion-title>
+
+    <ion-buttons end>
+      <button ion-button (click)="save()" color="primary">
+        Save
+      </button>
+    </ion-buttons>
+
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="outer-content">
+  <ion-list *ngIf="device">
+
+    <ion-item-group>
+
+      <ion-item>
+        <ion-label stacked>Tracking interval</ion-label>
+
+        <ion-select [(ngModel)]="trackingOptions.intervalInMs">
+          <ion-option value="5000">5 seconds</ion-option>
+          <ion-option value="15000">15 seconds</ion-option>
+          <ion-option value="30000">30 seconds</ion-option>
+          <ion-option value="60000">1 minute</ion-option>
+          <ion-option value="120000">2 minutes</ion-option>
+          <ion-option value="300000">5 minutes</ion-option>
+          <ion-option value="600000">10 minutes</ion-option>
+          <ion-option value="900000">15 minutes</ion-option>
+          <ion-option value="1800000">30 minutes</ion-option>
+          <ion-option value="3600000">1 hour</ion-option>
+        </ion-select>
+      </ion-item>
+
+    </ion-item-group>
+
+    <ion-item-group padding-top>
+
+      <ion-item-divider color="light">
+
+        Notifications
+
+        <button ion-button item-right outline (click)="addNotification()"
+                class="disable-hover item-button button button-outline">
+          <span class="button-inner">Add notification</span>
+          <div class="button-effect"></div>
+        </button>
+
+      </ion-item-divider>
+
+      <div padding *ngIf="notifications.length === 0">No notifications</div>
+
+      <ion-item-sliding *ngFor="let notification of notifications" #slidingItem>
+
+        <button ion-item (click)="goEditNotificationPage(notification)">
+          <h2>{{ notification.getExplanation() }}</h2>
+          <p ion-text color="secondary" *ngIf="notification.enabled">Enabled</p>
+          <p ion-text color="danger" *ngIf="!notification.enabled">Disabled</p>
+        </button>
+
+        <ion-item-options>
+          <button ion-button color="primary" (click)="enableNotification(notification, slidingItem)"
+                  *ngIf="!notification.enabled">
+            <ion-icon name="switch"></ion-icon>
+            Enable
+          </button>
+          <button ion-button color="warning" (click)="disableNotification(notification, slidingItem)"
+                  *ngIf="notification.enabled">
+            <ion-icon name="switch"></ion-icon>
+            Disable
+          </button>
+          <button ion-button color="danger" (click)="removeNotification(notification)">
+            <ion-icon name="close"></ion-icon>
+            Delete
+          </button>
+        </ion-item-options>
+
+      </ion-item-sliding>
+
+    </ion-item-group>
+
+  </ion-list>
+
+</ion-content>
