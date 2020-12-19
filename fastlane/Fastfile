@@ -49,6 +49,10 @@ platform :ios do
       type: 'appstore',
       build_number: Time.new.strftime("%Y.%m.%d.%H.%M")
     )
-    upload_to_testflight(skip_submission: true, ipa: ENV["CORDOVA_IOS_RELEASE_BUILD_PATH"])
+    upload_to_testflight(
+      skip_submission: true,
+      ipa: ENV["CORDOVA_IOS_RELEASE_BUILD_PATH"],
+      beta_app_description: ENV["GITHUB_REF"]
+    )
   end
 end

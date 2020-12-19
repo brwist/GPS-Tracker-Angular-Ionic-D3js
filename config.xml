@@ -147,7 +147,6 @@
     <plugin name="cordova-plugin-uniquedeviceid" spec="https://github.com/massaroni/uniquedeviceid" />
     <plugin name="cordova-plugin-add-swift-support" spec="2.0.2" />
     <plugin name="cordova-open-native-settings" spec="1.5.2" />
-    <plugin name="cordova-plugin-inappbrowser" spec="3.0.0" />
     <engine name="android" spec="7.1.4" />
     <plugin name="cordova-plugin-networkinterface" spec="2.0.0" />
     <plugin name="cordova-plugin-network-information" spec="2.0.2" />

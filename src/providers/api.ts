@@ -711,8 +711,14 @@ export class ApiProvider {
     public recoverAccess(recoverAccessData: IRecoverAccessData) {
 
         return this.http
-            .post(ApiProvider.obtainRequestUrl('users/recover-password'),
-                JSON.stringify(recoverAccessData), ApiProvider.obtainRequestOptions())
+            .post(
+                ApiProvider.obtainRequestUrl('users/recover-password'),
+                JSON.stringify(recoverAccessData), 
+                {
+                    ...ApiProvider.obtainRequestOptions(),
+                    responseType: 'text'
+                },
+            )
             .toPromise()
             .catch((err) => {
                 this.handleApiError(err);
