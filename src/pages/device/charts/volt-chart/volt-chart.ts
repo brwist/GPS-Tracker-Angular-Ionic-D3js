@@ -122,7 +122,7 @@ export class VoltChartComponent implements OnInit {
           .attr('width', '100%')
           .attr('height', '100%')
           .attr('viewBox', [-15, 0, width + 30, height + 30]);
-        
+        this.svg.select("*").remove();
         const g = this.svg
           .append("g")
           .attr(
