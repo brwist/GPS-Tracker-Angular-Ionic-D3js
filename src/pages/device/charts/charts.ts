@@ -354,8 +354,8 @@ export class DeviceChartsPage implements OnInit {
 
             this.chartData.batteryOrVolts = points.map(item => {
                 return {
-                    sortTime: new Date(item.timestamp).getDate(),
-                    batteryOrVolts: item.temperature
+                    sortTime: new Date(item.timestamp).getTime(),
+                    batteryOrVolts: item.batteryOrVolts
                 }
             })
             .sort((a, b) =>
@@ -364,7 +364,7 @@ export class DeviceChartsPage implements OnInit {
 
             this.chartData.temperature = points.map(item => {
                 return {
-                    sortTime: new Date(item.timestamp).getDate(),
+                    sortTime: new Date(item.timestamp).getTime(),
                     temperature: item.temperature
                 }
             })

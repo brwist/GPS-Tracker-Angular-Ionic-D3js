@@ -104,7 +104,7 @@ export class TemperatureChartComponent implements OnInit {
         this.y = d3.scaleLinear().rangeRound([this.height, 0]);
         this.yAxis = d3
           .axisRight(this.y)
-          .ticks(5)
+          .ticks(10)
           .tickSize(this.width)
           .tickPadding(-20 - this.width);
         this.x.domain(d3.extent(this.data, (d) => d.sortTime));
@@ -122,7 +122,7 @@ export class TemperatureChartComponent implements OnInit {
           .append('svg')
           .attr('width', '100%')
           .attr('height', '100%')
-          .attr('viewBox', [0, 0, width + 30, height + 20]);
+          .attr('viewBox', [-15, 0, width + 30, height + 30]);
         
         const g = this.svg
           .append("g")
