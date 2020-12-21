@@ -322,31 +322,15 @@ export class DeviceChartsPage implements OnInit {
 
         this.groupedBy = null;
 
-        if (this.data.items.length > this.maxNumberOfPointsNumber) {
-
-            if (moment(this.endDate).diff(this.startDate, 'days') === 0) {
-
-                points = this.groupBy('hour');
-
-            } else {
-
-                points = this.groupBy('day');
-            }
-
-        } else {
-
-            points = this.data.items.map((item: ITrack) => {
-                return {
-                    label: this.formatTimeLabel(item.timestamp, `HH:mm`),
-                    fullDate: this.formatTimeLabel(item.timestamp, `M/DD/YYYY, h:mm:ss a`),
-                    timestamp: item.timestamp,
-                    batteryOrVolts: this.prepareBatteryOrVoltsData(this.isCableKitConnected ? item.volts : item.battery),
-                    temperature: item.temperature
-                };
-            });
-
-            // console.log(points);
-        }
+        points = this.data.items.map((item: ITrack) => {
+            return {
+                timestamp: item.timestamp,
+                label: this.formatTimeLabel(item.timestamp, `HH:mm`),
+                fullDate: this.formatTimeLabel(item.timestamp, `M/DD/YYYY, h:mm:ss a`),
+                batteryOrVolts: this.prepareBatteryOrVoltsData(this.isCableKitConnected ? item.volts : item.battery),
+                temperature: item.temperature
+            };
+        });
 
         this.chartData = {};
 
