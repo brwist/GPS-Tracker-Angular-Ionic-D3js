@@ -15,7 +15,9 @@ import { Subscription } from 'rxjs/Rx';
 import * as moment from 'moment';
 import * as momentTimezone from 'moment-timezone';
 import * as async from 'async';
+import * as d3 from "d3";
 
+declare var window: any;
 const DATE_SETTINGS_STORAGE_KEY     = 'device-date-settings-for-charts';
 const MAX_ITEMS_PER_DAY_STORAGE_KEY = 'max-items-per-day';
 
@@ -24,7 +26,6 @@ const MAX_ITEMS_PER_DAY_STORAGE_KEY = 'max-items-per-day';
     templateUrl: 'charts.html'
 })
 export class DeviceChartsPage implements OnInit {
-
     public chartData: any = {};
     public groupedBy: string;
     public pointsTotal: number;
@@ -80,7 +81,6 @@ export class DeviceChartsPage implements OnInit {
     }
 
     public ngOnInit() {
-
         async.series([(callback) => {
 
             this.storage.get(DATE_SETTINGS_STORAGE_KEY).then((dateSettings?: IDateSettings) => {
@@ -220,6 +220,9 @@ export class DeviceChartsPage implements OnInit {
         return this.device.lastTrack && this.device.lastTrack.battery === 'K';
     }
 
+    /**
+     * Trigger on date change
+     */
     public presentDateSettings() {
 
         this.modalCtrl.create(DateSettingsPage, {
@@ -336,6 +339,7 @@ export class DeviceChartsPage implements OnInit {
                 return {
                     label: this.formatTimeLabel(item.timestamp, `HH:mm`),
                     fullDate: this.formatTimeLabel(item.timestamp, `M/DD/YYYY, h:mm:ss a`),
+                    timestamp: item.timestamp,
                     batteryOrVolts: this.prepareBatteryOrVoltsData(this.isCableKitConnected ? item.volts : item.battery),
                     temperature: item.temperature
                 };
@@ -348,95 +352,25 @@ export class DeviceChartsPage implements OnInit {
 
         setTimeout(() => {
 
-            this.chartData.batteryOrVolts = {
-                dataSets: [{
-                    data: points.map((item: any) => item.batteryOrVolts),
-                    label: this.isCableKitConnected ? `Volts` : `Battery`,
-                    borderWidth: 1,
-                    pointBorderWidth: 1,
-                    pointRadius: 1,
-                    pointHoverRadius: 2,
-                    pointHitRadius: 25
-                }],
-                labels: points.map((item: any) => item.label),
-                options: {
-                    responsive: true,
-                    scales: {
-                        yAxes: [{
-                            ticks: {min: 0, max: this.isCableKitConnected ? 35 : 100}
-                        }]
-                    },
-                    layout: {
-                        padding: {
-                            top: 20,
-                            left: 10,
-                            right: 10
-                        }
-                    },
-                    animation: {
-                        duration: 0
-                    },
-                    tooltips: {
-                        callbacks: {
-                            title: (tooltipItem) => {
+            this.chartData.batteryOrVolts = points.map(item => {
+                return {
+                    sortTime: new Date(item.timestamp).getDate(),
+                    batteryOrVolts: item.temperature
+                }
+            })
+            .sort((a, b) =>
+                a.sortTime > b.sortTime ? -1 : b.sortTime > a.sortTime ? 1 : 0
+            );
 
-                                // console.log(points[tooltipItem[0].index]);
-
-                                if (points[tooltipItem[0].index].fullDate) {
-                                    return points[tooltipItem[0].index].fullDate;
-                                } else {
-                                    return points[tooltipItem[0].index].label;
-                                }
-                            }
-                        }
-                    }
-                },
-                legend: false,
-                chartType: 'line'
-            };
-
-            this.chartData.temperature = {
-                dataSets: [{
-                    data: points.map((item: any) => item.temperature),
-                    label: `Temperature`,
-                    borderWidth: 1,
-                    pointBorderWidth: 1,
-                    pointRadius: 1,
-                    pointHoverRadius: 2,
-                    pointHitRadius: 25
-                }],
-                labels: points.map((item: any) => item.label),
-                options: {
-                    responsive: true,
-                    layout: {
-                        padding: {
-                            top: 20,
-                            left: 10,
-                            right: 10
-                        }
-                    },
-                    animation: {
-                        duration: 0
-                    },
-                    tooltips: {
-                        callbacks: {
-                            title: (tooltipItem) => {
-
-                                // console.log(points[tooltipItem[0].index]);
-
-                                if (points[tooltipItem[0].index].fullDate) {
-                                    return points[tooltipItem[0].index].fullDate;
-                                } else {
-                                    return points[tooltipItem[0].index].label;
-                                }
-                            }
-                        }
-                    }
-                },
-                legend: false,
-                chartType: 'line'
-            };
-
+            this.chartData.temperature = points.map(item => {
+                return {
+                    sortTime: new Date(item.timestamp).getDate(),
+                    temperature: item.temperature
+                }
+            })
+            .sort((a, b) =>
+                a.sortTime > b.sortTime ? -1 : b.sortTime > a.sortTime ? 1 : 0
+            );
         }, 100);
     }
 

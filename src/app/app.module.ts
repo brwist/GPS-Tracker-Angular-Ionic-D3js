@@ -100,6 +100,8 @@ import '../../node_modules/chart.js/dist/Chart.bundle.js';
 import { FirstAlertProvider } from '../providers/first-alert';
 
 import * as Sentry from '@sentry/browser';
+import { TemperatureChartComponent } from '../pages/device/charts/temperature-chart/temperature-chart';
+import { VoltChartComponent } from '../pages/device/charts/volt-chart/volt-chart';
 
 Sentry.init({
     dsn: 'https://d8f1c773c46d4b6c91ad8604bc4f90b1@sentry.io/2299214'
@@ -144,6 +146,8 @@ Sentry.init({
         TrackingOptionsPage,
         RulesEditorPage,
         LatestVersionPage,
+        TemperatureChartComponent,
+        VoltChartComponent,
 
         TemperatureConditionPage,
         SpeedConditionPage,
