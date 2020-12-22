@@ -206,7 +206,7 @@ export class VoltChartComponent implements OnInit {
   }
 
   private zoomed(): void {
-    // this.rangeTabChange.emit(0);
+    this.rangeTabChange.emit(0);
     this.gX.call(this.xAxis.scale(d3.event.transform.rescaleX(this.x)));
     const xt = d3.event.transform.rescaleX(this.x);
     const domain = xt.domain();

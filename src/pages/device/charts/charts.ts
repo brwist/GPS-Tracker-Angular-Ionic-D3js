@@ -253,6 +253,7 @@ export class DeviceChartsPage implements OnInit {
     // }
 
     private loadChartData() {
+        this.firstLoad = true;
         if(moment(this.dateSettings.startDate).isSame(this.dateSettings.endDate)) {
             this.dateSettings.startDate = moment(this.dateSettings.startDate).add(-1, 'hours');
         }
@@ -423,7 +424,9 @@ export class DeviceChartsPage implements OnInit {
             .sort((a, b) =>
                 a.sortTime > b.sortTime ? -1 : b.sortTime > a.sortTime ? 1 : 0
             );
-            this.firstLoad = false;
+            setTimeout(() => {
+                this.firstLoad = false;
+            }, 2000);
         }, 100);
 
     }
