@@ -434,6 +434,11 @@ export class DeviceChartsPage implements OnInit {
         }
     }
 
+    rangeTimeChange(event) {
+        this.rangeDateStart = moment(event.start);
+        this.rangeDateEnd = moment(event.end);
+    }
+
     public selectTimeDurationHour(tab) {
         this.activeTab = tab;
         const currentTime = moment().format();

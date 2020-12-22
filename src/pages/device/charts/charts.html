@@ -58,11 +58,11 @@
     </div>
   </div>
   <div *ngIf="chartType === 'batteryOrVolts'">
-    <page-volt-chart [data]="chartData?.batteryOrVolts" (rangeTabChange)="rangeTabChange($event)" *ngIf="chartData.batteryOrVolts"></page-volt-chart>
+    <page-volt-chart [data]="chartData?.batteryOrVolts" (rangeTabChange)="rangeTabChange($event)" (rangeTimeChange)="rangeTimeChange($event)" *ngIf="chartData.batteryOrVolts"></page-volt-chart>
   </div>
 
   <div *ngIf="chartType === 'temperature'">
-    <page-temperature-chart [data]="chartData?.temperature" (rangeTabChange)="rangeTabChange($event)" *ngIf="chartData.temperature"></page-temperature-chart>
+    <page-temperature-chart [data]="chartData?.temperature" (rangeTabChange)="rangeTabChange($event)" (rangeTimeChange)="rangeTimeChange($event)" *ngIf="chartData.temperature"></page-temperature-chart>
   </div>
 
   <ion-list>

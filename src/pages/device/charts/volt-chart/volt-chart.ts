@@ -2,13 +2,21 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import * as d3 from 'd3';
 
 declare var window: any;
+
+interface rangeModelArgs{
+  start: Date,
+  end: Date
+}
+
 @Component({
   selector: 'page-volt-chart',
   templateUrl: 'volt-chart.html'
 })
+
 export class VoltChartComponent implements OnInit {
   @Input() data;
   @Output() public rangeTabChange = new EventEmitter<number>();
+  @Output() public rangeTimeChange = new EventEmitter<rangeModelArgs>();
   title = 'Volt';
   subtitle = '';
   activeTab = 1;
@@ -201,6 +209,8 @@ export class VoltChartComponent implements OnInit {
     // this.rangeTabChange.emit(0);
     this.gX.call(this.xAxis.scale(d3.event.transform.rescaleX(this.x)));
     const xt = d3.event.transform.rescaleX(this.x);
+    const domain = xt.domain();
+    this.rangeTimeChange.emit({start: domain[0], end: domain[1]});
     const newLine = d3
       .line()
       .x((d: any) => xt(d.sortTime))
