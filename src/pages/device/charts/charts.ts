@@ -15,9 +15,7 @@ import { Subscription } from 'rxjs/Rx';
 import * as moment from 'moment';
 import * as momentTimezone from 'moment-timezone';
 import * as async from 'async';
-import * as d3 from "d3";
 
-declare var window: any;
 const DATE_SETTINGS_STORAGE_KEY     = 'device-date-settings-for-charts';
 const MAX_ITEMS_PER_DAY_STORAGE_KEY = 'max-items-per-day';
 
@@ -47,9 +45,10 @@ export class DeviceChartsPage implements OnInit {
         pointHoverBackgroundColor: 'rgba(54, 162, 235, 0.5)',
         pointHoverBorderColor: 'rgba(54, 162, 235, 1)'
     }]];
-
+    
     public maxNumberOfPointsModel: number | string;
-
+    public activeTab = 1;
+    
     private data: any;
 
     private chartTypeModel: string = 'batteryOrVolts';
@@ -67,6 +66,8 @@ export class DeviceChartsPage implements OnInit {
 
     private startDate: any;
     private endDate: any;
+    rangeDateStart: any;
+    rangeDateEnd: any;
 
     constructor(private logger: Logger,
                 private params: NavParams,
@@ -81,6 +82,15 @@ export class DeviceChartsPage implements OnInit {
     }
 
     public ngOnInit() {
+        this.storage.set(MAX_ITEMS_PER_DAY_STORAGE_KEY, "All").then(() => {
+
+            this.maxNumberOfPointsModel = "All";
+
+            this.renderCharts();
+
+        }).catch((err) => {
+            this.logger.error(err);
+        });
         async.series([(callback) => {
 
             this.storage.get(DATE_SETTINGS_STORAGE_KEY).then((dateSettings?: IDateSettings) => {
@@ -95,7 +105,7 @@ export class DeviceChartsPage implements OnInit {
 
                         if (updatedDateRange) {
                             this.dateSettings.startDate = updatedDateRange.startDate;
-                            this.dateSettings.endDate   = updatedDateRange.endDate;
+                            this.dateSettings.endDate   = moment(updatedDateRange.endDate).add(1, 'hours');
                         }
                     }
                 }
@@ -164,56 +174,57 @@ export class DeviceChartsPage implements OnInit {
         return this.chartTypeModel;
     }
 
-    get dateRangeString() {
+    // get dateRangeString() {
 
-        if (!this.dateSettings || !this.dateSettings.startDate || !this.dateSettings.endDate) return 'Date range unknown';
+    //     if (!this.dateSettings || !this.dateSettings.startDate || !this.dateSettings.endDate) return 'Date range unknown';
 
-        if (!moment(this.dateSettings.startDate).isValid() || !moment(this.dateSettings.endDate).isValid()) {
+    //     if (!moment(this.dateSettings.startDate).isValid() || !moment(this.dateSettings.endDate).isValid()) {
 
-            this.logger
-                .warning(`GET:dateRangeString: one of date is invalid. "${this.dateSettings.startDate}" - "${this.dateSettings.endDate}"`);
+    //         this.logger
+    //             .warning(`GET:dateRangeString: one of date is invalid. "${this.dateSettings.startDate}" - "${this.dateSettings.endDate}"`);
 
-            return 'Date range unknown';
-        }
+    //         return 'Date range unknown';
+    //     }
 
-        return moment(this.dateSettings.startDate).format('MMM D') + ' - ' + moment(this.dateSettings.endDate).format('MMM D');
-    }
+    //     return moment(this.dateSettings.startDate).format('MMM D') + ' - ' + moment(this.dateSettings.endDate).format('MMM D');
+    // }
 
-    set maxNumberOfPoints(value) {
+    // set maxNumberOfPoints(value) {
 
-        this.storage.set(MAX_ITEMS_PER_DAY_STORAGE_KEY, value).then(() => {
+    //     this.storage.set(MAX_ITEMS_PER_DAY_STORAGE_KEY, value).then(() => {
 
-            this.maxNumberOfPointsModel = value;
+    //         this.maxNumberOfPointsModel = value;
 
-            this.renderCharts();
+    //         this.renderCharts();
 
-        }).catch((err) => {
-            this.logger.error(err);
-        });
-    }
+    //     }).catch((err) => {
+    //         this.logger.error(err);
+    //     });
+    // }
 
-    get maxNumberOfPointsValue() {
+    // [DELETE]
+    // get maxNumberOfPointsValue() {
 
-        return this.maxNumberOfPointsModel;
-    }
+    //     return this.maxNumberOfPointsModel;
+    // }
 
-    set maxNumberOfPointsValue(value) {
+    // set maxNumberOfPointsValue(value) {
 
-        this.storage.set(MAX_ITEMS_PER_DAY_STORAGE_KEY, value).then(() => {
+    //     this.storage.set(MAX_ITEMS_PER_DAY_STORAGE_KEY, value).then(() => {
 
-            this.maxNumberOfPointsModel = value;
+    //         this.maxNumberOfPointsModel = value;
 
-            this.renderCharts();
+    //         this.renderCharts();
 
-        }).catch((err) => {
-            this.logger.error(err);
-        });
-    }
+    //     }).catch((err) => {
+    //         this.logger.error(err);
+    //     });
+    // }
 
-    get maxNumberOfPointsNumber() {
+    // get maxNumberOfPointsNumber() {
 
-        return this.maxNumberOfPointsModel === 'All' ? Number.MAX_SAFE_INTEGER : this.maxNumberOfPointsModel;
-    }
+    //     return this.maxNumberOfPointsModel === 'All' ? Number.MAX_SAFE_INTEGER : this.maxNumberOfPointsModel;
+    // }
 
     get isCableKitConnected() {
 
@@ -221,27 +232,30 @@ export class DeviceChartsPage implements OnInit {
     }
 
     /**
-     * Trigger on date change
+     * Trigger on date change [DELETE]
      */
-    public presentDateSettings() {
+    // public presentDateSettings() {
 
-        this.modalCtrl.create(DateSettingsPage, {
-            dateSettings: Object.assign({}, this.dateSettings),
-            callback: (dateSettings: IDateSettings) => {
+    //     this.modalCtrl.create(DateSettingsPage, {
+    //         dateSettings: Object.assign({}, this.dateSettings),
+    //         callback: (dateSettings: IDateSettings) => {
 
-                this.dateSettings = dateSettings;
+    //             this.dateSettings = dateSettings;
 
-                this.storage.set(DATE_SETTINGS_STORAGE_KEY, dateSettings).catch((err) => {
-                    this.logger.error(err);
-                });
+    //             this.storage.set(DATE_SETTINGS_STORAGE_KEY, dateSettings).catch((err) => {
+    //                 this.logger.error(err);
+    //             });
 
-                this.loadChartData();
-            }
-        }).present();
-    }
+    //             this.loadChartData();
+    //         }
+    //     }).present();
+    // }
 
     private loadChartData() {
-
+        if(moment(this.dateSettings.startDate).isSame(this.dateSettings.endDate)) {
+            this.dateSettings.startDate = moment(this.dateSettings.startDate).add(-1, 'hours');
+        }
+        
         if (this.dateSettings.startDate && moment(this.dateSettings.startDate).isValid()) {
 
             this.startDate = this.dateSettings.startDate;
@@ -271,12 +285,67 @@ export class DeviceChartsPage implements OnInit {
             select.push('battery');
         }
 
+        this.rangeDateStart = moment(this.startDate);
+        this.rangeDateEnd = moment(this.endDate);
+
+        var duration = moment.duration(this.endDate.diff(this.startDate));
+        var hours = duration.asHours();
+        if(hours === 1) {
+            this.getHourData(select);
+        } else {
+            this.trackProvider.getListForChart(this.device.id, {
+                filter: {
+                    startDate:
+                        encodeURIComponent(momentTimezone(this.startDate).tz(this.timeZone).format()),
+                    endDate:
+                        encodeURIComponent(momentTimezone(this.endDate).tz(this.timeZone).format())
+                },
+                select,
+                lean: true
+            }).then((data: any) => {
+
+                this.data = data;
+
+                if (this.isCableKitConnected) {
+
+                    let ntcIsValid = false;
+
+                    for (const item of this.data.items) {
+
+                        if (/\d+\.?\d?/.test(item.ntc1)) {
+
+                            ntcIsValid = true;
+
+                            break;
+                        }
+                    }
+
+                    if (ntcIsValid) {
+
+                        this.data.items = this.data.items.map((item) => {
+
+                            item.temperature = item.ntc1;
+
+                            return item;
+                        });
+                    }
+                }
+
+                this.renderCharts();
+
+            }).catch((err) => {
+                this.logger.error(err);
+            });
+        }
+    }
+
+    private getHourData(select) {
         this.trackProvider.getListForChart(this.device.id, {
             filter: {
                 startDate:
-                    encodeURIComponent(momentTimezone(this.startDate).tz(this.timeZone).startOf('day').format()),
+                    encodeURIComponent(momentTimezone(this.startDate).tz(this.timeZone).startOf('date').format('YYYY-MM-DD HH:mm:ss')),
                 endDate:
-                    encodeURIComponent(momentTimezone(this.endDate).tz(this.timeZone).endOf('day').format())
+                    encodeURIComponent(momentTimezone(this.endDate).tz(this.timeZone).endOf('date').format('YYYY-MM-DD HH:mm:ss'))
             },
             select,
             lean: true
@@ -358,74 +427,83 @@ export class DeviceChartsPage implements OnInit {
         }, 100);
     }
 
-    private groupBy(kind: string) {
-
-        const by  = [];
-        const raw = {};
-
-        this.groupedBy   = kind;
-        this.pointsTotal = this.data.items.length;
-
-        this.data.items.forEach((item: ITrack) => {
-
-            let token;
-
-            if (kind === 'day') {
-
-                token = momentTimezone.tz(item.timestamp, this.timeZone).format('MMM, DD');
-
-            } else {
-
-                token = momentTimezone.tz(item.timestamp, this.timeZone).format('h a');
-            }
-
-            if (!raw[token]) raw[token] = [];
-
-            raw[token].push({
-                batteryOrVolts: this.isCableKitConnected ? item.volts : item.battery,
-                temperature: item.temperature
-            });
+    public selectTimeDurationHour(tab) {
+        this.activeTab = tab;
+        const currentTime = moment().format();
+        const start = moment(currentTime).add(-1, 'hours');
+        const end = moment(currentTime);
+        this.dateSettings.startDate = start;
+        this.dateSettings.endDate = end;
+        this.storage.set(DATE_SETTINGS_STORAGE_KEY, this.dateSettings).catch((err) => {
+            this.logger.error(err);
         });
+        this.rangeDateStart = start;
+        this.rangeDateEnd = end;
+        this.loadChartData();
+    }
 
-        for (const token in raw) {
+    public selectTimeDurationDay(tab) {
+        this.activeTab = tab;
+        const currentTime = moment().format();
+        const start = moment(currentTime).add(-1, 'day');
+        const end = moment(currentTime);
+        this.dateSettings.startDate = start;
+        this.dateSettings.endDate = end;
+        this.storage.set(DATE_SETTINGS_STORAGE_KEY, this.dateSettings).catch((err) => {
+            this.logger.error(err);
+        });
+        this.rangeDateStart = start;
+        this.rangeDateEnd = end;
 
-            if (raw.hasOwnProperty(token)) {
+        this.loadChartData();
+    }
 
-                let batteryOrVoltsTotal = 0;
-                let batteryOrVoltsSum   = 0;
+    public selectTimeDurationWeek(tab) {
+        this.activeTab = tab;
+        const currentTime = moment().format();
+        const start = moment(currentTime).add(-1, 'week');
+        const end = moment(currentTime);
+        this.dateSettings.startDate = start;
+        this.dateSettings.endDate = end;
+        this.storage.set(DATE_SETTINGS_STORAGE_KEY, this.dateSettings).catch((err) => {
+            this.logger.error(err);
+        });
+        this.rangeDateStart = start;
+        this.rangeDateEnd = end;
 
-                let temperatureTotal = 0;
-                let temperatureSum   = 0;
+        this.loadChartData();
+    }
 
-                raw[token].forEach((item) => {
+    public selectTimeDurationMonth(tab) {
+        this.activeTab = tab;
+        const currentTime = moment().format();
+        const start = moment(currentTime).add(-1, 'month');
+        const end = moment(currentTime);
+        this.dateSettings.startDate = start;
+        this.dateSettings.endDate = end;
+        this.storage.set(DATE_SETTINGS_STORAGE_KEY, this.dateSettings).catch((err) => {
+            this.logger.error(err);
+        });
+        this.rangeDateStart = start;
+        this.rangeDateEnd = end;
 
-                    if (/\d+\.?\d?/.test(item.batteryOrVolts)) {
+        this.loadChartData();
+    }
 
-                        batteryOrVoltsSum += +item.batteryOrVolts;
-                        batteryOrVoltsTotal++;
+    public selectTimeDurationYear(tab) {
+        this.activeTab = tab;
+        const currentTime = moment().format();
+        const start = moment(currentTime).add(-1, 'year');
+        const end = moment(currentTime);
+        this.dateSettings.startDate = start;
+        this.dateSettings.endDate = end;
+        this.storage.set(DATE_SETTINGS_STORAGE_KEY, this.dateSettings).catch((err) => {
+            this.logger.error(err);
+        });
+        this.rangeDateStart = start;
+        this.rangeDateEnd = end;
 
-                    } else if (item.battery === 'L' || item.battery === 'K') {
-
-                        batteryOrVoltsSum += 100;
-                        batteryOrVoltsTotal++;
-                    }
-
-                    if (typeof item.temperature === 'number') {
-
-                        temperatureSum += item.temperature;
-                        temperatureTotal++;
-                    }
-                });
-
-                by.push({
-                    label: token,
-                    batteryOrVolts: batteryOrVoltsTotal > 0 ? Math.floor(batteryOrVoltsSum / batteryOrVoltsTotal) : null,
-                    temperature: temperatureTotal > 0 ? Math.floor(temperatureSum / temperatureTotal) : null
-                });
-            }
-        }
-
-        return by;
+        this.loadChartData();
     }
 
     private formatTimeLabel(dateTime: string, outFormat: string, format?: string) {

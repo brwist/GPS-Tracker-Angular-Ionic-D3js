@@ -4,4 +4,33 @@ page-charts {
     padding-top: 30px;
     text-align: center;
   }
+
+  .tabs-container {
+    display: flex;
+    margin: 10px 0;
+    height: 29px;
+    &_name {
+      height: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20%;
+      border: 1px solid grey;
+      border-radius: 5px;
+      margin: 3px;
+      font-size: 12px;
+      color: black;
+      cursor: pointer;
+      &.active-tab {
+        background: #387ef5;
+        color: white;
+      }
+    }
+  }
+
+  .current-range {
+    display: flex;
+    color: black;
+    font-weight: 500;
+  }
 }

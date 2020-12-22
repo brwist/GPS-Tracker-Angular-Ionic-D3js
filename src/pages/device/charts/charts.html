@@ -20,59 +20,56 @@
   <div *ngIf="!chartData.batteryOrVolts" class="loading">
     <ion-spinner></ion-spinner>
   </div>
-
+  <div class="tabs-container">
+    <div
+      class="tabs-container_name"
+      [ngClass]="{'active-tab': activeTab === 1 }"
+      (click)="selectTimeDurationHour(1)"
+    >
+      <span>Hour</span>
+    </div>
+    <div
+      class="tabs-container_name"
+      [ngClass]="{'active-tab': activeTab === 2 }"
+      (click)="selectTimeDurationDay(2)"
+    >
+      <span>Day</span>
+    </div>
+    <div
+      class="tabs-container_name"
+      [ngClass]="{'active-tab': activeTab === 3 }"
+      (click)="selectTimeDurationWeek(3)"
+    >
+      <span>Week</span>
+    </div>
+    <div
+      class="tabs-container_name"
+      [ngClass]="{'active-tab': activeTab === 4 }"
+      (click)="selectTimeDurationMonth(4)"
+    >
+      <span>Month</span>
+    </div>
+    <div
+      class="tabs-container_name"
+      [ngClass]="{'active-tab': activeTab === 5 }"
+      (click)="selectTimeDurationYear(5)"
+    >
+      <span>Year</span>
+    </div>
+  </div>
   <div *ngIf="chartType === 'batteryOrVolts'">
     <page-volt-chart [data]="chartData?.batteryOrVolts" *ngIf="chartData.batteryOrVolts"></page-volt-chart>
-    <!-- <canvas *ngIf="chartData.batteryOrVolts"
-            baseChart
-            [datasets]="chartData.batteryOrVolts.dataSets"
-            [labels]="chartData.batteryOrVolts.labels"
-            [options]="chartData.batteryOrVolts.options"
-            [colors]="chartDataColors[0]"
-            [legend]="chartData.batteryOrVolts.legend"
-            [chartType]="chartData.batteryOrVolts.chartType"></canvas> -->
   </div>
 
   <div *ngIf="chartType === 'temperature'">
     <page-temperature-chart [data]="chartData?.temperature" *ngIf="chartData.temperature"></page-temperature-chart>
-    <!-- <div id="stacked-area"></div> -->
-    <!-- <canvas *ngIf="chartData.temperature"
-            baseChart
-            [datasets]="chartData.temperature.dataSets"
-            [labels]="chartData.temperature.labels"
-            [options]="chartData.temperature.options"
-            [colors]="chartDataColors[1]"
-            [legend]="chartData.temperature.legend"
-            [chartType]="chartData.temperature.chartType"></canvas> -->
   </div>
 
   <ion-list>
-
-    <button ion-item detail-none (click)="presentDateSettings()">
-      {{ dateRangeString }}
-    </button>
-
-    <ion-item>
-      <ion-label>Max number of points</ion-label>
-      <ion-select [(ngModel)]="maxNumberOfPointsValue">
-        <ion-option *ngFor="let value of [25, 50, 100, 150, 300, 500, 1000, 'All']" [value]="value">
-          {{ value }}
-        </ion-option>
-      </ion-select>
+    <ion-item class="current-range">
+      <ion-label item-left>{{rangeDateStart |  date:'MMM d h:mm a'}}</ion-label>
+      <ion-label item-right text-right>{{rangeDateEnd |  date:'MMM d h:mm a'}}</ion-label>
     </ion-item>
-
-  </ion-list>
-
-  <ion-list *ngIf="groupedBy">
-    <ion-list-header>Grouped by {{ groupedBy }}s (median shown)</ion-list-header>
-
-    <ion-item>
-      <h2>Total data points</h2>
-      <ion-note item-right>
-        {{ pointsTotal }}
-      </ion-note>
-    </ion-item>
-
   </ion-list>
 
 </ion-content>
