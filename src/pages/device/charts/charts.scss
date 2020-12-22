@@ -32,5 +32,8 @@ page-charts {
     display: flex;
     color: black;
     font-weight: 500;
+    ion-label {
+      font-size: 13px;
+    }
   }
 }
