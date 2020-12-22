@@ -48,6 +48,8 @@ export class DeviceChartsPage implements OnInit {
     
     public maxNumberOfPointsModel: number | string;
     public activeTab = 1;
+    public rangeDateStart: any;
+    public rangeDateEnd: any;
     
     private data: any;
 
@@ -66,8 +68,7 @@ export class DeviceChartsPage implements OnInit {
 
     private startDate: any;
     private endDate: any;
-    rangeDateStart: any;
-    rangeDateEnd: any;
+    private firstLoad = true;
 
     constructor(private logger: Logger,
                 private params: NavParams,
@@ -402,9 +403,7 @@ export class DeviceChartsPage implements OnInit {
         });
 
         this.chartData = {};
-
         setTimeout(() => {
-
             this.chartData.batteryOrVolts = points.map(item => {
                 return {
                     sortTime: new Date(item.timestamp),
@@ -424,7 +423,15 @@ export class DeviceChartsPage implements OnInit {
             .sort((a, b) =>
                 a.sortTime > b.sortTime ? -1 : b.sortTime > a.sortTime ? 1 : 0
             );
+            this.firstLoad = false;
         }, 100);
+
+    }
+
+    rangeTabChange(e) {
+        if(!this.firstLoad) {
+            this.activeTab = e;
+        }
     }
 
     public selectTimeDurationHour(tab) {
