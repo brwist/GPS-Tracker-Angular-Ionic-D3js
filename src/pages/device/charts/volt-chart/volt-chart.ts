@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import * as d3 from 'd3';
 
 declare var window: any;
@@ -10,7 +10,8 @@ interface rangeModelArgs{
 
 @Component({
   selector: 'page-volt-chart',
-  templateUrl: 'volt-chart.html'
+  templateUrl: 'volt-chart.html',
+  encapsulation: ViewEncapsulation.Emulated
 })
 
 export class VoltChartComponent implements OnInit {
@@ -131,6 +132,10 @@ export class VoltChartComponent implements OnInit {
       .attr('viewBox', [-40, 0, width + 90, height + 20]);
     this.svg.select('*').remove();
     const g = this.svg.append('g').attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');
+    const div = d3
+      .select('#stacked-area').append('div')
+      .attr('class', 'tooltip')
+      .style('opacity', 0);
 
     this.gX = g
       .append('g')
@@ -156,6 +161,15 @@ export class VoltChartComponent implements OnInit {
       .attr('stroke', 'steelblue')
       .attr('stroke-width', 1)
       .attr('d', this.line);
+
+    this.chartBody.selectAll('dot')
+      .data(this.data)
+      .enter()
+      .append('circle')
+      .attr('cx', (d) => this.x(d.sortTime) )
+      .attr('cy', (d) => this.y(d.batteryOrVolts) )
+      .attr('r', 2);
+
     this.chartBody
       .append('rect')
       .attr('width', this.width)
@@ -209,6 +223,11 @@ export class VoltChartComponent implements OnInit {
     this.rangeTabChange.emit(0);
     this.gX.call(this.xAxis.scale(d3.event.transform.rescaleX(this.x)));
     const xt = d3.event.transform.rescaleX(this.x);
+    const div = d3
+      .select('#stacked-area').append('div')
+      .attr('class', 'tooltip')
+      .style('opacity', 0);
+    
     const domain = xt.domain();
     this.rangeTimeChange.emit({start: domain[0], end: domain[1]});
     const newLine = d3
@@ -227,7 +246,15 @@ export class VoltChartComponent implements OnInit {
         [this.width + this.margin.right, this.height + this.margin.bottom]
       ]);
 
-    this.chartBody.selectAll('path').attr('d', newLine);
-    this.voronoiGroup.attr('transform', d3.event.transform);
+      this.chartBody.selectAll('path').attr('d', newLine);
+      this.voronoiGroup.selectAll('dot')
+        .data(this.data)
+        .enter()
+        .append('circle')
+        .attr('cx', (d) => this.x(d.sortTime) )
+        .attr('cy', (d) => this.y(d.batteryOrVolts) )
+        .attr('r', 2);
+        
+      this.voronoiGroup.attr('transform', d3.event.transform);
   }
 }
