@@ -1,5 +1,6 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import * as d3 from 'd3';
+import d3Tip from 'd3-tip';
 
 declare var window: any;
 
@@ -10,8 +11,7 @@ interface rangeModelArgs{
 
 @Component({
   selector: 'page-volt-chart',
-  templateUrl: 'volt-chart.html',
-  encapsulation: ViewEncapsulation.Emulated
+  templateUrl: 'volt-chart.html'
 })
 
 export class VoltChartComponent implements OnInit {
@@ -132,10 +132,6 @@ export class VoltChartComponent implements OnInit {
       .attr('viewBox', [-40, 0, width + 90, height + 20]);
     this.svg.select('*').remove();
     const g = this.svg.append('g').attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');
-    const div = d3
-      .select('#stacked-area').append('div')
-      .attr('class', 'tooltip')
-      .style('opacity', 0);
 
     this.gX = g
       .append('g')
@@ -162,14 +158,6 @@ export class VoltChartComponent implements OnInit {
       .attr('stroke-width', 1)
       .attr('d', this.line);
 
-    this.chartBody.selectAll('dot')
-      .data(this.data)
-      .enter()
-      .append('circle')
-      .attr('cx', (d) => this.x(d.sortTime) )
-      .attr('cy', (d) => this.y(d.batteryOrVolts) )
-      .attr('r', 2);
-
     this.chartBody
       .append('rect')
       .attr('width', this.width)
@@ -177,6 +165,7 @@ export class VoltChartComponent implements OnInit {
       .attr('pointer-events', 'all')
       .style('fill', 'transparent')
       .call(this.zoom);
+
     g.append('defs')
       .append('clipPath')
       .attr('id', 'clip')
@@ -192,6 +181,27 @@ export class VoltChartComponent implements OnInit {
     this.voronoiGroup.append('path').attr('d', function (d) {
       return d ? 'M' + d.join('L') + 'Z' : null;
     });
+
+    const tip = d3Tip()
+        .html(temp => {
+            const style = 'padding: 0.5em; background: white; border-radius: 5px'
+            return `<div style="${style}">${temp}</div>`
+        })
+​
+    this.chartBody.call(tip)
+​
+    this.chartBody
+        .selectAll('circle.datum')
+        .data(this.data)
+        .enter()
+        .append('circle')
+        .attr('class', 'datum')
+        .attr('cx', d => this.x(d.sortTime))
+        .attr('cy', d => this.y(d.batteryOrVolts))
+        .attr('r', 3)
+        .on('mouseover', function (d) { tip.show(d.batteryOrVolts, this) })
+        .on('mouseout', function (d) { tip.hide(d.batteryOrVolts, this) }) 
+
     this.resetZoom();
   }
 
@@ -223,11 +233,6 @@ export class VoltChartComponent implements OnInit {
     this.rangeTabChange.emit(0);
     this.gX.call(this.xAxis.scale(d3.event.transform.rescaleX(this.x)));
     const xt = d3.event.transform.rescaleX(this.x);
-    const div = d3
-      .select('#stacked-area').append('div')
-      .attr('class', 'tooltip')
-      .style('opacity', 0);
-    
     const domain = xt.domain();
     this.rangeTimeChange.emit({start: domain[0], end: domain[1]});
     const newLine = d3
@@ -246,15 +251,13 @@ export class VoltChartComponent implements OnInit {
         [this.width + this.margin.right, this.height + this.margin.bottom]
       ]);
 
-      this.chartBody.selectAll('path').attr('d', newLine);
-      this.voronoiGroup.selectAll('dot')
-        .data(this.data)
-        .enter()
-        .append('circle')
-        .attr('cx', (d) => this.x(d.sortTime) )
-        .attr('cy', (d) => this.y(d.batteryOrVolts) )
-        .attr('r', 2);
-        
-      this.voronoiGroup.attr('transform', d3.event.transform);
+    this.chartBody.selectAll('path').attr('d', newLine);        
+    this.voronoiGroup.attr('transform', d3.event.transform);
+
+    // reposition circles after zoom
+    this.chartBody
+      .selectAll('circle.datum')
+      .attr('cx', d => xt(d.sortTime))
+      .attr('cy', d => this.y(d.batteryOrVolts));
   }
 }

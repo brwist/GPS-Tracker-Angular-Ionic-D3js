@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import * as d3 from 'd3';
+import d3Tip from 'd3-tip';
 
 declare var window: any;
 
@@ -178,6 +179,28 @@ export class TemperatureChartComponent implements OnInit {
     this.voronoiGroup.append('path').attr('d', function (d) {
       return d ? 'M' + d.join('L') + 'Z' : null;
     });
+
+    const tip = d3Tip()
+        .html(temp => {
+            const style = 'padding: 0.5em; background: white; border-radius: 5px'
+            return `<div style="${style}">${temp}</div>`
+        })
+​
+    this.chartBody.call(tip)
+​
+    this.chartBody
+        .selectAll('circle.datum')
+        .data(this.data)
+        .enter()
+        .append('circle')
+        .attr('class', 'datum')
+        .attr('cx', d => this.x(d.sortTime))
+        .attr('cy', d => this.y(d.temperature))
+        .attr('r', 3)
+        .attr('stroke', 'red')
+        .on('mouseover', function (d) { tip.show(d.temperature, this) })
+        .on('mouseout', function (d) { tip.hide(d.temperature, this) }) 
+
     this.resetZoom();
   }
 
@@ -229,5 +252,11 @@ export class TemperatureChartComponent implements OnInit {
 
     this.chartBody.selectAll('path').attr('d', newLine);
     this.voronoiGroup.attr('transform', d3.event.transform);
+
+    // reposition circles after zoom
+    this.chartBody
+      .selectAll('circle.datum')
+      .attr('cx', d => xt(d.sortTime))
+      .attr('cy', d => this.y(d.temperature));
   }
 }
