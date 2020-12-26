@@ -88,18 +88,6 @@ export class TemperatureChartComponent implements OnInit {
       .on('zoom', () => {
         this.zoomed();
       });
-    this.voronoi = d3
-      .voronoi()
-      .x((d) => {
-        return this.x(d.dt);
-      })
-      .y((d) => {
-        return this.y(d.price);
-      })
-      .extent([
-        [-this.margin.left, -this.margin.top],
-        [this.width + this.margin.right, this.height + this.margin.bottom]
-      ]);
 
     this.buildSvg();
   }
@@ -197,9 +185,8 @@ export class TemperatureChartComponent implements OnInit {
         .attr('cx', d => this.x(d.sortTime))
         .attr('cy', d => this.y(d.temperature))
         .attr('r', 3)
-        .attr('stroke', 'red')
-        .on('mouseover', function (d) { tip.show(d.temperature, this) })
-        .on('mouseout', function (d) { tip.hide(d.temperature, this) }) 
+        .on('touchstart mouseover', function (d) { tip.show(d.temperature, this) })
+        .on('touchend mouseout', function (d) { tip.hide(d.temperature, this) }) 
 
     this.resetZoom();
   }

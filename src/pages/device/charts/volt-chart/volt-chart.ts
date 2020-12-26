@@ -88,18 +88,6 @@ export class VoltChartComponent implements OnInit {
       .on('zoom', () => {
         this.zoomed();
       });
-    this.voronoi = d3
-      .voronoi()
-      .x((d) => {
-        return this.x(d.dt);
-      })
-      .y((d) => {
-        return this.y(d.price);
-      })
-      .extent([
-        [-this.margin.left, -this.margin.top],
-        [this.width + this.margin.right, this.height + this.margin.bottom]
-      ]);
 
     this.buildSvg();
   }
@@ -199,8 +187,8 @@ export class VoltChartComponent implements OnInit {
         .attr('cx', d => this.x(d.sortTime))
         .attr('cy', d => this.y(d.batteryOrVolts))
         .attr('r', 3)
-        .on('mouseover', function (d) { tip.show(d.batteryOrVolts, this) })
-        .on('mouseout', function (d) { tip.hide(d.batteryOrVolts, this) }) 
+        .on('touchstart mouseover', function (d) { tip.show(d.batteryOrVolts, this) })
+        .on('touchend mouseout', function (d) { tip.hide(d.batteryOrVolts, this) }) 
 
     this.resetZoom();
   }

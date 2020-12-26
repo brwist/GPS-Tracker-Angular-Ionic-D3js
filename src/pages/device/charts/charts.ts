@@ -447,8 +447,8 @@ export class DeviceChartsPage implements OnInit {
     }
 
     rangeTimeChange(event) {
-        this.rangeDateStart = moment(event.start);
-        this.rangeDateEnd = moment(event.end);
+        this.rangeDateStart = moment(event.start).isValid() ? moment(event.start) : undefined;
+        this.rangeDateEnd = moment(event.end).isValid() ? moment(event.end) : undefined;
     }
 
     public selectTimeDurationHour(tab) {
