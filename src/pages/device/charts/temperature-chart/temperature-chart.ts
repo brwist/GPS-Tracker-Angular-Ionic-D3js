@@ -14,10 +14,11 @@ interface rangeModelArgs{
   templateUrl: 'temperature-chart.html'
 })
 export class TemperatureChartComponent implements OnInit {
-  @Input() data;
+  @Input() data = [];
   @Output() public rangeTabChange = new EventEmitter<number>();
   @Output() public rangeTimeChange = new EventEmitter<rangeModelArgs>();
 
+  chartValueAround;
   title = 'Temperature';
   subtitle = '';
   activeTab = 1;
@@ -49,6 +50,11 @@ export class TemperatureChartComponent implements OnInit {
   formatWeek = d3.timeFormat('%b %d');
   formatMonth = d3.timeFormat('%B');
   formatYear = d3.timeFormat('%Y');
+  formatDate: any;
+  lineSvg: any;
+  xt: any;
+
+  selectedDetailLeft = 10;
 
   constructor() {}
 
@@ -89,12 +95,9 @@ export class TemperatureChartComponent implements OnInit {
         this.zoomed();
       });
 
-    this.buildSvg();
-  }
-
-  private buildSvg() {
-    d3.selectAll('#stacked-area > *').remove();
-
+    
+    // d3.selectAll('#stacked-area > *').remove();
+    this.formatDate = d3.timeFormat('%d-%b, %H:%M');
     this.y = d3.scaleLinear().rangeRound([this.height, 0]);
     this.yAxis = d3
       .axisRight(this.y)
@@ -117,8 +120,9 @@ export class TemperatureChartComponent implements OnInit {
       .append('svg')
       .attr('width', '100%')
       .attr('height', '100%')
-      .attr('viewBox', [-40, 0, width + 90, height + 20]);
-    this.svg.select('*').remove();
+      .attr('viewBox', [-40, 0, width + 90, height + 20])
+      .call(this.zoom);
+    // this.svg.select('*').remove();
     const g = this.svg.append('g').attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');
 
     this.gX = g
@@ -134,24 +138,32 @@ export class TemperatureChartComponent implements OnInit {
       .call(d3.axisBottom(this.x).ticks(0));
 
     g.append('g').call(d3.axisLeft(this.y).ticks(0));
-
     this.chartBody = g.append('g').attr('class', 'chartbody').attr('clip-path', 'url(#clip)');
 
     this.chartBody
-      .append('path')
-      .data([this.data])
-      .attr('class', 'line')
-      .attr('fill', 'none')
-      .attr('stroke', 'steelblue')
-      .attr('stroke-width', 1)
-      .attr('d', this.line);
+      .append('path').data([this.data]).attr('class', 'line').attr('d', this.line);
     this.chartBody
       .append('rect')
       .attr('width', this.width)
       .attr('height', this.height)
       .attr('pointer-events', 'all')
       .style('fill', 'transparent')
-      .call(this.zoom);
+      .on('click', (() => {
+        if(this.data.length === 0) {
+          return;
+        }
+        var x0 = this.xt.invert(d3.mouse(d3.event.currentTarget)[0]);
+        const selectedTime: any = new Date(x0).getTime();
+        
+        var temp = this.data.map(d => Math.abs(selectedTime - new Date(d.sortTime).getTime()));
+        var idx = temp.indexOf(Math.min(...temp));
+        var d = this.data[idx];
+        this.chartValueAround = this.formatDate(x0) + ' ' + d.temperature + '\u00B0';
+
+        const xCor = d3.event.x - 44;
+        this.selectedDetailLeft = xCor;
+      }));
+
     g.append('defs')
       .append('clipPath')
       .attr('id', 'clip')
@@ -167,26 +179,6 @@ export class TemperatureChartComponent implements OnInit {
     this.voronoiGroup.append('path').attr('d', function (d) {
       return d ? 'M' + d.join('L') + 'Z' : null;
     });
-
-    const tip = d3Tip()
-        .html(temp => {
-            const style = 'padding: 0.5em; background: white; border-radius: 5px'
-            return `<div style="${style}">${temp}</div>`
-        })
-​
-    this.chartBody.call(tip)
-​
-    this.chartBody
-        .selectAll('circle.datum')
-        .data(this.data)
-        .enter()
-        .append('circle')
-        .attr('class', 'datum')
-        .attr('cx', d => this.x(d.sortTime))
-        .attr('cy', d => this.y(d.temperature))
-        .attr('r', 3)
-        .on('touchstart mouseover', function (d) { tip.show(d.temperature, this) })
-        .on('touchend mouseout', function (d) { tip.hide(d.temperature, this) }) 
 
     this.resetZoom();
   }
@@ -216,18 +208,24 @@ export class TemperatureChartComponent implements OnInit {
   }
 
   private zoomed(): void {
-    this.rangeTabChange.emit(0);
+    this.chartValueAround = undefined;
+    if(this.data.length > 0) {
+      const defData = this.data[0];
+      if(defData) {
+        this.chartValueAround = this.formatDate(defData.sortTime) + ' ' + defData.temperature + '\u00B0';
+      }
+    }
     this.gX.call(this.xAxis.scale(d3.event.transform.rescaleX(this.x)));
-    const xt = d3.event.transform.rescaleX(this.x);
-    const domain = xt.domain();
+    this.xt = d3.event.transform.rescaleX(this.x);
+    const domain = this.xt.domain();
     this.rangeTimeChange.emit({start: domain[0], end: domain[1]});
     const newLine = d3
       .line()
-      .x((d: any) => xt(d.sortTime))
+      .x((d: any) => this.xt(d.sortTime))
       .y((d: any) => this.y(d.temperature));
     d3.voronoi()
       .x((d: any) => {
-        return xt(d.sortTime);
+        return this.xt(d.sortTime);
       })
       .y((d: any) => {
         return this.y(d.temperature);
@@ -239,11 +237,5 @@ export class TemperatureChartComponent implements OnInit {
 
     this.chartBody.selectAll('path').attr('d', newLine);
     this.voronoiGroup.attr('transform', d3.event.transform);
-
-    // reposition circles after zoom
-    this.chartBody
-      .selectAll('circle.datum')
-      .attr('cx', d => xt(d.sortTime))
-      .attr('cy', d => this.y(d.temperature));
   }
 }

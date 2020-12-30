@@ -1,1 +1,7 @@
+<div class="temperature-details-con" *ngIf="chartValueAround">
+    <div class="temperature-detail" [style.left.px]="selectedDetailLeft">  
+        <div class="temperature-text">{{chartValueAround}}</div>
+        <div class="triangle_down"></div>
+    </div>
+</div>
 <div id="stacked-area"></div>
