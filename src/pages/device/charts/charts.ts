@@ -399,6 +399,9 @@ export class DeviceChartsPage implements OnInit {
 
     loadData(data, yearPoints?) {
         let points;
+        if(!data) {
+            return;
+        }
 
         this.groupedBy = null;
         if(!this.yearSelected) {

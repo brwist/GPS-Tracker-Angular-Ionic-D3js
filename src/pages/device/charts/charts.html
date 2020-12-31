@@ -57,13 +57,20 @@
       <span>Year</span>
     </div>
   </div>
-  <ion-list>
-    <ion-item>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Volts</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
       <page-volt-chart [data]="chartData?.batteryOrVolts" (rangeTabChange)="rangeTabChange($event)" (rangeTimeChange)="rangeTimeChange($event)" *ngIf="chartData.batteryOrVolts"></page-volt-chart>
-    </ion-item>
-
-    <ion-item>
+    </ion-card-content>
+  </ion-card>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Temperature</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
       <page-temperature-chart [data]="chartData?.temperature" (rangeTabChange)="rangeTabChange($event)" (rangeTimeChange)="rangeTimeChange($event)" *ngIf="chartData.temperature"></page-temperature-chart>
-    </ion-item>
-  </ion-list>
+    </ion-card-content>
+  </ion-card>
 </ion-content>
