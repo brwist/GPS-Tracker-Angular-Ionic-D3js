@@ -117,7 +117,7 @@ export class TemperatureChartComponent implements OnInit {
     const width = this.width + this.margin.left + this.margin.right;
 
     this.svg = d3
-      .select('#stacked-area')
+      .select('#stacked-area-temp')
       .append('svg')
       .attr('width', '100%')
       .attr('height', '100%')

@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import * as d3 from 'd3';
 
+import * as moment from 'moment';
+
 declare var window: any;
 
 interface rangeModelArgs{
@@ -17,6 +19,9 @@ export class VoltChartComponent implements OnInit {
   @Output() public rangeTabChange = new EventEmitter<number>();
   @Output() public rangeTimeChange = new EventEmitter<rangeModelArgs>();
 
+  public rangeDateStart: any;
+  public rangeDateEnd: any;
+  public datePipeFormat = 'MMM d h:mm a';
   chartValueAround;
   title = 'Volt';
   subtitle = '';
@@ -118,7 +123,7 @@ export class VoltChartComponent implements OnInit {
     const width = this.width + this.margin.left + this.margin.right;
 
     this.svg = d3
-      .select('#stacked-area')
+      .select('#stacked-area-volt')
       .append('svg')
       .attr('width', '100%')
       .attr('height', '100%')
@@ -222,7 +227,9 @@ export class VoltChartComponent implements OnInit {
     this.gX.call(this.xAxis.scale(d3.event.transform.rescaleX(this.x)));
     this.xt = d3.event.transform.rescaleX(this.x);
     const domain = this.xt.domain();
-    this.rangeTimeChange.emit({start: domain[0], end: domain[1]});
+    this.rangeDateStart = moment(domain[0]).isValid() ? moment(domain[0]) : undefined;
+    this.rangeDateEnd = moment(domain[1]).isValid() ? moment(domain[1]) : undefined;
+    // this.rangeTimeChange.emit({start: domain[0], end: domain[1]});
     const newLine = d3
       .line()
       .x((d: any) => this.xt(d.sortTime))

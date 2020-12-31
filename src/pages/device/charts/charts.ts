@@ -219,8 +219,8 @@ export class DeviceChartsPage implements OnInit {
             select.push('battery');
         }
 
-        this.rangeDateStart = moment(this.startDate);
-        this.rangeDateEnd = moment(this.endDate);
+        // this.rangeDateStart = moment(this.startDate);
+        // this.rangeDateEnd = moment(this.endDate);
 
         var duration = moment.duration(this.endDate.diff(this.startDate));
         var hours = duration.asHours();

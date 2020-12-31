@@ -2,7 +2,7 @@
   <ion-navbar>
     <ion-title>Charts</ion-title>
   </ion-navbar>
-  <ion-toolbar>
+  <!-- <ion-toolbar>
     <ion-segment [(ngModel)]="chartType">
       <ion-segment-button value="batteryOrVolts">
         <ng-container *ngIf="isCableKitConnected">Volts</ng-container>
@@ -12,7 +12,7 @@
         Temperature
       </ion-segment-button>
     </ion-segment>
-  </ion-toolbar>
+  </ion-toolbar> -->
 </ion-header>
 
 <ion-content>
@@ -57,19 +57,13 @@
       <span>Year</span>
     </div>
   </div>
-  <div *ngIf="chartType === 'batteryOrVolts'">
-    <page-volt-chart [data]="chartData?.batteryOrVolts" (rangeTabChange)="rangeTabChange($event)" (rangeTimeChange)="rangeTimeChange($event)" *ngIf="chartData.batteryOrVolts"></page-volt-chart>
-  </div>
-
-  <div *ngIf="chartType === 'temperature'">
-    <page-temperature-chart [data]="chartData?.temperature" (rangeTabChange)="rangeTabChange($event)" (rangeTimeChange)="rangeTimeChange($event)" *ngIf="chartData.temperature"></page-temperature-chart>
-  </div>
-
   <ion-list>
-    <ion-item class="current-range">
-      <ion-label item-left>{{rangeDateStart | date:datePipeFormat}}</ion-label>
-      <ion-label item-right text-right>{{rangeDateEnd | date:datePipeFormat}}</ion-label>
+    <ion-item>
+      <page-volt-chart [data]="chartData?.batteryOrVolts" (rangeTabChange)="rangeTabChange($event)" (rangeTimeChange)="rangeTimeChange($event)" *ngIf="chartData.batteryOrVolts"></page-volt-chart>
+    </ion-item>
+
+    <ion-item>
+      <page-temperature-chart [data]="chartData?.temperature" (rangeTabChange)="rangeTabChange($event)" (rangeTimeChange)="rangeTimeChange($event)" *ngIf="chartData.temperature"></page-temperature-chart>
     </ion-item>
   </ion-list>
-
 </ion-content>
