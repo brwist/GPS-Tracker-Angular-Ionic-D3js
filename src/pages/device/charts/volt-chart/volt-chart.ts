@@ -218,12 +218,12 @@ export class VoltChartComponent implements OnInit {
 
   private zoomed(): void {
     this.chartValueAround = undefined;
-    if(this.data.length > 0) {
-      const defData = this.data[0];
-      if(defData) {
-        this.chartValueAround = this.formatDate(defData.sortTime) + ' ' + defData.batteryOrVolts;
-      }
-    }
+    // if(this.data.length > 0) {
+    //   const defData = this.data[0];
+    //   if(defData) {
+    //     this.chartValueAround = this.formatDate(defData.sortTime) + ' ' + defData.batteryOrVolts;
+    //   }
+    // }
     this.gX.call(this.xAxis.scale(d3.event.transform.rescaleX(this.x)));
     this.xt = d3.event.transform.rescaleX(this.x);
     const domain = this.xt.domain();

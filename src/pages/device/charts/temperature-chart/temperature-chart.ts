@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import * as d3 from 'd3';
-import d3Tip from 'd3-tip';
+
+import * as moment from 'moment';
 
 declare var window: any;
 
@@ -18,6 +19,8 @@ export class TemperatureChartComponent implements OnInit {
   @Output() public rangeTabChange = new EventEmitter<number>();
   @Output() public rangeTimeChange = new EventEmitter<rangeModelArgs>();
 
+  public rangeDateStart: any;
+  public rangeDateEnd: any;
   chartValueAround;
   title = 'Temperature';
   subtitle = '';
@@ -212,16 +215,18 @@ export class TemperatureChartComponent implements OnInit {
 
   private zoomed(): void {
     this.chartValueAround = undefined;
-    if(this.data.length > 0) {
-      const defData = this.data[0];
-      if(defData) {
-        this.chartValueAround = this.formatDate(defData.sortTime) + ' ' + defData.temperature + '\u00B0';
-      }
-    }
+    // if(this.data.length > 0) {
+    //   const defData = this.data[0];
+    //   if(defData) {
+    //     this.chartValueAround = this.formatDate(defData.sortTime) + ' ' + defData.temperature + '\u00B0';
+    //   }
+    // }
     this.gX.call(this.xAxis.scale(d3.event.transform.rescaleX(this.x)));
     this.xt = d3.event.transform.rescaleX(this.x);
     const domain = this.xt.domain();
-    this.rangeTimeChange.emit({start: domain[0], end: domain[1]});
+    this.rangeDateStart = moment(domain[0]).isValid() ? moment(domain[0]) : undefined;
+    this.rangeDateEnd = moment(domain[1]).isValid() ? moment(domain[1]) : undefined;
+    // this.rangeTimeChange.emit({start: domain[0], end: domain[1]});
     const newLine = d3
       .line()
       .x((d: any) => this.xt(d.sortTime))

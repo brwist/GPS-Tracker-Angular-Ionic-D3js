@@ -6,3 +6,9 @@
     </div>
 </div>
 <div id="stacked-area-temp"></div>
+<ion-list>
+    <ion-item class="current-range">
+      <ion-label item-left>{{rangeDateStart | date:datePipeFormat}}</ion-label>
+      <ion-label item-right text-right>{{rangeDateEnd | date:datePipeFormat}}</ion-label>
+    </ion-item>
+</ion-list>
