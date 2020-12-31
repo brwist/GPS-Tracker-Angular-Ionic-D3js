@@ -182,6 +182,8 @@ export class VoltChartComponent implements OnInit {
       return d ? 'M' + d.join('L') + 'Z' : null;
     });
 
+    this.verticalLineH = d3.select('rect').node().getBoundingClientRect().height + 8;
+
     this.resetZoom();
   }
 

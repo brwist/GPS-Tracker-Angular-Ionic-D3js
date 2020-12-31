@@ -55,6 +55,7 @@ export class TemperatureChartComponent implements OnInit {
   xt: any;
 
   selectedDetailLeft = 10;
+  verticalLineH: any;
 
   constructor() {}
 
@@ -179,6 +180,8 @@ export class TemperatureChartComponent implements OnInit {
     this.voronoiGroup.append('path').attr('d', function (d) {
       return d ? 'M' + d.join('L') + 'Z' : null;
     });
+
+    this.verticalLineH = d3.select('rect').node().getBoundingClientRect().height + 8;
 
     this.resetZoom();
   }
