@@ -37,9 +37,14 @@ page-charts {
     }
   }
 
-  ion-content {
-    background-color: #eaeaea !important;
+  ion-card.tabs-container-card {
+    border-radius: 0px !important;
+    margin: 2px;
   }
+
+  // ion-content {
+  //   background-color: #eaeaea !important;
+  // }
   
   ion-card {
     border-radius: 10px !important;

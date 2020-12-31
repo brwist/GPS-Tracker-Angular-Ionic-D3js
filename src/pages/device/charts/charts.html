@@ -20,49 +20,46 @@
   <div *ngIf="!chartData.batteryOrVolts" class="loading">
     <ion-spinner></ion-spinner>
   </div>
-  <div class="tabs-container">
-    <div
-      class="tabs-container_name"
-      [ngClass]="{'active-tab': activeTab === 1 }"
-      (click)="selectTimeDurationHour(1)"
-    >
-      <span>Hour</span>
-    </div>
-    <div
-      class="tabs-container_name"
-      [ngClass]="{'active-tab': activeTab === 2 }"
-      (click)="selectTimeDurationDay(2)"
-    >
-      <span>Day</span>
-    </div>
-    <div
-      class="tabs-container_name"
-      [ngClass]="{'active-tab': activeTab === 3 }"
-      (click)="selectTimeDurationWeek(3)"
-    >
-      <span>Week</span>
-    </div>
-    <div
-      class="tabs-container_name"
-      [ngClass]="{'active-tab': activeTab === 4 }"
-      (click)="selectTimeDurationMonth(4)"
-    >
-      <span>Month</span>
-    </div>
-    <div
-      class="tabs-container_name"
-      [ngClass]="{'active-tab': activeTab === 5 }"
-      (click)="selectTimeDurationYear(5)"
-    >
-      <span>Year</span>
-    </div>
-  </div>
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Volts</ion-card-title>
-    </ion-card-header>
+
+  <ion-card class="tabs-container-card">
     <ion-card-content>
-      <page-volt-chart [data]="chartData?.batteryOrVolts" (rangeTabChange)="rangeTabChange($event)" (rangeTimeChange)="rangeTimeChange($event)" *ngIf="chartData.batteryOrVolts"></page-volt-chart>
+      <div class="tabs-container">
+        <div
+          class="tabs-container_name"
+          [ngClass]="{'active-tab': activeTab === 1 }"
+          (click)="selectTimeDurationHour(1)"
+        >
+          <span>Hour</span>
+        </div>
+        <div
+          class="tabs-container_name"
+          [ngClass]="{'active-tab': activeTab === 2 }"
+          (click)="selectTimeDurationDay(2)"
+        >
+          <span>Day</span>
+        </div>
+        <div
+          class="tabs-container_name"
+          [ngClass]="{'active-tab': activeTab === 3 }"
+          (click)="selectTimeDurationWeek(3)"
+        >
+          <span>Week</span>
+        </div>
+        <div
+          class="tabs-container_name"
+          [ngClass]="{'active-tab': activeTab === 4 }"
+          (click)="selectTimeDurationMonth(4)"
+        >
+          <span>Month</span>
+        </div>
+        <div
+          class="tabs-container_name"
+          [ngClass]="{'active-tab': activeTab === 5 }"
+          (click)="selectTimeDurationYear(5)"
+        >
+          <span>Year</span>
+        </div>
+      </div>
     </ion-card-content>
   </ion-card>
   <ion-card>
@@ -71,6 +68,14 @@
     </ion-card-header>
     <ion-card-content>
       <page-temperature-chart [data]="chartData?.temperature" (rangeTabChange)="rangeTabChange($event)" (rangeTimeChange)="rangeTimeChange($event)" *ngIf="chartData.temperature"></page-temperature-chart>
+    </ion-card-content>
+  </ion-card>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Volts</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <page-volt-chart [data]="chartData?.batteryOrVolts" (rangeTabChange)="rangeTabChange($event)" (rangeTimeChange)="rangeTimeChange($event)" *ngIf="chartData.batteryOrVolts"></page-volt-chart>
     </ion-card-content>
   </ion-card>
 </ion-content>
