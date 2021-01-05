@@ -42,5 +42,27 @@
   border-left: 1px solid #387ef5;
   float: left;
   left: 44px;
-  margin-top: 2px
+  margin-top: 2px;
+}
+
+.current-range {
+  display: flex;
+  color: black;
+  font-weight: 500;
+  height: 20px;
+  ion-label {
+    font-size: 13px;
+  }
+  ion-note {
+    font-size: 13px;
+    color: black;
+  }
+}
+
+ion-list {
+  padding: 0px;
+}
+
+#stacked-area-temp {
+  margin-left: 35px !important;
 }

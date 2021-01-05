@@ -44,3 +44,25 @@
   left: 44px;
   margin-top: 2px;
 }
+
+.current-range {
+  display: flex;
+  color: black;
+  font-weight: 500;
+  height: 20px;
+  ion-label {
+    font-size: 13px;
+  }
+  ion-note {
+    font-size: 13px;
+    color: black;
+  }
+}
+
+ion-list {
+  padding: 0px;
+}
+
+#stacked-area-volt {
+  margin-left: 35px;
+}

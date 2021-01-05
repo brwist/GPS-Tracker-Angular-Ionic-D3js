@@ -1,5 +1,4 @@
 page-charts {
-
   .loading {
     padding-top: 30px;
     text-align: center;
@@ -40,13 +39,15 @@ page-charts {
   ion-card.tabs-container-card {
     border-radius: 0px !important;
     margin: 2px;
+    padding: 0px;
   }
 
   // ion-content {
   //   background-color: #eaeaea !important;
   // }
-  
+
   ion-card {
+    padding: 5px;
     border-radius: 10px !important;
     margin-left: 0px !important;
     margin-right: 0px !important;

@@ -105,7 +105,7 @@ export class VoltChartComponent implements OnInit {
     
     // d3.selectAll('#stacked-area > *').remove();
     this.formatDate = d3.timeFormat('%d-%b, %H:%M');
-    this.y = d3.scaleLinear().rangeRound([this.height, 0]);
+    // this.y = d3.scaleLinear().rangeRound([this.height, 0]);
     this.yAxis = d3
       .axisRight(this.y)
       .ticks(10)
@@ -125,9 +125,9 @@ export class VoltChartComponent implements OnInit {
     this.svg = d3
       .select('#stacked-area-volt')
       .append('svg')
-      .attr('width', '100%')
+      .attr('width', '90%')
       .attr('height', '100%')
-      .attr('viewBox', [-40, 0, width + 90, height + 20])
+      .attr('viewBox', [-9, 0, width, height + 20])
       .call(this.zoom);
     // this.svg.select('*').remove();
     const g = this.svg.append('g').attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');
@@ -218,18 +218,11 @@ export class VoltChartComponent implements OnInit {
 
   private zoomed(): void {
     this.chartValueAround = undefined;
-    // if(this.data.length > 0) {
-    //   const defData = this.data[0];
-    //   if(defData) {
-    //     this.chartValueAround = this.formatDate(defData.sortTime) + ' ' + defData.batteryOrVolts;
-    //   }
-    // }
     this.gX.call(this.xAxis.scale(d3.event.transform.rescaleX(this.x)));
     this.xt = d3.event.transform.rescaleX(this.x);
     const domain = this.xt.domain();
     this.rangeDateStart = moment(domain[0]).isValid() ? moment(domain[0]) : undefined;
     this.rangeDateEnd = moment(domain[1]).isValid() ? moment(domain[1]) : undefined;
-    // this.rangeTimeChange.emit({start: domain[0], end: domain[1]});
     const newLine = d3
       .line()
       .x((d: any) => this.xt(d.sortTime))

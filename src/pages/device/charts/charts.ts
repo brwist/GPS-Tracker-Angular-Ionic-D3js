@@ -418,25 +418,50 @@ export class DeviceChartsPage implements OnInit {
 
         this.chartData = {};
         setTimeout(() => {
-            this.chartData.batteryOrVolts = points.map(item => {
-                return {
-                    sortTime: new Date(item.timestamp),
-                    batteryOrVolts: item.batteryOrVolts
-                }
-            })
-            .sort((a, b) =>
-                a.sortTime > b.sortTime ? -1 : b.sortTime > a.sortTime ? 1 : 0
-            );
+            let batteryOrVolts = [];
+            let temperature = [];
+            if(points) {
+                batteryOrVolts = points
+                .filter((item) => {
+                    if(!item.batteryOrVolts) {
+                        return false;
+                    }
+                    return true;
+                })
+                .map(item => {
+                    return {
+                        sortTime: new Date(item.timestamp).getTime(),
+                        batteryOrVolts: item.batteryOrVolts
+                    }
+                })
+                .sort((a, b) =>
+                    a.sortTime > b.sortTime ? -1 : b.sortTime > a.sortTime ? 1 : 0
+                );
 
-            this.chartData.temperature = points.map(item => {
-                return {
-                    sortTime: new Date(item.timestamp),
-                    temperature: item.temperature
-                }
-            })
-            .sort((a, b) =>
-                a.sortTime > b.sortTime ? -1 : b.sortTime > a.sortTime ? 1 : 0
-            );
+                temperature = points
+                .filter((item) => {
+                    if(!item.temperature) {
+                        return false;
+                    }
+                    return true;
+                })
+                .map(item => {
+                    if(!item.temperature) {
+                        console.log(item.temperature);
+                        return;
+                    }
+                    return {
+                        sortTime: new Date(item.timestamp).getTime(),
+                        temperature: item.temperature
+                    }
+                })
+                .sort((a, b) =>
+                    a.sortTime > b.sortTime ? -1 : b.sortTime > a.sortTime ? 1 : 0
+                );
+            }
+
+            this.chartData.batteryOrVolts = batteryOrVolts;
+            this.chartData.temperature = temperature;
             setTimeout(() => {
                 this.firstLoad = false;
             }, 4000);

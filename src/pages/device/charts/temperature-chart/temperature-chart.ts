@@ -19,6 +19,7 @@ export class TemperatureChartComponent implements OnInit {
   @Output() public rangeTabChange = new EventEmitter<number>();
   @Output() public rangeTimeChange = new EventEmitter<rangeModelArgs>();
 
+  public datePipeFormat = 'MMM d h:mm a';
   public rangeDateStart: any;
   public rangeDateEnd: any;
   chartValueAround;
@@ -102,7 +103,7 @@ export class TemperatureChartComponent implements OnInit {
     
     // d3.selectAll('#stacked-area > *').remove();
     this.formatDate = d3.timeFormat('%d-%b, %H:%M');
-    this.y = d3.scaleLinear().rangeRound([this.height, 0]);
+    // this.y = d3.scaleLinear().rangeRound([this.height, 0]);
     this.yAxis = d3
       .axisRight(this.y)
       .ticks(10)
@@ -122,9 +123,9 @@ export class TemperatureChartComponent implements OnInit {
     this.svg = d3
       .select('#stacked-area-temp')
       .append('svg')
-      .attr('width', '100%')
+      .attr('width', '90%')
       .attr('height', '100%')
-      .attr('viewBox', [-40, 0, width + 90, height + 20])
+      .attr('viewBox', [-5, 0, width, height + 20])
       .call(this.zoom);
     // this.svg.select('*').remove();
     const g = this.svg.append('g').attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');
@@ -215,12 +216,6 @@ export class TemperatureChartComponent implements OnInit {
 
   private zoomed(): void {
     this.chartValueAround = undefined;
-    // if(this.data.length > 0) {
-    //   const defData = this.data[0];
-    //   if(defData) {
-    //     this.chartValueAround = this.formatDate(defData.sortTime) + ' ' + defData.temperature + '\u00B0';
-    //   }
-    // }
     this.gX.call(this.xAxis.scale(d3.event.transform.rescaleX(this.x)));
     this.xt = d3.event.transform.rescaleX(this.x);
     const domain = this.xt.domain();
