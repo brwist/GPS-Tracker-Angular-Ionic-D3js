@@ -17,7 +17,7 @@ import { ISettings, Settings } from '../../providers/settings';
 import { ApiProvider, IDeviceLocation, IFirmwareUpdateInfo, IUserInfo } from '../../providers/api';
 import { LatestVersionPage } from './latest-version';
 import { DeviceTracksPage } from './tracks';
-import { DeviceChartsPage } from './charts';
+import { DeviceGPSChartsPage, DeviceTHSChartsPage } from './charts';
 import { NativeRingtones } from '@ionic-native/native-ringtones';
 import { DateSettingsPage } from './date-settings';
 import { UtilsService } from '../../services/utils.service';
@@ -33,10 +33,12 @@ import 'leaflet.markercluster';
 import 'leaflet.gridlayer.googlemutant';
 import 'leaflet-fullscreen';
 import { debounceTime, filter } from 'rxjs/operators';
+import { MeasurementsPage } from './measurements/measurements';
 // import 'leaflet-canvas-marker';
 
 const DATE_SETTINGS_STORAGE_KEY = 'device-date-settings';
-const SHOW_GPS_LOGS_KEY         = 'show-gps-logs';
+const SHOW_GPS_LOGS_KEY = 'show-gps-logs';
+const SHOW_DETAILS_KEY = 'show-ths-details';
 
 export interface IDateSettings {
     type: string;
@@ -118,49 +120,35 @@ export class DevicePage implements OnInit {
         endDate: moment()
     };
 
-    
     private timeZone: string = momentTimezone.tz.guess();
-    
+
     private mapLoaded: boolean = false;
-    
+
     private userSubscription: Subscription;
     private activeThemeSubscription: Subscription;
     private watchPositionSubscription: Subscription;
     private deviceLocationSubscription: Subscription;
     private firstAlertSubscription: Subscription;
-    
-    constructor(private navCtrl: NavController,
-                private params: NavParams,
-                private deviceProvider: DeviceProvider,
-                private actionSheetCtrl: ActionSheetController,
-                private loadingCtrl: LoadingController,
-                private storage: Storage,
-                private settingsProvider: Settings,
-                private apiProvider: ApiProvider,
-                private logger: Logger,
-                private ngZone: NgZone,
-                private platform: Platform,
-                private modalCtrl: ModalController,
-                private ringtones: NativeRingtones,
-                private geolocation: Geolocation,
-                private trackProvider: TrackProvider,
-                private alertCtrl: AlertController) {
+    private settingSubscription: Subscription;
 
-    }
-
-    set showTelemetry(value: boolean) {
-
-        this.showTelemetryModel = value;
-
-        this.storage.set(`show-telemetry-${this.id}`, value).catch((err) => {
-            this.logger.error(err);
-        });
-    }
-
-    get showTelemetry() {
-
-        return this.showTelemetryModel;
-    }
+    constructor(
+        private navCtrl: NavController,
+        private params: NavParams,
+        private deviceProvider: DeviceProvider,
+        private actionSheetCtrl: ActionSheetController,
+        private loadingCtrl: LoadingController,
+        private storage: Storage,
+        private settingsProvider: Settings,
+        private apiProvider: ApiProvider,
+        private logger: Logger,
+        private ngZone: NgZone,
+        private platform: Platform,
+        private modalCtrl: ModalController,
+        private ringtones: NativeRingtones,
+        private geolocation: Geolocation,
+        private trackProvider: TrackProvider,
+        private alertCtrl: AlertController
+    ) { }
 
     get dateRangeString() {
 
@@ -225,6 +213,16 @@ export class DevicePage implements OnInit {
         this.fetchTracksByBoundsArea();
     }
 
+    get showDetails() {
+        const storedValue = localStorage.getItem(SHOW_DETAILS_KEY + `-${this.id}`);
+
+        return storedValue ? storedValue === 'true' : true;
+    }
+
+    set showDetails(value) {
+        localStorage.setItem(SHOW_DETAILS_KEY + `-${this.id}`, value ? 'true' : 'false');
+    }
+
     get isNightTheme() {
 
         return this.activeTheme === 'night-theme';
@@ -242,7 +240,16 @@ export class DevicePage implements OnInit {
         return true;
     }
 
+    // @TODO huge kostil
+    get isGps() {
+        return this.device && this.device.type === 'GPS';
+    }
+
     public ngOnInit() {
+
+        this.settingSubscription = this.settingsProvider.settings.subscribe((settings: ISettings) => {
+            this.settings = settings;
+        });
 
         this.id = this.params.get('id');
 
@@ -262,7 +269,7 @@ export class DevicePage implements OnInit {
 
                         if (updatedDateRange) {
                             this.dateSettings.startDate = updatedDateRange.startDate;
-                            this.dateSettings.endDate   = updatedDateRange.endDate;
+                            this.dateSettings.endDate = updatedDateRange.endDate;
                         }
                     }
                 }
@@ -276,7 +283,6 @@ export class DevicePage implements OnInit {
         }, (callback) => {
 
             this.settingsProvider.settings.take(1).subscribe((settings: ISettings) => {
-
                 this.settings = settings;
 
                 this.settings.lastOpenedDeviceId = this.id;
@@ -305,75 +311,77 @@ export class DevicePage implements OnInit {
 
             }).catch((err) => console.log(err));
 
-            this.deviceLocationSubscription = this.apiProvider.deviceLocation.subscribe((deviceLocation: IDeviceLocation) => {
+            if (this.isGps) {
+                this.deviceLocationSubscription = this.apiProvider.deviceLocation.subscribe((deviceLocation: IDeviceLocation) => {
 
-                if (deviceLocation.id !== this.id) return;
-                if (!this.device) return; // Device is not loaded yet
+                    if (deviceLocation.id !== this.id) return;
+                    if (!this.device) return; // Device is not loaded yet
 
-                this.previousTrack = this.device.lastTrack;
+                    this.previousTrack = this.device.lastTrack;
 
-                this.device.lastTrack = deviceLocation.lastTrack;
+                    this.device.lastTrack = deviceLocation.lastTrack;
 
-                if (!this.mapRecenterPaused) {
+                    if (!this.mapRecenterPaused) {
 
-                    this.mapCenter = deviceLocation.lastLocation.location.coordinates;
+                        this.mapCenter = deviceLocation.lastLocation.location.coordinates;
 
-                    if (this.map) {
+                        if (this.map) {
 
-                        this.leafletRecenter = true;
+                            this.leafletRecenter = true;
 
-                        this.setDeviceMarker();
+                            this.setDeviceMarker();
 
-                        this.map.setView(L.latLng({lat: this.mapCenter[1], lng: this.mapCenter[0]}), this.mapZoom);
+                            this.map.setView(L.latLng({ lat: this.mapCenter[1], lng: this.mapCenter[0] }), this.mapZoom);
 
-                        setTimeout(() => {
-                            this.leafletRecenter = false;
-                        }, 1000);
-                    }
-                }
-
-                this.shownTrack = deviceLocation.lastTrack;
-
-                this.checkForFirmwareUpdate();
-
-                if (this.previousTrack && this.device.lastTrack) {
-
-                    if (this.previousTrack.createdAt !== this.device.lastTrack.createdAt) {
-
-                        if (this.settings && this.settings.newTrackRingtone) {
-
-                            this.ringtones.playRingtone(this.settings.newTrackRingtone.Url).catch((err) => {
-                                this.logger.error(err);
-                            });
+                            setTimeout(() => {
+                                this.leafletRecenter = false;
+                            }, 1000);
                         }
                     }
-                }
 
-                setTimeout(() => { // wait for map recenter is done
-                    this.fetchTracksByBoundsArea();
-                }, 2000);
-            });
+                    this.shownTrack = deviceLocation.lastTrack;
 
-            this.activeThemeSubscription = this.settingsProvider.getActiveTheme().subscribe((activeTheme: string) => {
+                    this.checkForFirmwareUpdate();
 
-                if (this.activeTheme && this.activeTheme !== activeTheme) {
+                    if (this.previousTrack && this.device.lastTrack) {
 
-                    this.activeTheme = activeTheme;
+                        if (this.previousTrack.createdAt !== this.device.lastTrack.createdAt) {
 
-                    if (this.isNightTheme) {
+                            if (this.settings && this.settings.newTrackRingtone) {
 
-                        this.roadMutant.removeFrom(this.map);
-                        this.nightMutant.addTo(this.map);
-
-                    } else {
-
-                        this.nightMutant.removeFrom(this.map);
-                        this.roadMutant.addTo(this.map);
+                                this.ringtones.playRingtone(this.settings.newTrackRingtone.Url).catch((err) => {
+                                    this.logger.error(err);
+                                });
+                            }
+                        }
                     }
 
-                    this.fetchTracksByBoundsArea();
-                }
-            });
+                    setTimeout(() => { // wait for map recenter is done
+                        this.fetchTracksByBoundsArea();
+                    }, 2000);
+                });
+
+                this.activeThemeSubscription = this.settingsProvider.getActiveTheme().subscribe((activeTheme: string) => {
+
+                    if (this.activeTheme && this.activeTheme !== activeTheme) {
+
+                        this.activeTheme = activeTheme;
+
+                        if (this.isNightTheme) {
+
+                            this.roadMutant.removeFrom(this.map);
+                            this.nightMutant.addTo(this.map);
+
+                        } else {
+
+                            this.nightMutant.removeFrom(this.map);
+                            this.roadMutant.addTo(this.map);
+                        }
+
+                        this.fetchTracksByBoundsArea();
+                    }
+                });
+            }
 
             callback();
 
@@ -390,53 +398,59 @@ export class DevicePage implements OnInit {
         });
 
         this.firstAlertSubscription = this.apiProvider.firstAlert
-        .pipe(
-            debounceTime(500),
-            filter(el => el.deviceId === this.id)
-        )
-        .subscribe((res) => this.fetchDeviceInfo());
+            .pipe(
+                debounceTime(500),
+                filter((el) => el.deviceId === this.id)
+            )
+            .subscribe((res) => this.fetchDeviceInfo());
     }
 
     public ngOnDestroy() {
 
         if (this.watchPositionSubscription) {
-
             this.watchPositionSubscription.unsubscribe();
         }
 
-        this.deviceLocationSubscription.unsubscribe();
+        if (this.deviceLocationSubscription) {
+            this.deviceLocationSubscription.unsubscribe();
+        }
+
         this.userSubscription.unsubscribe();
         this.firstAlertSubscription.unsubscribe();
+        this.settingSubscription.unsubscribe();
     }
 
     public goEditDevicePage() {
 
-        this.navCtrl.push(EditDevicePage, {id: this.id});
+        this.navCtrl.push(EditDevicePage, { id: this.id });
     }
 
     public goDeviceRulesPage() {
 
-        this.navCtrl.push(RulesPage, {device: this.device});
+        this.navCtrl.push(RulesPage, { device: this.device });
+    }
+
+    public goDeviceMeasurementsPage() {
+        this.navCtrl.push(MeasurementsPage, { device: this.device });
     }
 
     public goDeviceTracksPage() {
 
-        this.navCtrl.push(DeviceTracksPage, {device: this.device});
+        this.navCtrl.push(DeviceTracksPage, { device: this.device });
     }
 
     public goDeviceChartsPage() {
-
-        this.navCtrl.push(DeviceChartsPage, {device: this.device});
+        this.navCtrl.push(this.isGps ? DeviceGPSChartsPage : DeviceTHSChartsPage, { device: this.device });
     }
 
     public openDeviceTrackingOptionsModal() {
 
-        this.navCtrl.push(TrackingOptionsPage, {id: this.id, pushed: true});
+        this.navCtrl.push(TrackingOptionsPage, { id: this.id, pushed: true });
     }
 
     public openDeviceSharingPage() {
 
-        this.navCtrl.push(DeviceSharePage, {device: this.device});
+        this.navCtrl.push(DeviceSharePage, { device: this.device });
     }
 
     public mapBoundsChange() {
@@ -507,7 +521,7 @@ export class DevicePage implements OnInit {
     public resumeMapRecenter() {
 
         this.resumeRecenterControlText.style.opacity = '0';
-        this.mapRecenterPaused                       = false;
+        this.mapRecenterPaused = false;
     }
 
     public mapReady() {
@@ -521,14 +535,14 @@ export class DevicePage implements OnInit {
 
                 $this.resumeRecenterControlText = resumeRecenterControlText;
 
-                resumeRecenterControlText.style.color               = '#222';
+                resumeRecenterControlText.style.color = '#222';
                 resumeRecenterControlText.style['background-color'] = '#ffd76e';
-                resumeRecenterControlText.style['border-radius']    = '4px 4px 4px 4px';
-                resumeRecenterControlText.style.padding             = '3px 5px 3px 5px';
-                resumeRecenterControlText.style.cursor              = 'pointer';
-                resumeRecenterControlText.style.fontSize            = '14px';
-                resumeRecenterControlText.style.opacity             = '0';
-                resumeRecenterControlText.innerHTML                 = 'resume map refresh';
+                resumeRecenterControlText.style['border-radius'] = '4px 4px 4px 4px';
+                resumeRecenterControlText.style.padding = '3px 5px 3px 5px';
+                resumeRecenterControlText.style.cursor = 'pointer';
+                resumeRecenterControlText.style.fontSize = '14px';
+                resumeRecenterControlText.style.opacity = '0';
+                resumeRecenterControlText.innerHTML = 'resume map refresh';
 
                 resumeRecenterControlText.addEventListener('click', () => {
 
@@ -551,7 +565,7 @@ export class DevicePage implements OnInit {
             return new (L.Control as any).ResumeButton(opts);
         };
 
-        (L.control as any).resumeButton({position: 'bottomleft'}).addTo(this.map);
+        (L.control as any).resumeButton({ position: 'bottomleft' }).addTo(this.map);
 
         this.map.on('moveend', () => {
 
@@ -560,7 +574,7 @@ export class DevicePage implements OnInit {
                 this.mapBoundsChange();
 
                 this.resumeRecenterControlText.style.opacity = '1';
-                this.mapRecenterPaused                       = true;
+                this.mapRecenterPaused = true;
             }
         });
 
@@ -621,12 +635,12 @@ export class DevicePage implements OnInit {
 
         if (notAllowedForShared) return;
 
-        this.modalCtrl.create(HelpModal, {feature}).present();
+        this.modalCtrl.create(HelpModal, { feature }).present();
     }
 
     public openLatestVersionPage() {
 
-        this.navCtrl.push(LatestVersionPage, {firmwareUpdateInfo: this.firmwareUpdateInfo});
+        this.navCtrl.push(LatestVersionPage, { firmwareUpdateInfo: this.firmwareUpdateInfo });
     }
 
     public presentDateSettings() {
@@ -733,7 +747,7 @@ export class DevicePage implements OnInit {
         if (icon) options.icon = icon;
         if (rotationAngle) options.rotationAngle = rotationAngle;
 
-        this.deviceMarker = L.marker(L.latLng({lat: this.mapCenter[1], lng: this.mapCenter[0]}), options);
+        this.deviceMarker = L.marker(L.latLng({ lat: this.mapCenter[1], lng: this.mapCenter[0] }), options);
 
         this.deviceMarker.addTo(this.map);
     }
@@ -778,84 +792,84 @@ export class DevicePage implements OnInit {
         this.nightMutant = (L.gridLayer as any).googleMutant({
             maxZoom: 24,
             type: 'roadmap',
-            styles: [{elementType: 'geometry', stylers: [{color: '#242f3e'}]},
-                {elementType: 'labels.text.stroke', stylers: [{color: '#242f3e'}]},
-                {elementType: 'labels.text.fill', stylers: [{color: '#746855'}]},
-                {
-                    featureType: 'administrative.locality',
-                    elementType: 'labels.text.fill',
-                    stylers: [{color: '#d59563'}]
-                },
-                {
-                    featureType: 'poi',
-                    elementType: 'labels.text.fill',
-                    stylers: [{color: '#d59563'}]
-                },
-                {
-                    featureType: 'poi.park',
-                    elementType: 'geometry',
-                    stylers: [{color: '#263c3f'}]
-                },
-                {
-                    featureType: 'poi.park',
-                    elementType: 'labels.text.fill',
-                    stylers: [{color: '#6b9a76'}]
-                },
-                {
-                    featureType: 'road',
-                    elementType: 'geometry',
-                    stylers: [{color: '#38414e'}]
-                },
-                {
-                    featureType: 'road',
-                    elementType: 'geometry.stroke',
-                    stylers: [{color: '#212a37'}]
-                },
-                {
-                    featureType: 'road',
-                    elementType: 'labels.text.fill',
-                    stylers: [{color: '#9ca5b3'}]
-                },
-                {
-                    featureType: 'road.highway',
-                    elementType: 'geometry',
-                    stylers: [{color: '#746855'}]
-                },
-                {
-                    featureType: 'road.highway',
-                    elementType: 'geometry.stroke',
-                    stylers: [{color: '#1f2835'}]
-                },
-                {
-                    featureType: 'road.highway',
-                    elementType: 'labels.text.fill',
-                    stylers: [{color: '#f3d19c'}]
-                },
-                {
-                    featureType: 'transit',
-                    elementType: 'geometry',
-                    stylers: [{color: '#2f3948'}]
-                },
-                {
-                    featureType: 'transit.station',
-                    elementType: 'labels.text.fill',
-                    stylers: [{color: '#d59563'}]
-                },
-                {
-                    featureType: 'water',
-                    elementType: 'geometry',
-                    stylers: [{color: '#17263c'}]
-                },
-                {
-                    featureType: 'water',
-                    elementType: 'labels.text.fill',
-                    stylers: [{color: '#515c6d'}]
-                },
-                {
-                    featureType: 'water',
-                    elementType: 'labels.text.stroke',
-                    stylers: [{color: '#17263c'}]
-                }]
+            styles: [{ elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
+            { elementType: 'labels.text.stroke', stylers: [{ color: '#242f3e' }] },
+            { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] },
+            {
+                featureType: 'administrative.locality',
+                elementType: 'labels.text.fill',
+                stylers: [{ color: '#d59563' }]
+            },
+            {
+                featureType: 'poi',
+                elementType: 'labels.text.fill',
+                stylers: [{ color: '#d59563' }]
+            },
+            {
+                featureType: 'poi.park',
+                elementType: 'geometry',
+                stylers: [{ color: '#263c3f' }]
+            },
+            {
+                featureType: 'poi.park',
+                elementType: 'labels.text.fill',
+                stylers: [{ color: '#6b9a76' }]
+            },
+            {
+                featureType: 'road',
+                elementType: 'geometry',
+                stylers: [{ color: '#38414e' }]
+            },
+            {
+                featureType: 'road',
+                elementType: 'geometry.stroke',
+                stylers: [{ color: '#212a37' }]
+            },
+            {
+                featureType: 'road',
+                elementType: 'labels.text.fill',
+                stylers: [{ color: '#9ca5b3' }]
+            },
+            {
+                featureType: 'road.highway',
+                elementType: 'geometry',
+                stylers: [{ color: '#746855' }]
+            },
+            {
+                featureType: 'road.highway',
+                elementType: 'geometry.stroke',
+                stylers: [{ color: '#1f2835' }]
+            },
+            {
+                featureType: 'road.highway',
+                elementType: 'labels.text.fill',
+                stylers: [{ color: '#f3d19c' }]
+            },
+            {
+                featureType: 'transit',
+                elementType: 'geometry',
+                stylers: [{ color: '#2f3948' }]
+            },
+            {
+                featureType: 'transit.station',
+                elementType: 'labels.text.fill',
+                stylers: [{ color: '#d59563' }]
+            },
+            {
+                featureType: 'water',
+                elementType: 'geometry',
+                stylers: [{ color: '#17263c' }]
+            },
+            {
+                featureType: 'water',
+                elementType: 'labels.text.fill',
+                stylers: [{ color: '#515c6d' }]
+            },
+            {
+                featureType: 'water',
+                elementType: 'labels.text.stroke',
+                stylers: [{ color: '#17263c' }]
+            }]
         });
 
         this.settingsProvider.getActiveTheme().take(1).subscribe((theme: string) => {
@@ -897,7 +911,7 @@ export class DevicePage implements OnInit {
 
         if (this.mapCenter) {
 
-            this.map.setView(L.latLng({lat: this.mapCenter[1], lng: this.mapCenter[0]}), this.mapZoom);
+            this.map.setView(L.latLng({ lat: this.mapCenter[1], lng: this.mapCenter[0] }), this.mapZoom);
         }
 
         this.setDeviceMarker();
@@ -911,12 +925,12 @@ export class DevicePage implements OnInit {
                 onAdd: (map) => {
                     const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
 
-                    container.style.backgroundColor        = 'white';
-                    container.style.backgroundImage        = 'url(assets/img/location-icon.svg)';
-                    container.style['background-size']     = '25px 25px';
+                    container.style.backgroundColor = 'white';
+                    container.style.backgroundImage = 'url(assets/img/location-icon.svg)';
+                    container.style['background-size'] = '25px 25px';
                     container.style['background-position'] = 'center center';
-                    container.style.width                  = '30px';
-                    container.style.height                 = '30px';
+                    container.style.width = '30px';
+                    container.style.height = '30px';
 
                     container.onclick = () => {
 
@@ -1000,53 +1014,27 @@ export class DevicePage implements OnInit {
     private fetchDeviceInfo() {
 
         this.deviceProvider.getItem(this.id).then((device: IDevice) => {
-
-            this.noMapMessage = null;
-
-            if (this.device) {
-
-                this.previousTrack = this.device.lastTrack;
-            }
-
             this.device = device;
             this.firstAlert = device.firstAlert;
 
-            if (!this.device.lastTrack) {
+            if (this.isGps) {
+                this.noMapMessage = null;
 
-                this.noMapMessage = 'No Device location history available.';
+                if (this.device) {
+                    this.previousTrack = this.device.lastTrack;
+                }
 
-                setTimeout(this.loadMap.bind(this), 100);
+                if (!this.device.lastTrack) {
 
-            } else if (this.device.lastTrack.location && this.device.lastTrack.location.coordinates[0] !== 0) {
-
-                if (!this.mapRecenterPaused) {
-
-                    this.mapCenter = this.device.lastTrack.location.coordinates;
+                    this.noMapMessage = 'No Device location history available.';
 
                     setTimeout(this.loadMap.bind(this), 100);
 
-                    if (this.map) {
+                } else if (this.device.lastTrack.location && this.device.lastTrack.location.coordinates[0] !== 0) {
 
-                        this.leafletRecenter = true;
+                    if (!this.mapRecenterPaused) {
 
-                        this.setDeviceMarker();
-
-                        this.map.setView(L.latLng({lat: this.mapCenter[1], lng: this.mapCenter[0]}), this.mapZoom);
-
-                        setTimeout(() => {
-                            this.leafletRecenter = false;
-                        }, 1000);
-                    }
-                }
-
-            } else {
-
-                if (!this.mapRecenterPaused) {
-
-                    // Fetch last non-zero coordinates and set map center
-                    this.deviceProvider.getLastLocation(this.id).then((lastLocation: ITrack) => {
-
-                        this.mapCenter = lastLocation.location.coordinates;
+                        this.mapCenter = this.device.lastTrack.location.coordinates;
 
                         setTimeout(this.loadMap.bind(this), 100);
 
@@ -1056,34 +1044,60 @@ export class DevicePage implements OnInit {
 
                             this.setDeviceMarker();
 
-                            this.map.setView(L.latLng({lat: this.mapCenter[1], lng: this.mapCenter[0]}), this.mapZoom);
+                            this.map.setView(L.latLng({ lat: this.mapCenter[1], lng: this.mapCenter[0] }), this.mapZoom);
 
                             setTimeout(() => {
                                 this.leafletRecenter = false;
                             }, 1000);
                         }
-                    });
-                }
-            }
+                    }
 
-            this.shownTrack = this.device.lastTrack;
+                } else {
 
-            this.device.trackingOptions.notifications = this.device.trackingOptions.notifications.map((notificationData) => {
+                    if (!this.mapRecenterPaused) {
 
-                return NotificationFactory.createNotification(notificationData);
-            });
+                        // Fetch last non-zero coordinates and set map center
+                        this.deviceProvider.getLastLocation(this.id).then((lastLocation: ITrack) => {
 
-            this.checkForFirmwareUpdate();
+                            this.mapCenter = lastLocation.location.coordinates;
 
-            if (this.previousTrack && this.device.lastTrack) {
+                            setTimeout(this.loadMap.bind(this), 100);
 
-                if (this.previousTrack.createdAt !== this.device.lastTrack.createdAt) {
+                            if (this.map) {
 
-                    if (this.settings && this.settings.newTrackRingtone) {
+                                this.leafletRecenter = true;
 
-                        this.ringtones.playRingtone(this.settings.newTrackRingtone.Url).catch((err) => {
-                            this.logger.error(err);
+                                this.setDeviceMarker();
+
+                                this.map.setView(L.latLng({ lat: this.mapCenter[1], lng: this.mapCenter[0] }), this.mapZoom);
+
+                                setTimeout(() => {
+                                    this.leafletRecenter = false;
+                                }, 1000);
+                            }
                         });
+                    }
+                }
+
+                this.shownTrack = this.device.lastTrack;
+
+                this.device.trackingOptions.notifications = this.device.trackingOptions.notifications.map((notificationData) => {
+
+                    return NotificationFactory.createNotification(notificationData);
+                });
+
+                this.checkForFirmwareUpdate();
+
+                if (this.previousTrack && this.device.lastTrack) {
+
+                    if (this.previousTrack.createdAt !== this.device.lastTrack.createdAt) {
+
+                        if (this.settings && this.settings.newTrackRingtone) {
+
+                            this.ringtones.playRingtone(this.settings.newTrackRingtone.Url).catch((err) => {
+                                this.logger.error(err);
+                            });
+                        }
                     }
                 }
             }
@@ -1235,7 +1249,7 @@ export class DevicePage implements OnInit {
                 });
 
                 this.markers.on('clusterclick', (a) => {
-                    a.layer.zoomToBounds({padding: [20, 20]});
+                    a.layer.zoomToBounds({ padding: [20, 20] });
                 });
 
                 this.markers.on('click', (event) => {
@@ -1291,7 +1305,7 @@ export class DevicePage implements OnInit {
 
                 iconUrl = 'assets/img/circle-bright-green.png';
 
-                iconSize   = [10, 10];
+                iconSize = [10, 10];
                 iconAnchor = [5, 5];
 
             } else if (feature.properties.data.source === trackSources.TRACK_SOURCE_HOME_WIFI_GPS_LOG) {
@@ -1302,14 +1316,14 @@ export class DevicePage implements OnInit {
 
                         iconUrl = 'assets/img/circle-white-with-direction.png';
 
-                        iconSize   = [12, 12];
+                        iconSize = [12, 12];
                         iconAnchor = [5, 5];
 
                     } else {
 
                         iconUrl = 'assets/img/circle-white.png';
 
-                        iconSize   = [10, 10];
+                        iconSize = [10, 10];
                         iconAnchor = [5, 5];
                     }
 
@@ -1319,14 +1333,14 @@ export class DevicePage implements OnInit {
 
                         iconUrl = 'assets/img/circle-black-with-direction.png';
 
-                        iconSize   = [12, 12];
+                        iconSize = [12, 12];
                         iconAnchor = [5, 5];
 
                     } else {
 
                         iconUrl = 'assets/img/circle-black.png';
 
-                        iconSize   = [10, 10];
+                        iconSize = [10, 10];
                         iconAnchor = [5, 5];
                     }
                 }
@@ -1342,7 +1356,7 @@ export class DevicePage implements OnInit {
                     iconUrl = 'assets/img/circle-blue.png';
                 }
 
-                iconSize   = [10, 10];
+                iconSize = [10, 10];
                 iconAnchor = [5, 5];
 
             } else {
@@ -1358,7 +1372,7 @@ export class DevicePage implements OnInit {
                         iconUrl = 'assets/img/circle-red-v1.png';
                     }
 
-                    iconSize   = [12, 12];
+                    iconSize = [12, 12];
                     iconAnchor = [5, 5];
 
                 } else {
@@ -1372,7 +1386,7 @@ export class DevicePage implements OnInit {
                         iconUrl = 'assets/img/circle-red.png';
                     }
 
-                    iconSize   = [10, 10];
+                    iconSize = [10, 10];
                     iconAnchor = [5, 5];
                 }
             }
@@ -1405,13 +1419,13 @@ export class DevicePage implements OnInit {
 
         const renderer = L.canvas();
 
-        const MARKER_COLOR_BLUE         = '#0000ff';
-        const MARKER_COLOR_ORANGE       = '#ffd700';
-        const MARKER_COLOR_RED          = '#ff0000';
-        const MARKER_COLOR_GREEN        = '#00ff1a';
+        const MARKER_COLOR_BLUE = '#0000ff';
+        const MARKER_COLOR_ORANGE = '#ffd700';
+        const MARKER_COLOR_RED = '#ff0000';
+        const MARKER_COLOR_GREEN = '#00ff1a';
         const MARKER_COLOR_BRIGHT_GREEN = '#7fd228';
-        const MARKER_COLOR_WHITE        = '#ffffff';
-        const MARKER_COLOR_BLACK        = '#000000';
+        const MARKER_COLOR_WHITE = '#ffffff';
+        const MARKER_COLOR_BLACK = '#000000';
 
         // console.time(`prepareMarkersOnCanvas(points: ${data.geoJSON.features.length})`);
 
@@ -1519,7 +1533,7 @@ export class DevicePage implements OnInit {
 
         const radius = Math.floor(data.coords.accuracy / 2);
 
-        this.currentUserPosition = L.latLng({lat: data.coords.latitude, lng: data.coords.longitude});
+        this.currentUserPosition = L.latLng({ lat: data.coords.latitude, lng: data.coords.longitude });
 
         const greyIcon = new L.Icon({
             iconUrl: 'assets/img/leaflet-color-markers/marker-icon-2x-grey.png',
@@ -1529,7 +1543,7 @@ export class DevicePage implements OnInit {
             shadowSize: [41, 41]
         });
 
-        this.currentUserPositionMarker = L.marker(this.currentUserPosition, {icon: greyIcon}).addTo(this.map)
+        this.currentUserPositionMarker = L.marker(this.currentUserPosition, { icon: greyIcon }).addTo(this.map)
             .bindPopup(`You are within ${radius} meters from this point`);
 
         this.currentUserAccuracyMarker = L.circle(this.currentUserPosition).addTo(this.map);

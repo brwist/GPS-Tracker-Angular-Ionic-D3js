@@ -1,0 +1,21 @@
+.ths-preview {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 15px;
+  align-items: center;
+  min-width: 80px;
+  min-height: 80px;
+
+  .line {
+    border-bottom: 1px solid #ddd;
+    height: 1px;
+    width: 100%;
+    margin: 5px 0;
+  }
+
+  .ion-md-thermometer {
+    font-size: 50px;
+  }
+}

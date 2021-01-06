@@ -10,6 +10,8 @@ export interface ILocation {
     coordinates: number[];
 }
 
+export type DeviceType = 'THS' | 'GPS';
+
 export interface ITrack {
     id: string;
     location?: ILocation;
@@ -31,6 +33,14 @@ export interface ITrack {
     createdAt: string;
 }
 
+export interface IMeasurement {
+    id: string;
+    temperature: number;
+    humidity: number;
+    battery: number;
+    createdAt: any;
+}
+
 export interface IDevice {
     id?: string;
     name?: string;
@@ -42,11 +52,13 @@ export interface IDevice {
     firmware?: string;
     trackingOptions?: ITrackingOptions;
     lastTrack?: ITrack;
+    lastMeasurement?: IMeasurement;
     lastSeen?: string;
     code?: IDeviceCode;
     sharedWith?: ISharedWith[];
     sharedAccess?: boolean;
     firstAlert?: IFirstAlert;
+    type: DeviceType;
 }
 
 export interface IFirstAlert {
@@ -57,7 +69,7 @@ export interface IFirstAlert {
     hours?: number;
     seenAfter?: number;
     deviceId?: string;
-    deviceName?: string; 
+    deviceName?: string;
 }
 
 export interface ISharedWith {
@@ -88,6 +100,8 @@ export const statusCodes = [{
     value: 3,
     name: 'Locate'
 }];
+
+export const TYPES = ['GPS', 'THS'];
 
 @Injectable()
 export class DeviceProvider extends BaseProvider {
@@ -122,7 +136,7 @@ export class DeviceProvider extends BaseProvider {
 
     public setStatusCode(device: IDevice, code: number) {
 
-        return this.applyActionV2(ApiProvider.obtainRequestUrl(`devices/${device.id}/set-status-code`), {code});
+        return this.applyActionV2(ApiProvider.obtainRequestUrl(`devices/${device.id}/set-status-code`), { code });
     }
 
     public share(device: IDevice, email: string, firstName: string) {
@@ -145,9 +159,9 @@ export class DeviceProvider extends BaseProvider {
      * @param id - device id
      */
     public dismissFirstAlerts(id: string) {
-            return this.http
+        return this.http
             .post(
-                ApiProvider.obtainRequestUrl(`devices/${id}/first-alert/dismiss`), 
+                ApiProvider.obtainRequestUrl(`devices/${id}/first-alert/dismiss`),
                 {},
                 { responseType: 'text', ...ApiProvider.obtainRequestOptions() }
             )

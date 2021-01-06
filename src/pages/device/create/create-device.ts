@@ -11,8 +11,9 @@ import { Storage } from '@ionic/storage';
 export class CreateDevicePage implements OnInit {
     @ViewChild('nameInput') public nameInput;
 
-    public device: IDevice = {
-        name: 'New device'
+    public device: Partial<IDevice> = {
+        name: 'New device',
+        mac: ''
     };
 
     private refreshCallback: () => void;
@@ -32,7 +33,8 @@ export class CreateDevicePage implements OnInit {
         if (!this.device.mac) {
             try {
                 const mac = await this.storage.get(TRAKKIT_MAC_KEY);
-                this.device.mac = mac;
+                this.setMac(mac);
+
             } catch (error) {
                 //
                 console.info(error);
@@ -40,6 +42,10 @@ export class CreateDevicePage implements OnInit {
         }
 
         this.refreshCallback = this.navParams.get('refreshCallback');
+    }
+
+    public setMac(mac) {
+        this.device.mac = String(mac || '').replace(/\s/ig, '').toUpperCase();
     }
 
     public ionViewDidEnter() {

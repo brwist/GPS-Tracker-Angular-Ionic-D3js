@@ -27,6 +27,7 @@ import { InstructionPage } from '../pages/instruction';
 import { TrakkitConfigPage } from '../pages/trakkit-config';
 import { TrakkitProvider } from '../providers/trakkit';
 import { Subscription } from 'rxjs';
+import { Network } from '@ionic-native/network';
 
 declare const window: any;
 
@@ -77,7 +78,9 @@ export class MyApp {
     private notificationProvider: NotificationProvider,
     private logger: Logger,
     private trakkitProvider: TrakkitProvider,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public network: Network
+
   ) {
 
     this.resumeSubscription = this.platform.resume.subscribe(async () => {
@@ -89,6 +92,21 @@ export class MyApp {
       if (needRedirect) {
         this.nav.setRoot(TrakkitConfigPage);
       }
+    });
+
+    this.network.onchange().subscribe({
+      next: (async ({ type }) => {
+        logger.info(`TrakkitConfigPage:network.onchange: Connection type = ${type}`);
+
+        const isAvailable = await this.trakkitProvider.isAvailable();
+        logger.info(`TrakkitConfigPage: is available device? ${isAvailable}`);
+
+        if (isAvailable) {
+          setTimeout((x) => {
+            this.openTrakkitConfigPage();
+          }, 200);
+        }
+      })
     });
 
     platform.ready().then(() => {

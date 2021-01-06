@@ -7,6 +7,10 @@ interface IFeatureFlag {
 @Injectable()
 export class UtilsService {
 
+    public static toFixed(value: string | number, n = 2) {
+        return Number(value).toFixed(n);
+    }
+
     public static getPointColor(coordinates): string {
 
         let numberOf = 0;

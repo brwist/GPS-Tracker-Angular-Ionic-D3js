@@ -4,12 +4,12 @@
   </ion-navbar>
   <ion-toolbar>
     <ion-segment [(ngModel)]="chartType">
-      <ion-segment-button value="batteryOrVolts">
-        <ng-container *ngIf="isCableKitConnected">Volts</ng-container>
-        <ng-container *ngIf="!isCableKitConnected">Battery</ng-container>
-      </ion-segment-button>
-      <ion-segment-button value="temperature">
-        Temperature
+
+      <ion-segment-button
+        *ngFor="let type of chartTypes"
+        value="{{type.value}}"
+      >
+        {{type.label}}
       </ion-segment-button>
     </ion-segment>
   </ion-toolbar>
@@ -17,42 +17,41 @@
 
 <ion-content>
 
-  <div *ngIf="!chartData.batteryOrVolts" class="loading">
+  <div
+    *ngIf="!chartData"
+    class="loading"
+  >
     <ion-spinner></ion-spinner>
   </div>
-
-  <div *ngIf="chartType === 'batteryOrVolts'">
-    <canvas *ngIf="chartData.batteryOrVolts"
-            baseChart
-            [datasets]="chartData.batteryOrVolts.dataSets"
-            [labels]="chartData.batteryOrVolts.labels"
-            [options]="chartData.batteryOrVolts.options"
-            [colors]="chartDataColors[0]"
-            [legend]="chartData.batteryOrVolts.legend"
-            [chartType]="chartData.batteryOrVolts.chartType"></canvas>
-  </div>
-
-  <div *ngIf="chartType === 'temperature'">
-    <canvas *ngIf="chartData.temperature"
-            baseChart
-            [datasets]="chartData.temperature.dataSets"
-            [labels]="chartData.temperature.labels"
-            [options]="chartData.temperature.options"
-            [colors]="chartDataColors[1]"
-            [legend]="chartData.temperature.legend"
-            [chartType]="chartData.temperature.chartType"></canvas>
-  </div>
-
+  <ng-container *ngIf="chartData">
+    <p class="chart-title">{{ chartData.title }}</p>
+    <canvas
+      baseChart
+      [datasets]="chartData.dataSets"
+      [labels]="chartData.labels"
+      [options]="chartData.options"
+      [legend]="chartData.legend"
+      [colors]="chartData.colors"
+      [chartType]="chartData.chartType"
+    ></canvas>
+  </ng-container>
   <ion-list>
 
-    <button ion-item detail-none (click)="presentDateSettings()">
+    <button
+      ion-item
+      detail-none
+      (click)="presentDateSettings()"
+    >
       {{ dateRangeString }}
     </button>
 
     <ion-item>
       <ion-label>Max number of points</ion-label>
       <ion-select [(ngModel)]="maxNumberOfPointsValue">
-        <ion-option *ngFor="let value of [25, 50, 100, 150, 300, 500, 1000, 'All']" [value]="value">
+        <ion-option
+          *ngFor="let value of [25, 50, 100, 150, 300, 500, 1000, 'All']"
+          [value]="value"
+        >
           {{ value }}
         </ion-option>
       </ion-select>
@@ -71,5 +70,12 @@
     </ion-item>
 
   </ion-list>
+
+  <!-- <chart
+    [chartData]="chartData"
+    [device]="device"
+  >
+
+  </chart> -->
 
 </ion-content>

@@ -7,11 +7,10 @@ import {
 } from 'ionic-angular';
 import { debounceTime, delay, filter } from 'rxjs/operators';
 import { IPagination, ISorting } from '../../providers/base';
-import { DeviceProvider, IDevice, ITrack, IFirstAlert } from '../../providers/device';
+import { DeviceProvider, IDevice, IFirstAlert } from '../../providers/device';
 import { DevicesPopoverPage } from './popover';
 import { Storage } from '@ionic/storage';
 import { Logger } from '../../providers/logger';
-import { TrackProvider } from '../../providers/track';
 import { ApiProvider, IDeviceLocation } from '../../providers/api';
 import { Keyboard } from '@ionic-native/keyboard';
 import { FirstAlertProvider } from '../../providers/first-alert';
@@ -20,6 +19,7 @@ import * as moment from 'moment';
 import * as async from 'async';
 import * as _ from 'lodash';
 import { Subscription } from 'rxjs';
+import { BaseComponent } from '../../app/base-component';
 
 const SORTING_STORAGE_KEY = 'devices-sorting';
 
@@ -27,7 +27,7 @@ const SORTING_STORAGE_KEY = 'devices-sorting';
     selector: 'page-devices',
     templateUrl: 'devices.html'
 })
-export class DevicesPage  /* @merge (use after merge) extends BaseComponent*/ {
+export class DevicesPage extends BaseComponent {
     /** list of first alerts */
     public firstAlerts: IFirstAlert[] = [];
     public devices: IDevice[] = [];
@@ -59,8 +59,6 @@ export class DevicesPage  /* @merge (use after merge) extends BaseComponent*/ {
     private pushNotificationSubscription: Subscription;
     private firstAlertSubscription: Subscription;
 
-    private providerSubscription: Subscription;
-
     constructor(
         private navCtrl: NavController,
         private deviceProvider: DeviceProvider,
@@ -76,7 +74,9 @@ export class DevicesPage  /* @merge (use after merge) extends BaseComponent*/ {
         private firstAlertProvider: FirstAlertProvider
     ) {
 
-        this.providerSubscription = this.apiProvider.isOnline.subscribe({
+        super();
+
+        this.sub = this.apiProvider.isOnline.subscribe({
             next: (isOnline) => {
                 this.showButton = isOnline;
             }
@@ -227,7 +227,6 @@ export class DevicesPage  /* @merge (use after merge) extends BaseComponent*/ {
         this.refreshSubscription.unsubscribe();
         this.pushNotificationSubscription.unsubscribe();
         this.firstAlertSubscription.unsubscribe();
-        this.providerSubscription.unsubscribe();
     }
 
     /**
@@ -238,25 +237,6 @@ export class DevicesPage  /* @merge (use after merge) extends BaseComponent*/ {
     public dismissAlert(event: Event, id: string) {
         event.stopPropagation();
         this.deviceProvider.dismissFirstAlerts(id);
-    }
-
-    /**
-     * Update first alerts
-     */
-    private _updateAlerts() {
-        this.firstAlertProvider.getFirstAlerts()
-            .then(({ items = [] }) => {
-                this.firstAlerts = items;
-            })
-            .catch((e) => console.error(e));
-    }
-
-    public getTrackMapUrl(track: ITrack) {
-
-        return TrackProvider.getTrackMapUrl(track, {
-            resolution: '160x160',
-            zoom: 17
-        });
     }
 
     public searchItems(event) {
@@ -370,7 +350,7 @@ export class DevicesPage  /* @merge (use after merge) extends BaseComponent*/ {
         }
     }
 
-    public removeDevice(device: IDevice, slidingItem: ItemSliding) {
+    public removeDevice({ device, slidingItem }: { device: IDevice, slidingItem: ItemSliding }) {
 
         this.alertCtrl.create({
             title: 'Remove device?',
@@ -413,13 +393,23 @@ export class DevicesPage  /* @merge (use after merge) extends BaseComponent*/ {
     }
 
     public isHighlighted(device: IDevice) {
-
         return this.highlightedDevicesRows.indexOf(device.id) > -1;
     }
 
     public isHighlightedWithAlert(device: IDevice) {
 
         return this.highlightedDevicesWithAlert.indexOf(device.id) > -1;
+    }
+
+    /**
+    * Update first alerts
+    */
+    private _updateAlerts() {
+        this.firstAlertProvider.getFirstAlerts()
+            .then(({ items = [] }) => {
+                this.firstAlerts = items;
+            })
+            .catch((e) => console.error(e));
     }
 
     private loadDevices(showLoader?: boolean) {

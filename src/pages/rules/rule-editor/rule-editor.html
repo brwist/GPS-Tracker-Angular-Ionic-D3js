@@ -16,6 +16,24 @@
 
   <div *ngIf="rule">
 
+    <ion-list padding-top>
+      <ion-item>
+        <ion-label>Device Type</ion-label>
+        <ion-select
+          [(ngModel)]="rule.devicesType"
+          (ngModelChange)="changeType()"
+          class="calling-code"
+        >
+          <ion-option
+            *ngFor="let type of deviceTypes"
+            [value]="type"
+          >
+            {{ type }}
+          </ion-option>
+        </ion-select>
+      </ion-item>
+    </ion-list>
+
     <ion-list>
       <ion-list-header>General</ion-list-header>
 

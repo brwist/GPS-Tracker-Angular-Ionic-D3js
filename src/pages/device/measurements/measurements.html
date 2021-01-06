@@ -1,0 +1,46 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>{{ device.name }}'s measurements</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-refresher (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div
+    *ngIf="measurements.length === 0"
+    class="centered-text-block"
+  >
+    No measurements found
+  </div>
+
+  <ion-list *ngIf="measurements.length > 0">
+    <ion-item *ngFor="let measurement of measurements">
+      <ion-label>
+        <div class="last-measurement">
+          <p class="temperature">{{ measurement.temperature |
+            formatTemperature:settings.temperatureFormat
+            }}°{{ settings.temperatureFormat }}</p>
+          <p class="delimiter">/</p>
+          <p class="humidity">{{ measurement.humidity | number: '1.1-1' }}%</p>
+          <p class="delimiter">/</p>
+          <p class="battery">Battery: {{ measurement.battery | number: '1.1-1' }}%</p>
+        </div>
+       
+      </ion-label>
+      <ion-note item-right>
+        <div class="date">
+          <div class="main">
+            {{ measurement.createdAt | date:'MM/dd/yyyy'}}
+          </div>
+          <div class="sub-main">
+            {{ measurement.createdAt | date:'HH:mm:ss'}}
+          </div>
+        </div>
+      </ion-note>
+    </ion-item>
+  </ion-list>
+</ion-content>

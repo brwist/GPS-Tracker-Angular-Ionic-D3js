@@ -96,6 +96,15 @@ export class SettingsPage implements OnInit, OnDestroy {
         this.settingsProvider.saveSettings(this.settings);
     }
 
+    get temperatureFormat() {
+        return this.settings.temperatureFormat;
+    }
+
+    set temperatureFormat(value) {
+        this.settings.temperatureFormat = value;
+        this.settingsProvider.saveSettings(this.settings);
+    }
+
     public ngOnInit() {
 
         this.settingsSubscription =

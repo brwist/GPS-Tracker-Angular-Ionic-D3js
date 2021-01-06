@@ -55,6 +55,16 @@
   </ion-list>
 
   <ion-list>
+    <ion-list-header>Temperature</ion-list-header>
+    <ion-item>
+      <ion-select [(ngModel)]="temperatureFormat">
+        <ion-option value="F">°F</ion-option>
+        <ion-option value="C">°C</ion-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+
+  <ion-list>
     <ion-list-header>Debug</ion-list-header>
     <ion-item>
       <ion-label>Show device debug data</ion-label>

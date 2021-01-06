@@ -4,6 +4,7 @@ import { BaseProvider } from './base';
 import { ApiProvider } from './api';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/toPromise';
+import { DeviceType } from './device';
 
 export interface IRule {
     id?: string;
@@ -13,6 +14,7 @@ export interface IRule {
     conditions?: any;
     actions?: any[];
     explanation?: string;
+    devicesType: DeviceType;
 }
 
 @Injectable()

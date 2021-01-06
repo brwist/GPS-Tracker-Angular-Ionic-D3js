@@ -1,0 +1,76 @@
+<ion-item-sliding
+  *ngIf="device"
+  #slidingItem
+>
+  <button
+    ion-item
+    (click)="goDevicePage(device.id)"
+    [ngClass]="{'highlighted': isHighlighted(device), 'highlighted-with-alert': isHighlightedWithAlert(device), 'shared': device.sharedAccess}"
+  >
+
+    <ion-thumbnail item-left>
+      <img
+        *ngIf="device.type === 'GPS'; else THS;"
+        [src]="getTrackMapUrl(device.lastTrack)"
+      >
+
+      <ng-template #THS>
+        <div class="ths-preview">
+          <ng-container *ngIf="device.lastMeasurement; else NoMeasurement">
+            <div class="temperature">{{ 
+              device.lastMeasurement.temperature 
+              | formatTemperature:settings.temperatureFormat
+            }} °{{ settings.temperatureFormat }}</div>
+            <div class="line"></div>
+            <div class="humidity">{{ device.lastMeasurement.humidity | number: '1.1-1'}}%</div>
+          </ng-container>
+
+          <ng-template #NoMeasurement>
+            <ion-icon
+              color="gray"
+              name="thermometer"
+              mode="md"
+            ></ion-icon>
+          </ng-template>
+        </div>
+
+      </ng-template>
+    </ion-thumbnail>
+
+    <ion-label>
+      <h2>
+        {{ device.name }}
+        <span
+          *ngIf="device.sharedAccess"
+          class="shared"
+        >SHARED</span>
+        <span
+          *ngIf="!device.sharedAccess && device.sharedWith && device.sharedWith.length > 0"
+          class="shared with-other-users"
+        >SHARED</span>
+      </h2>
+
+      <p>
+        {{ device.mac }}
+        <span *ngIf="device.battery === 'L'">(Line)</span>
+        <span *ngIf="device.battery === 'K'">(Cable Kit)</span>
+        <span *ngIf="device.battery && device.battery !== 'L' && device.battery !== 'K'">({{ device.battery }} %)</span>
+      </p>
+
+      <p *ngIf="device.lastSeen">Last seen: {{ device.lastSeen | amTimeAgo }}</p>
+    </ion-label>
+  </button>
+
+  <ion-item-options (ionSwipe)="onSwipe($event)">
+    <button
+      ion-button
+      color="danger"
+      (click)="removeDevice(device, slidingItem )"
+      [disabled]="device.sharedAccess"
+    >
+      <ion-icon name="close"></ion-icon>
+      Delete
+    </button>
+  </ion-item-options>
+
+</ion-item-sliding>

@@ -18,20 +18,38 @@
   </ng-container>
 
   <ng-container *ngIf="!isConnecting">
+    <div
+      *ngIf="error"
+      class="error"
+    >
+      <p>Not Connected to Trakkit...</p>
+      <p>Make sure Trakkit is plugged in and in Configuration Mode (<a (click)="openHelpVideoPage()">Help</a>)</p> 
 
-    <div *ngIf="error" class="error">
-      Not Connected to Trakkit...<br><br>
-      Ensure that your Phone is connected to your Trakkit's Wi-Fi (SSID: Trakkit-XXXX).
-      <br><br><br>
-      Click <span class="open-settings" (click)="openSettings()">Here</span> to Open Wi-Fi Settings.
-      <br><br><br><br>
+      <p>Then connect your Phone's Wi-Fi to Trakkit SSID (Trakkit----)</p>
 
-      <button ion-button color="default" (click)="tryOpenConfigPage()" type="button">
-        <ion-icon name='refresh'></ion-icon>
-        &nbsp;
-        Retry
-      </button>
-
+      <div class="buttons">
+        <button
+          ion-button
+          color="default"
+          (click)="openSettings()"
+          type="button"
+        >
+          <ion-icon name='wifi'></ion-icon>
+          &nbsp;
+          Open WiFi Settings
+        </button>
+      
+        <button
+          ion-button
+          color="default"
+          (click)="tryOpenConfigPage()"
+          type="button"
+        >
+          <ion-icon name='refresh'></ion-icon>
+          &nbsp;
+          Retry
+        </button>
+      </div>
     </div>
 
     <div *ngIf="!error">

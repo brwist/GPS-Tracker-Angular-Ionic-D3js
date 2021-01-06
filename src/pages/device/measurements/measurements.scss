@@ -1,0 +1,38 @@
+.last-measurement {
+  display: flex;
+  flex-wrap: wrap;
+
+  .delimiter {
+    margin: 0 5px 0 5px;
+  }
+
+  .temperature,
+  .humidity,
+  .battery,
+  .delimiter {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  @media (max-width: 576px) {
+    .battery {
+      width: 100%;
+    }
+
+    .delimiter_battery {
+      display: none;
+    }
+  }
+}
+
+.date {
+  text-align: right;
+
+  .main {
+    font-size: 14px;
+  }
+
+  .sub-main {
+    font-size: 12px;
+  }
+}

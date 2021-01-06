@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { AppVersion } from '@ionic-native/app-version';
 import { Platform, ViewController } from 'ionic-angular';
+import { Logger } from '../../providers/logger';
 import { TrakkitProvider, TRAKKIT_URL } from '../../providers/trakkit';
 
 declare const XDomainRequest;
@@ -22,7 +23,8 @@ export class TrakkitConfigPage {
         public platform: Platform,
         public appVersion: AppVersion,
         public viewCtrl: ViewController,
-        public trakkitProvider: TrakkitProvider
+        public trakkitProvider: TrakkitProvider,
+        public logger: Logger
     ) {
 
     }
@@ -49,14 +51,17 @@ export class TrakkitConfigPage {
             this.error = false;
             this.isConnecting = false;
 
-            // Open in browser + attach footer with Done button
-            cordova.InAppBrowser.open(TRAKKIT_URL, '_blank', 'location=no,footer=yes,footercolor=#CC000000,closebuttoncaption=Done,closebuttoncolor=#00FFFF');
+            this.openAppBrowser(TRAKKIT_URL);
 
         } catch (err) {
 
             this.error = true;
             this.isConnecting = false;
         }
+    }
+
+    public openHelpVideoPage() {
+        this.openAppBrowser('https://www.youtube.com/embed/PBoMm72ExJ8');
     }
 
     public dismiss() {
@@ -75,6 +80,12 @@ export class TrakkitConfigPage {
         });
 
     }
+
+    private openAppBrowser(url) {
+        // Open in browser + attach footer with Done button
+        return cordova.InAppBrowser.open(url, '_blank', 'location=no,footer=yes,footercolor=#CC000000,closebuttoncaption=Done,closebuttoncolor=#00FFFF');
+    }
+
 }
 
 function createCORSRequest(method, url) {

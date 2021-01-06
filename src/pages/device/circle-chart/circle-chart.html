@@ -1,0 +1,23 @@
+<div
+  *ngIf="measurement"
+  class="sensor-circle"
+  margin-bottom
+  (click)="settingsProvider.convertTemperature()"
+>
+  <div class="sensor-circle__temperature">
+    <div innerHTML="{{
+    measurement.temperature |
+    formatTemperature:settings.temperatureFormat |
+    camelStyle:'temperature-number':'temperature-factorial'
+  }}"></div>
+    <div class="sensor-circle__symbol">°{{ settings.temperatureFormat }}</div>
+  </div>
+
+  <div class="sensor-circle__humidity">
+    <div innerHTML="{{
+      measurement.humidity |
+      camelStyle:'humidity-number':'humidity-factorial'
+    }}"></div>
+    <div class="sensor-circle__symbol">RH%</div>
+  </div>
+</div>

@@ -2,7 +2,12 @@
   <ion-navbar>
     <ion-title>Add New Device</ion-title>
     <ion-buttons end>
-      <button ion-button icon-only (click)="add()" color="primary">
+      <button
+        ion-button
+        icon-only
+        (click)="add()"
+        color="primary"
+      >
         Save
       </button>
     </ion-buttons>
@@ -14,12 +19,20 @@
 
     <ion-item>
       <ion-label stacked>Name</ion-label>
-      <ion-input type="text" [(ngModel)]="device.name" #nameInput></ion-input>
+      <ion-input
+        type="text"
+        [(ngModel)]="device.name"
+        #nameInput
+      ></ion-input>
     </ion-item>
 
     <ion-item>
       <ion-label stacked>MAC Address</ion-label>
-      <ion-input type="text" [(ngModel)]="device.mac"></ion-input>
+      <ion-input
+        type="text"
+        [ngModel]="device.mac"
+        (ngModelChange)="setMac($event)"
+      ></ion-input>
     </ion-item>
 
   </ion-list>

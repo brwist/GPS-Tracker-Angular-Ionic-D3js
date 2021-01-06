@@ -4,6 +4,7 @@
     <ion-title>
       <ng-container *ngIf="feature === 'tracking-modes'">Trakkit Modes</ng-container>
       <ng-container *ngIf="feature === 'rules'">Rules</ng-container>
+      <ng-container *ngIf="feature === 'measurements'">Measurements</ng-container>
       <ng-container *ngIf="feature === 'tracks'">Tracks</ng-container>
       <ng-container *ngIf="feature === 'charts'">Charts</ng-container>
       <ng-container *ngIf="feature === 'tracking-options'">Tracking Options</ng-container>
@@ -73,6 +74,16 @@
       Add Rules that will trigger Alerts.
       <br>
       For example, you can set Motion Alerts, Geo-Fence (Inside or Outside), Speed, or Temperature Alerts
+    </p>
+
+  </ng-container>
+
+  <ng-container *ngIf="feature === 'measurements'">
+
+    <h5>Measurements Data</h5>
+    <p>
+      This shows your raw measurements data.
+      <br>
     </p>
 
   </ng-container>

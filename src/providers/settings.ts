@@ -9,7 +9,7 @@ import * as moment from 'moment';
 
 const SETTINGS_STORAGE_TOKEN = 'settings';
 
-const DAY_THEME_CLASS   = 'day-theme';
+const DAY_THEME_CLASS = 'day-theme';
 const NIGHT_THEME_CLASS = 'night-theme';
 
 export interface IRington {
@@ -33,6 +33,8 @@ export interface ISettings {
     bucketPointLoading: boolean;
 
     showDeviceDebug: boolean;
+
+    temperatureFormat: 'C' | 'F';
 }
 
 const defaultSettings: ISettings = {
@@ -42,6 +44,7 @@ const defaultSettings: ISettings = {
         start: '21:00',
         end: '05:00'
     },
+    temperatureFormat: 'C',
     clusterizeDeviceMap: false,
     bucketPointLoading: false,
     showDeviceDebug: false
@@ -57,6 +60,10 @@ export class Settings {
     private theme: BehaviorSubject<string> = new BehaviorSubject(DAY_THEME_CLASS);
 
     private currentTheme: string = DAY_THEME_CLASS;
+
+    public storageSettings() {
+        return this.storage.get(SETTINGS_STORAGE_TOKEN);
+    }
 
     constructor(private storage: Storage,
                 private logger: Logger) {
@@ -98,6 +105,15 @@ export class Settings {
         });
     }
 
+    public convertTemperature() {
+        this.storageSettings().then((config) => {
+            this.saveSettings({
+                ...config,
+                temperatureFormat: config.temperatureFormat === 'F' ? 'C' : 'F'
+            });
+        });
+    }
+
     public saveSettings(settings: ISettings) {
 
         this.storage.set(SETTINGS_STORAGE_TOKEN, settings).then(() => {
@@ -126,7 +142,7 @@ export class Settings {
             if (settings.nightMode.enabled) {
 
                 const start = moment(settings.nightMode.start, 'HH:mm a');
-                const end   = moment(settings.nightMode.end, 'HH:mm a');
+                const end = moment(settings.nightMode.end, 'HH:mm a');
 
                 // console.log(start);
                 // console.log(end);
@@ -134,8 +150,8 @@ export class Settings {
                 // console.log(`${moment()}`);
 
                 const currentMinutesOfDay = minutesOfDay(moment());
-                const startMinutesOfDay   = minutesOfDay(start);
-                const endMinutesOfDay     = minutesOfDay(end);
+                const startMinutesOfDay = minutesOfDay(start);
+                const endMinutesOfDay = minutesOfDay(end);
 
                 // console.log(`${currentMinutesOfDay}: ${startMinutesOfDay} - ${endMinutesOfDay}`);
 

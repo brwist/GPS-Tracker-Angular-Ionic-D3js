@@ -7,6 +7,7 @@ import { StateChangeCondition } from './change-state';
 import { BatteryCondition } from './battery';
 import { SpeedCondition } from './speed';
 import { ReeferHoursCondition } from './reefer-hours';
+import { HumidityCondition } from './humidity';
 
 export interface IAbstractCondition {
     conditionType: string;
@@ -24,6 +25,8 @@ export class ConditionFactory {
         switch (conditionData.conditionType) {
             case 'temperature':
                 return new TemperatureCondition(conditionData);
+            case 'humidity':
+                return new HumidityCondition(conditionData);
             case 'ntc1':
                 return new NTC1Condition(conditionData);
             case 'volts':

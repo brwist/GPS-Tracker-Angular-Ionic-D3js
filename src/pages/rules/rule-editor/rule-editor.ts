@@ -1,40 +1,42 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {RuleProvider, IRule} from '../../../providers/rule';
-import {NavController, NavParams, AlertController, ItemSliding, LoadingController} from 'ionic-angular';
-import {TemperatureConditionPage} from '../common/conditions/temperature/temperature';
-import {NTC1ConditionPage} from '../common/conditions/ntc1/ntc1';
-import {VoltsConditionPage} from '../common/conditions/volts/volts';
-import {MotionConditionPage} from '../common/conditions/motion/motion';
-import {BatteryConditionPage} from '../common/conditions/battery';
-import {StateChangeConditionPage} from '../common/conditions/state-change';
-import {ReeferHoursConditionPage} from '../common/conditions/reefer-hours';
-import {GeoZoneConditionPage} from '../common/conditions/geo-zone/geo-zone';
-import {EmailActionPage} from '../common/action/email/email';
-import {SmsActionPage} from '../common/action/sms/sms';
-import {PushActionPage} from '../common/action/push/push';
-import {WebPushActionPage} from '../common/action/web-push/web-push';
-import {TemperatureCondition} from '../../../app/conditions/temperature';
-import {NTC1Condition} from '../../../app/conditions/ntc1';
-import {VoltsCondition} from '../../../app/conditions/volts';
-import {MotionCondition} from '../../../app/conditions/motion';
-import {GeoZoneCondition} from '../../../app/conditions/geo-zone';
-import {EmailAction} from '../../../app/actions/email';
-import {SmsAction} from '../../../app/actions/sms';
-import {PushAction} from '../../../app/actions/push';
-import {WebPushAction} from '../../../app/actions/web-push';
-import {ConditionFactory} from '../../../app/conditions/condition-factory';
-import {ActionFactory} from '../../../app/actions/action-factory';
-import {BatteryCondition} from '../../../app/conditions/battery';
-import {StateChangeCondition} from '../../../app/conditions/change-state';
-import {ReeferHoursCondition} from '../../../app/conditions/reefer-hours';
-import {DeviceProvider, IDevice} from '../../../providers/device';
-import {ApiProvider, IUserInfo} from '../../../providers/api';
-import {Subscription} from 'rxjs/Subscription';
-import {Geolocation, Geoposition} from '@ionic-native/geolocation';
-import {Logger} from '../../../providers/logger';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { RuleProvider, IRule } from '../../../providers/rule';
+import { NavController, NavParams, AlertController, ItemSliding, LoadingController } from 'ionic-angular';
+import { TemperatureConditionPage } from '../common/conditions/temperature/temperature';
+import { NTC1ConditionPage } from '../common/conditions/ntc1/ntc1';
+import { VoltsConditionPage } from '../common/conditions/volts/volts';
+import { MotionConditionPage } from '../common/conditions/motion/motion';
+import { BatteryConditionPage } from '../common/conditions/battery';
+import { StateChangeConditionPage } from '../common/conditions/state-change';
+import { ReeferHoursConditionPage } from '../common/conditions/reefer-hours';
+import { GeoZoneConditionPage } from '../common/conditions/geo-zone/geo-zone';
+import { EmailActionPage } from '../common/action/email/email';
+import { SmsActionPage } from '../common/action/sms/sms';
+import { PushActionPage } from '../common/action/push/push';
+import { WebPushActionPage } from '../common/action/web-push/web-push';
+import { TemperatureCondition } from '../../../app/conditions/temperature';
+import { NTC1Condition } from '../../../app/conditions/ntc1';
+import { VoltsCondition } from '../../../app/conditions/volts';
+import { MotionCondition } from '../../../app/conditions/motion';
+import { GeoZoneCondition } from '../../../app/conditions/geo-zone';
+import { EmailAction } from '../../../app/actions/email';
+import { SmsAction } from '../../../app/actions/sms';
+import { PushAction } from '../../../app/actions/push';
+import { WebPushAction } from '../../../app/actions/web-push';
+import { ConditionFactory } from '../../../app/conditions/condition-factory';
+import { ActionFactory } from '../../../app/actions/action-factory';
+import { BatteryCondition } from '../../../app/conditions/battery';
+import { StateChangeCondition } from '../../../app/conditions/change-state';
+import { ReeferHoursCondition } from '../../../app/conditions/reefer-hours';
+import { DeviceProvider, IDevice, TYPES } from '../../../providers/device';
+import { ApiProvider, IUserInfo } from '../../../providers/api';
+import { Subscription } from 'rxjs/Subscription';
+import { Geolocation, Geoposition } from '@ionic-native/geolocation';
+import { Logger } from '../../../providers/logger';
 import * as humanizeDuration from 'humanize-duration';
-import {SpeedConditionPage} from '../common/conditions/speed/speed';
-import {SpeedCondition} from '../../../app/conditions/speed';
+import { SpeedConditionPage } from '../common/conditions/speed/speed';
+import { SpeedCondition } from '../../../app/conditions/speed';
+import { HumidityConditionPage } from '../common/conditions/humidity/humidity';
+import { HumidityCondition } from '../../../app/conditions/humidity';
 
 @Component({
     selector: 'page-rule-editor',
@@ -48,9 +50,17 @@ export class RulesEditorPage implements OnInit, OnDestroy {
     public conditions: any[] = [];
     public actions: any[] = [];
 
-    public devices: IDevice[];
+    public _devices: IDevice[] = [];
+    public get devices(): IDevice[] {
+        return this._devices.filter((device: IDevice) => device.type === this.rule.devicesType);
+    }
+    public set devices(value: IDevice[]) {
+        this._devices = value;
+    }
 
     public searchDevicesString: string;
+
+    public deviceTypes = TYPES;
 
     private ruleId: string;
 
@@ -64,15 +74,17 @@ export class RulesEditorPage implements OnInit, OnDestroy {
 
     private mobileDeviceLocation: any;
 
-    constructor(private navCtrl: NavController,
-                private ruleProvider: RuleProvider,
-                private deviceProvider: DeviceProvider,
-                private params: NavParams,
-                private loadingCtrl: LoadingController,
-                private apiProvider: ApiProvider,
-                private geolocation: Geolocation,
-                private logger: Logger,
-                private alertCtrl: AlertController) {
+    constructor(
+        private navCtrl: NavController,
+        private ruleProvider: RuleProvider,
+        private deviceProvider: DeviceProvider,
+        private params: NavParams,
+        private loadingCtrl: LoadingController,
+        private apiProvider: ApiProvider,
+        private geolocation: Geolocation,
+        private logger: Logger,
+        private alertCtrl: AlertController
+    ) {
 
         this.ruleId = this.params.get('id');
 
@@ -85,7 +97,8 @@ export class RulesEditorPage implements OnInit, OnDestroy {
             this.rule = {
                 name: 'New rule',
                 enabled: true,
-                devices: []
+                devices: [],
+                devicesType: 'GPS'
             };
 
             if (this.params.get('deviceId')) {
@@ -94,11 +107,12 @@ export class RulesEditorPage implements OnInit, OnDestroy {
             }
         }
 
-        this.deviceProvider.getList({select: ['id', 'name'], pagination: {limit: 1000}}).then((data: any) => {
-
-            this.devices = data.items;
-            this.allDevices = data.items;
-        });
+        this.deviceProvider
+            .getList({ select: ['id', 'name', 'type'], pagination: { limit: 1000 } })
+            .then((data: any) => {
+                this.devices = data.items;
+                this.allDevices = data.items;
+            });
     }
 
     public ngOnInit() {
@@ -141,6 +155,12 @@ export class RulesEditorPage implements OnInit, OnDestroy {
         this.watchPositionSubscription.unsubscribe();
     }
 
+    public changeType() {
+        this.rule.devices = [];
+        this.conditions = [];
+        this.actions = [];
+    }
+
     public matchConditionsAlertPresent() {
 
         const alert = this.alertCtrl.create({
@@ -181,105 +201,141 @@ export class RulesEditorPage implements OnInit, OnDestroy {
 
         alert.setTitle('Add new condition');
 
-        alert.addButton({
-            text: 'Geo zone',
-            handler: (data) => {
-                this.navCtrl.push(GeoZoneConditionPage, {
-                    mobileDeviceLocation: this.mobileDeviceLocation,
-                    callback: (condition: GeoZoneCondition) => {
-                        this.conditions.push(condition);
-                    }
-                });
-            }
-        });
+        if (this.rule.devicesType === 'GPS') {
 
-        alert.addButton({
-            text: 'Temperature',
-            handler: (data) => {
-                this.navCtrl.push(TemperatureConditionPage, {
-                    callback: (condition: TemperatureCondition) => {
-                        this.conditions.push(condition);
-                    }
-                });
-            }
-        });
+            alert.addButton({
+                text: 'Geo zone',
+                handler: (data) => {
+                    this.navCtrl.push(GeoZoneConditionPage, {
+                        mobileDeviceLocation: this.mobileDeviceLocation,
+                        callback: (condition: GeoZoneCondition) => {
+                            this.conditions.push(condition);
+                        }
+                    });
+                }
+            });
 
-        alert.addButton({
-            text: 'Temperature (NTC1)',
-            handler: (data) => {
-                this.navCtrl.push(NTC1ConditionPage, {
-                    callback: (condition: NTC1Condition) => {
-                        this.conditions.push(condition);
-                    }
-                });
-            }
-        });
+            alert.addButton({
+                text: 'Temperature',
+                handler: (data) => {
+                    this.navCtrl.push(TemperatureConditionPage, {
+                        callback: (condition: TemperatureCondition) => {
+                            this.conditions.push(condition);
+                        }
+                    });
+                }
+            });
 
-        alert.addButton({
-            text: 'Volt',
-            handler: (data) => {
-                this.navCtrl.push(VoltsConditionPage, {
-                    callback: (condition: VoltsCondition) => {
-                        this.conditions.push(condition);
-                    }
-                });
-            }
-        });
+            alert.addButton({
+                text: 'Temperature (NTC1)',
+                handler: (data) => {
+                    this.navCtrl.push(NTC1ConditionPage, {
+                        callback: (condition: NTC1Condition) => {
+                            this.conditions.push(condition);
+                        }
+                    });
+                }
+            });
 
-        alert.addButton({
-            text: 'Speed',
-            handler: (data) => {
-                this.navCtrl.push(SpeedConditionPage, {
-                    callback: (condition: SpeedCondition) => {
-                        this.conditions.push(condition);
-                    }
-                });
-            }
-        });
+            alert.addButton({
+                text: 'Volt',
+                handler: (data) => {
+                    this.navCtrl.push(VoltsConditionPage, {
+                        callback: (condition: VoltsCondition) => {
+                            this.conditions.push(condition);
+                        }
+                    });
+                }
+            });
 
-        alert.addButton({
-            text: 'Motion',
-            handler: (data) => {
-                this.navCtrl.push(MotionConditionPage, {
-                    callback: (condition: MotionCondition) => {
-                        this.conditions.push(condition);
-                    }
-                });
-            }
-        });
+            alert.addButton({
+                text: 'Speed',
+                handler: (data) => {
+                    this.navCtrl.push(SpeedConditionPage, {
+                        callback: (condition: SpeedCondition) => {
+                            this.conditions.push(condition);
+                        }
+                    });
+                }
+            });
 
-        alert.addButton({
-            text: 'Battery',
-            handler: (data) => {
-                this.navCtrl.push(BatteryConditionPage, {
-                    callback: (condition: BatteryCondition) => {
-                        this.conditions.push(condition);
-                    }
-                });
-            }
-        });
+            alert.addButton({
+                text: 'Motion',
+                handler: (data) => {
+                    this.navCtrl.push(MotionConditionPage, {
+                        callback: (condition: MotionCondition) => {
+                            this.conditions.push(condition);
+                        }
+                    });
+                }
+            });
 
-        alert.addButton({
-            text: 'US state change',
-            handler: (data) => {
-                this.navCtrl.push(StateChangeConditionPage, {
-                    callback: (condition: StateChangeCondition) => {
-                        this.conditions.push(condition);
-                    }
-                });
-            }
-        });
+            alert.addButton({
+                text: 'Battery',
+                handler: (data) => {
+                    this.navCtrl.push(BatteryConditionPage, {
+                        callback: (condition: BatteryCondition) => {
+                            this.conditions.push(condition);
+                        }
+                    });
+                }
+            });
 
-        alert.addButton({
-            text: 'Reefer Hours',
-            handler: (data) => {
-                this.navCtrl.push(ReeferHoursConditionPage, {
-                    callback: (condition: ReeferHoursCondition) => {
-                        this.conditions.push(condition);
-                    }
-                });
-            }
-        });
+            alert.addButton({
+                text: 'US state change',
+                handler: (data) => {
+                    this.navCtrl.push(StateChangeConditionPage, {
+                        callback: (condition: StateChangeCondition) => {
+                            this.conditions.push(condition);
+                        }
+                    });
+                }
+            });
+
+            alert.addButton({
+                text: 'Reefer Hours',
+                handler: (data) => {
+                    this.navCtrl.push(ReeferHoursConditionPage, {
+                        callback: (condition: ReeferHoursCondition) => {
+                            this.conditions.push(condition);
+                        }
+                    });
+                }
+            });
+        } else {
+            alert.addButton({
+                text: 'Temperature',
+                handler: (data) => {
+                    this.navCtrl.push(TemperatureConditionPage, {
+                        callback: (condition: TemperatureCondition) => {
+                            this.conditions.push(condition);
+                        }
+                    });
+                }
+            });
+
+            alert.addButton({
+                text: 'Battery',
+                handler: (data) => {
+                    this.navCtrl.push(BatteryConditionPage, {
+                        callback: (condition: BatteryCondition) => {
+                            this.conditions.push(condition);
+                        }
+                    });
+                }
+            });
+
+            alert.addButton({
+                text: 'Humidity',
+                handler: (data) => {
+                    this.navCtrl.push(HumidityConditionPage, {
+                        callback: (condition: HumidityCondition) => {
+                            this.conditions.push(condition);
+                        }
+                    });
+                }
+            });
+        }
 
         alert.addButton('Cancel');
 
@@ -369,82 +425,114 @@ export class RulesEditorPage implements OnInit, OnDestroy {
 
     public goEditConditionPage(condition) {
 
-        switch (condition.conditionType) {
-            case 'geoZone':
-                this.navCtrl.push(GeoZoneConditionPage, {
-                    condition,
-                    mobileDeviceLocation: this.mobileDeviceLocation,
-                    callback: (cond: GeoZoneCondition) => {
-                        this.doUpdateCondition(cond);
-                    }
-                });
-                break;
-            case 'temperature':
-                this.navCtrl.push(TemperatureConditionPage, {
-                    condition,
-                    callback: (cond: TemperatureCondition) => {
-                        this.doUpdateCondition(cond);
-                    }
-                });
-                break;
-            case 'ntc1':
-                this.navCtrl.push(NTC1ConditionPage, {
-                    condition,
-                    callback: (cond: NTC1Condition) => {
-                        this.doUpdateCondition(cond);
-                    }
-                });
-                break;
-            case 'volts':
-                this.navCtrl.push(VoltsConditionPage, {
-                    condition,
-                    callback: (cond: VoltsCondition) => {
-                        this.doUpdateCondition(cond);
-                    }
-                });
-                break;
-            case 'speed':
-                this.navCtrl.push(SpeedConditionPage, {
-                    condition,
-                    callback: (cond: SpeedCondition) => {
-                        this.doUpdateCondition(cond);
-                    }
-                });
-                break;
-            case 'motion':
-                this.navCtrl.push(MotionConditionPage, {
-                    condition,
-                    callback: (cond: MotionCondition) => {
-                        this.doUpdateCondition(cond);
-                    }
-                });
-                break;
-            case 'battery':
-                this.navCtrl.push(BatteryConditionPage, {
-                    condition,
-                    callback: (cond: BatteryCondition) => {
-                        this.doUpdateCondition(cond);
-                    }
-                });
-                break;
-            case 'changeState':
-                this.navCtrl.push(StateChangeConditionPage, {
-                    condition,
-                    callback: (cond: StateChangeCondition) => {
-                        this.doUpdateCondition(cond);
-                    }
-                });
-                break;
-            case 'reeferHours':
-                this.navCtrl.push(ReeferHoursConditionPage, {
-                    condition,
-                    callback: (cond: ReeferHoursCondition) => {
-                        this.doUpdateCondition(cond);
-                    }
-                });
-                break;
-            default:
-                console.log(`Unexpected condition type '${condition.conditionType}"`);
+        if (this.rule.devicesType === 'GPS') {
+
+            switch (condition.conditionType) {
+                case 'geoZone':
+                    this.navCtrl.push(GeoZoneConditionPage, {
+                        condition,
+                        mobileDeviceLocation: this.mobileDeviceLocation,
+                        callback: (cond: GeoZoneCondition) => {
+                            this.doUpdateCondition(cond);
+                        }
+                    });
+                    break;
+                case 'temperature':
+                    this.navCtrl.push(TemperatureConditionPage, {
+                        condition,
+                        callback: (cond: TemperatureCondition) => {
+                            this.doUpdateCondition(cond);
+                        }
+                    });
+                    break;
+                case 'ntc1':
+                    this.navCtrl.push(NTC1ConditionPage, {
+                        condition,
+                        callback: (cond: NTC1Condition) => {
+                            this.doUpdateCondition(cond);
+                        }
+                    });
+                    break;
+                case 'volts':
+                    this.navCtrl.push(VoltsConditionPage, {
+                        condition,
+                        callback: (cond: VoltsCondition) => {
+                            this.doUpdateCondition(cond);
+                        }
+                    });
+                    break;
+                case 'speed':
+                    this.navCtrl.push(SpeedConditionPage, {
+                        condition,
+                        callback: (cond: SpeedCondition) => {
+                            this.doUpdateCondition(cond);
+                        }
+                    });
+                    break;
+                case 'motion':
+                    this.navCtrl.push(MotionConditionPage, {
+                        condition,
+                        callback: (cond: MotionCondition) => {
+                            this.doUpdateCondition(cond);
+                        }
+                    });
+                    break;
+                case 'battery':
+                    this.navCtrl.push(BatteryConditionPage, {
+                        condition,
+                        callback: (cond: BatteryCondition) => {
+                            this.doUpdateCondition(cond);
+                        }
+                    });
+                    break;
+                case 'changeState':
+                    this.navCtrl.push(StateChangeConditionPage, {
+                        condition,
+                        callback: (cond: StateChangeCondition) => {
+                            this.doUpdateCondition(cond);
+                        }
+                    });
+                    break;
+                case 'reeferHours':
+                    this.navCtrl.push(ReeferHoursConditionPage, {
+                        condition,
+                        callback: (cond: ReeferHoursCondition) => {
+                            this.doUpdateCondition(cond);
+                        }
+                    });
+                    break;
+                default:
+                    console.log(`Unexpected condition type '${condition.conditionType}"`);
+            }
+        } else {
+            switch (condition.conditionType) {
+                case 'temperature':
+                    this.navCtrl.push(TemperatureConditionPage, {
+                        condition,
+                        callback: (cond: TemperatureCondition) => {
+                            this.doUpdateCondition(cond);
+                        }
+                    });
+                    break;
+                case 'battery':
+                    this.navCtrl.push(BatteryConditionPage, {
+                        condition,
+                        callback: (cond: BatteryCondition) => {
+                            this.doUpdateCondition(cond);
+                        }
+                    });
+                    break;
+                case 'humidity':
+                    this.navCtrl.push(HumidityConditionPage, {
+                        condition,
+                        callback: (cond: HumidityCondition) => {
+                            this.doUpdateCondition(cond);
+                        }
+                    });
+                    break;
+                default:
+                    console.log(`Unexpected condition type '${condition.conditionType}"`);
+            }
         }
     }
 
@@ -641,7 +729,7 @@ export class RulesEditorPage implements OnInit, OnDestroy {
 
     private loadRule() {
 
-        const loader = this.loadingCtrl.create({content: `Loading rule`});
+        const loader = this.loadingCtrl.create({ content: `Loading rule` });
 
         // noinspection JSIgnoredPromiseFromCall
         loader.present();

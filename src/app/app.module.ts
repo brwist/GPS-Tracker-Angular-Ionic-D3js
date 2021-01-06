@@ -40,7 +40,7 @@ import { DevicesPopoverPage } from '../pages/devices/popover';
 import { DevicePage } from '../pages/device/device';
 import { DateSettingsPage } from '../pages/device/date-settings';
 import { DeviceTracksPage } from '../pages/device/tracks';
-import { DeviceChartsPage } from '../pages/device/charts';
+import { DeviceGPSChartsPage , DeviceTHSChartsPage} from '../pages/device/charts';
 import { HelpModal } from '../pages/device/help-modal';
 import { TrackPage } from '../pages/device/tracks/track';
 import { RulesPage } from '../pages/rules';
@@ -100,7 +100,15 @@ import '../../node_modules/chart.js/dist/Chart.bundle.js';
 import { FirstAlertProvider } from '../providers/first-alert';
 
 import * as Sentry from '@sentry/browser';
+import { DevicesListItemComponent } from '../pages/devices/item';
+import { DeviceCircleChartPage } from '../pages/device/circle-chart';
+import { FormatTempModule } from '../pipes/format-temperature/format-temp.module';
+import { CamelCostModule } from '../pipes/camel-cost/camel-cost.module';
+import { MeasurementsModule } from '../pages/device/measurements/measurements.module';
+import { MeasurementProvider } from '../providers/measurement';
+import { HumidityConditionPage } from '../pages/rules/common/conditions/humidity/humidity';
 
+// @mergeTHS
 Sentry.init({
     dsn: 'https://d8f1c773c46d4b6c91ad8604bc4f90b1@sentry.io/2299214'
 });
@@ -130,11 +138,15 @@ Sentry.init({
         CreateDevicePage,
         EditDevicePage,
         DevicesPage,
+        DevicesListItemComponent,
         DevicesPopoverPage,
+        DeviceCircleChartPage,
+
         DevicePage,
         DateSettingsPage,
         DeviceTracksPage,
-        DeviceChartsPage,
+        DeviceGPSChartsPage,
+        DeviceTHSChartsPage,
         DeviceSharePage,
         HelpModal,
         ShareWithUserPage,
@@ -146,6 +158,7 @@ Sentry.init({
         LatestVersionPage,
 
         TemperatureConditionPage,
+        HumidityConditionPage,
         SpeedConditionPage,
         NTC1ConditionPage,
         VoltsConditionPage,
@@ -176,7 +189,10 @@ Sentry.init({
         IonicStorageModule.forRoot(),
         HttpClientModule,
         MomentModule,
-        ChartsModule
+        ChartsModule,
+        FormatTempModule,
+        CamelCostModule,
+        MeasurementsModule
     ],
     bootstrap: [IonicApp],
     entryComponents: [
@@ -207,7 +223,8 @@ Sentry.init({
         DevicePage,
         DateSettingsPage,
         DeviceTracksPage,
-        DeviceChartsPage,
+        DeviceGPSChartsPage,
+        DeviceTHSChartsPage,
         DeviceSharePage,
         HelpModal,
         ShareWithUserPage,
@@ -219,6 +236,7 @@ Sentry.init({
         LatestVersionPage,
 
         TemperatureConditionPage,
+        HumidityConditionPage,
         SpeedConditionPage,
         NTC1ConditionPage,
         VoltsConditionPage,
@@ -260,8 +278,9 @@ Sentry.init({
         HTTP,
         SplashScreen, StatusBar, Push, ApiProvider, DeviceProvider, RuleProvider, AlertProvider, TrackProvider,
         NotificationProvider, Logger, AppVersion, Geolocation, Settings, NativeRingtones, Device, /*ImagePicker,*/
-        Base64, UniqueDeviceID, Keyboard, OpenNativeSettings, FirstAlertProvider
+        Base64, UniqueDeviceID, Keyboard, OpenNativeSettings, FirstAlertProvider,
 
+        MeasurementProvider
     ]
 })
 export class AppModule {

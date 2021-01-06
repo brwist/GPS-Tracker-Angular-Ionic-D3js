@@ -22,12 +22,20 @@ import {UniqueDeviceID} from '@ionic-native/unique-device-id';
 
 declare const window: any;
 
-export const API_INFO = {
+export const API_INFO: {
+    PROTOCOL: string;
+    HOST: string;
+    PORT?: number;
+} = {
 
     // Local testing
     // PROTOCOL: 'http',
     // HOST: 'localhost',
     // PORT: 4100
+
+    // Staging
+    // PROTOCOL: 'https',
+    // HOST: 'trakkit-app-api.mobibean.com'
 
     // HOST: '192.168.2.28' // Kow
     // HOST: '192.168.1.33', // a
