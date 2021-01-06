@@ -2,7 +2,7 @@
   <ion-navbar>
     <ion-title>Charts</ion-title>
   </ion-navbar>
-  <ion-toolbar>
+  <!-- <ion-toolbar>
     <ion-segment [(ngModel)]="chartType">
 
       <ion-segment-button
@@ -12,7 +12,7 @@
         {{type.label}}
       </ion-segment-button>
     </ion-segment>
-  </ion-toolbar>
+  </ion-toolbar> -->
 </ion-header>
 
 <ion-content>
@@ -23,59 +23,62 @@
   >
     <ion-spinner></ion-spinner>
   </div>
-  <ng-container *ngIf="chartData">
-    <p class="chart-title">{{ chartData.title }}</p>
-    <canvas
-      baseChart
-      [datasets]="chartData.dataSets"
-      [labels]="chartData.labels"
-      [options]="chartData.options"
-      [legend]="chartData.legend"
-      [colors]="chartData.colors"
-      [chartType]="chartData.chartType"
-    ></canvas>
-  </ng-container>
-  <ion-list>
 
-    <button
-      ion-item
-      detail-none
-      (click)="presentDateSettings()"
-    >
-      {{ dateRangeString }}
-    </button>
-
-    <ion-item>
-      <ion-label>Max number of points</ion-label>
-      <ion-select [(ngModel)]="maxNumberOfPointsValue">
-        <ion-option
-          *ngFor="let value of [25, 50, 100, 150, 300, 500, 1000, 'All']"
-          [value]="value"
+  <ion-card class="tabs-container-card">
+    <ion-card-content>
+      <div class="tabs-container">
+        <div
+          class="tabs-container_name"
+          [ngClass]="{'active-tab': activeTab === 1 }"
+          (click)="selectTimeDurationHour(1)"
         >
-          {{ value }}
-        </ion-option>
-      </ion-select>
-    </ion-item>
-
-  </ion-list>
-
-  <ion-list *ngIf="groupedBy">
-    <ion-list-header>Grouped by {{ groupedBy }}s (median shown)</ion-list-header>
-
-    <ion-item>
-      <h2>Total data points</h2>
-      <ion-note item-right>
-        {{ pointsTotal }}
-      </ion-note>
-    </ion-item>
-
-  </ion-list>
-
-  <!-- <chart
-    [chartData]="chartData"
-    [device]="device"
-  >
-
-  </chart> -->
-
+          <span>Hour</span>
+        </div>
+        <div
+          class="tabs-container_name"
+          [ngClass]="{'active-tab': activeTab === 2 }"
+          (click)="selectTimeDurationDay(2)"
+        >
+          <span>Day</span>
+        </div>
+        <div
+          class="tabs-container_name"
+          [ngClass]="{'active-tab': activeTab === 3 }"
+          (click)="selectTimeDurationWeek(3)"
+        >
+          <span>Week</span>
+        </div>
+        <div
+          class="tabs-container_name"
+          [ngClass]="{'active-tab': activeTab === 4 }"
+          (click)="selectTimeDurationMonth(4)"
+        >
+          <span>Month</span>
+        </div>
+        <div
+          class="tabs-container_name"
+          [ngClass]="{'active-tab': activeTab === 5 }"
+          (click)="selectTimeDurationYear(5)"
+        >
+          <span>Year</span>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Temperature</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <page-temperature-chart [data]="chartData?.temperature" *ngIf="chartData.temperature"></page-temperature-chart>
+    </ion-card-content>
+  </ion-card>
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Volts</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <page-volt-chart [data]="chartData?.batteryOrVolts" *ngIf="chartData.batteryOrVolts"></page-volt-chart>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

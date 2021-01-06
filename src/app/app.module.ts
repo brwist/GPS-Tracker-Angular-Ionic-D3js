@@ -106,7 +106,9 @@ import { FormatTempModule } from '../pipes/format-temperature/format-temp.module
 import { CamelCostModule } from '../pipes/camel-cost/camel-cost.module';
 import { MeasurementsModule } from '../pages/device/measurements/measurements.module';
 import { MeasurementProvider } from '../providers/measurement';
-import { HumidityConditionPage } from '../pages/rules/common/conditions/humidity/humidity';
+import { HumidityConditionPage } from '../pages/rules/common/conditions/humidity/humidity'
+import { TemperatureChartComponent } from '../pages/device/charts/temperature-chart/temperature-chart';
+import { VoltChartComponent } from '../pages/device/charts/volt-chart/volt-chart';
 
 // @mergeTHS
 Sentry.init({
@@ -156,6 +158,8 @@ Sentry.init({
         TrackingOptionsPage,
         RulesEditorPage,
         LatestVersionPage,
+        TemperatureChartComponent,
+        VoltChartComponent,
 
         TemperatureConditionPage,
         HumidityConditionPage,
