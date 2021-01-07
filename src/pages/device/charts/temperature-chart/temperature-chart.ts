@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import * as d3 from 'd3';
 
 import * as moment from 'moment';
+import { DeviceProvider } from '../../../../providers/device';
 
 declare var window: any;
 
@@ -61,7 +62,7 @@ export class TemperatureChartComponent implements OnInit {
   selectedDetailLeft = 10;
   verticalLineH: any;
 
-  constructor() {}
+  constructor(private deviceProvider: DeviceProvider) {}
 
   ngOnInit() {
     this.width = window.innerWidth - this.margin.left - this.margin.right - 20;
@@ -188,6 +189,12 @@ export class TemperatureChartComponent implements OnInit {
     this.verticalLineH = d3.select('rect').node().getBoundingClientRect().height + 8;
 
     this.resetZoom();
+
+    this.deviceProvider.$zoomChangeTemp.subscribe(val => {
+      if(val) {
+        this.customeZoom(val);
+      }
+    });
   }
 
   resetZoom() {
@@ -216,6 +223,8 @@ export class TemperatureChartComponent implements OnInit {
 
   private zoomed(): void {
     this.chartValueAround = undefined;
+    const event = d3.event;
+    this.deviceProvider.zoomedVolt(event);
     this.gX.call(this.xAxis.scale(d3.event.transform.rescaleX(this.x)));
     this.xt = d3.event.transform.rescaleX(this.x);
     const domain = this.xt.domain();
@@ -240,5 +249,33 @@ export class TemperatureChartComponent implements OnInit {
 
     this.chartBody.selectAll('path').attr('d', newLine);
     this.voronoiGroup.attr('transform', d3.event.transform);
+  }
+
+  private customeZoom(event) {
+    this.chartValueAround = undefined;
+    this.gX.call(this.xAxis.scale(event.transform.rescaleX(this.x)));
+    this.xt = event.transform.rescaleX(this.x);
+    const domain = this.xt.domain();
+    this.rangeDateStart = moment(domain[0]).isValid() ? moment(domain[0]) : undefined;
+    this.rangeDateEnd = moment(domain[1]).isValid() ? moment(domain[1]) : undefined;
+    // this.rangeTimeChange.emit({start: domain[0], end: domain[1]});
+    const newLine = d3
+      .line()
+      .x((d: any) => this.xt(d.sortTime))
+      .y((d: any) => this.y(d.temperature));
+    d3.voronoi()
+      .x((d: any) => {
+        return this.xt(d.sortTime);
+      })
+      .y((d: any) => {
+        return this.y(d.temperature);
+      })
+      .extent([
+        [-this.margin.left, -this.margin.top],
+        [this.width + this.margin.right, this.height + this.margin.bottom]
+      ]);
+
+    this.chartBody.selectAll('path').attr('d', newLine);
+    this.voronoiGroup.attr('transform', event.transform);
   }
 }
