@@ -5,6 +5,7 @@ import { ApiProvider } from './api';
 import { IAbstractNotification } from '../app/notifications/notification-factory';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/toPromise';
+import { BehaviorSubject } from 'rxjs';
 
 export interface ILocation {
     coordinates: number[];
@@ -105,6 +106,11 @@ export const TYPES = ['GPS', 'THS'];
 
 @Injectable()
 export class DeviceProvider extends BaseProvider {
+    private zoomChangeTemp = new BehaviorSubject<any>(undefined);
+    $zoomChangeTemp = this.zoomChangeTemp.asObservable();
+
+    private zoomChangeVolt = new BehaviorSubject<any>(undefined);
+    $zoomChangeVolt = this.zoomChangeVolt.asObservable();
 
     public static codeToString(code: number) {
 
@@ -152,6 +158,16 @@ export class DeviceProvider extends BaseProvider {
         return this.applyActionV2(ApiProvider.obtainRequestUrl(`devices/${device.id}/stop-sharing-device`), {
             email
         });
+    }
+
+    public zoomedTemp(event) {
+        this.zoomChangeTemp.next(event);
+        // this.zoomChange.
+    }
+
+    public zoomedVolt(event) {
+        this.zoomChangeVolt.next(event);
+        // this.zoomChange.
     }
 
     /**
