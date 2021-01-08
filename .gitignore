@@ -9,6 +9,7 @@ log.txt
 .vscode/
 npm-debug.log*
 
+.gradle/
 .idea/
 .sass-cache/
 .tmp/
@@ -16,7 +17,6 @@ npm-debug.log*
 coverage/
 dist/
 node_modules/
-www/
 tmp/
 www/
 temp/
