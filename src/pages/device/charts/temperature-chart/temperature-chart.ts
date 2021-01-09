@@ -17,6 +17,7 @@ interface rangeModelArgs{
 })
 export class TemperatureChartComponent implements OnInit {
   @Input() data = [];
+  @Input() tempUnit;
   @Output() public rangeTabChange = new EventEmitter<number>();
   @Output() public rangeTimeChange = new EventEmitter<rangeModelArgs>();
 
@@ -80,7 +81,7 @@ export class TemperatureChartComponent implements OnInit {
       .axisRight(this.y)
       .ticks(5)
       .tickSize(this.width)
-      .tickPadding(-20 - this.width);
+      .tickPadding(-23 - this.width);
     this.line = d3
       .line()
       .x((d: any) => this.x(d.sortTime))
@@ -109,7 +110,7 @@ export class TemperatureChartComponent implements OnInit {
       .axisRight(this.y)
       .ticks(10)
       .tickSize(this.width)
-      .tickPadding(-20 - this.width);
+      .tickPadding(-25 - this.width);
     this.x.domain(d3.extent(this.data, (d) => d.sortTime));
     this.y.domain(d3.extent(this.data, (d) => d.temperature));
     this.xAxis = d3

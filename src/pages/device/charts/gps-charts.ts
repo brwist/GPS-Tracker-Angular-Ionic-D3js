@@ -70,9 +70,9 @@ export class DeviceGPSChartsPage implements OnInit {
 
     private startDate: any;
     private endDate: any;
-    private firstLoad = true;
     private yearSelected = false;
     yearPoints: any;
+    tempUnit = 'cTemp';
 
     constructor(private logger: Logger,
                 private params: NavParams,
@@ -185,7 +185,6 @@ export class DeviceGPSChartsPage implements OnInit {
     }
 
     private loadChartData() {
-        this.firstLoad = true;
         if(moment(this.dateSettings.startDate).isSame(this.dateSettings.endDate)) {
             this.dateSettings.startDate = moment(this.dateSettings.startDate).add(-1, 'hours');
         }
@@ -273,9 +272,6 @@ export class DeviceGPSChartsPage implements OnInit {
         } else {
             this.renderCharts();
         }
-        if(!this.yearSelected && !this.dataYear)  {
-            this.loadChartYear();
-        }
     }
 
     private getHourData(select) {
@@ -322,9 +318,11 @@ export class DeviceGPSChartsPage implements OnInit {
         }).catch((err) => {
             this.logger.error(err);
         });
+        this.loadChartYear();
     }
 
     private loadChartYear() {
+        // localStorage.setItem('yearData', undefined);
         const currentTime = moment().format();
         const start = moment(currentTime).add(-1, 'year');
         const end = moment(currentTime);
@@ -350,38 +348,41 @@ export class DeviceGPSChartsPage implements OnInit {
                 lean: true
             }).then((data: any) => {
 
-                this.dataYear = data;
-                this.yearPoints = data.items.map((item: ITrack) => {
+                // this.dataYearthis.dataYear = data;
+                
+                // if (this.isCableKitConnected) {
+
+                //     let ntcIsValid = false;
+
+                //     for (const item of dataYear.items) {
+
+                //         if (/\d+\.?\d?/.test(item.ntc1)) {
+
+                //             ntcIsValid = true;
+
+                //             break;
+                //         }
+                //     }
+
+                //     if (ntcIsValid) {
+
+                //         this.dataYear.items = dataYear.items.map((item) => {
+
+                //             item.temperature = item.ntc1;
+
+                //             return item;
+                //         });
+                //     }
+                // }
+                this.dataYear = data.items.map((item: ITrack) => {
                     return {
                         timestamp: item.timestamp,
                         batteryOrVolts: this.prepareBatteryOrVoltsData(this.isCableKitConnected ? item.volts : item.battery),
                         temperature: item.temperature
                     };
                 });
-                if (this.isCableKitConnected) {
 
-                    let ntcIsValid = false;
-
-                    for (const item of this.dataYear.items) {
-
-                        if (/\d+\.?\d?/.test(item.ntc1)) {
-
-                            ntcIsValid = true;
-
-                            break;
-                        }
-                    }
-
-                    if (ntcIsValid) {
-
-                        this.dataYear.items = this.dataYear.items.map((item) => {
-
-                            item.temperature = item.ntc1;
-
-                            return item;
-                        });
-                    }
-                }
+                // localStorage.setItem('yearData', JSON.stringify(dataYear));
 
             }).catch((err) => {
                 this.logger.error(err);
@@ -391,13 +392,16 @@ export class DeviceGPSChartsPage implements OnInit {
 
     private renderCharts() {
         if(this.yearSelected) {
-            this.loadData(this.dataYear, this.yearPoints);
+            // const dataYear = localStorage.getItem('yearData');
+            // this.data = JSON.parse(dataYear);
+            this.data = undefined;
+            this.loadData(this.dataYear);
         } else {
             this.loadData(this.data);
         }
     }
 
-    loadData(data, yearPoints?) {
+    loadData(data) {
         let points;
         if(!data) {
             return;
@@ -413,7 +417,7 @@ export class DeviceGPSChartsPage implements OnInit {
                 };
             });
         } else {
-            points = yearPoints;
+            points = data;
         }
 
         this.chartData = {};
@@ -452,7 +456,7 @@ export class DeviceGPSChartsPage implements OnInit {
                     }
                     return {
                         sortTime: new Date(item.timestamp).getTime(),
-                        temperature: item.temperature
+                        temperature: this.tempUnit === 'fTemp' ? (item.temperature * 9 / 5 + 32) : item.temperature
                     }
                 })
                 .sort((a, b) =>
@@ -462,16 +466,7 @@ export class DeviceGPSChartsPage implements OnInit {
 
             this.chartData.batteryOrVolts = batteryOrVolts;
             this.chartData.temperature = temperature;
-            setTimeout(() => {
-                this.firstLoad = false;
-            }, 4000);
         }, 100);
-    }
-
-    rangeTabChange(e) {
-        // if(!this.firstLoad) {
-        //     this.activeTab = e;
-        // }
     }
 
     rangeTimeChange(event) {
@@ -568,11 +563,6 @@ export class DeviceGPSChartsPage implements OnInit {
         this.loadChartData();
     }
 
-    private formatTimeLabel(dateTime: string, outFormat: string, format?: string) {
-
-        return momentTimezone(moment.utc(dateTime, format)).tz(this.timeZone).format(outFormat);
-    }
-
     private prepareBatteryOrVoltsData(batteryOrVolts: any) {
 
         if (/\d+\.?\d?/.test(batteryOrVolts)) {
@@ -584,4 +574,37 @@ export class DeviceGPSChartsPage implements OnInit {
             return 100;
         }
     }
+
+    fToC(type) {
+        this.tempUnit = type;
+        const tempdata = JSON.stringify(this.chartData.temperature);
+        const data = JSON.parse(tempdata);
+
+        this.chartData.temperature = undefined;
+
+        data.forEach(item => {
+          item.temperature = (item.temperature - 32) * 5 / 9;
+        });
+
+        setTimeout(() => {
+            this.chartData.temperature = data;
+        }, 100);
+
+      }
+    
+      cToF(type) {
+        this.tempUnit = type;
+        const tempdata = JSON.stringify(this.chartData.temperature);
+        const data = JSON.parse(tempdata);
+
+        this.chartData.temperature = undefined;
+
+        data.forEach(item => {
+            item.temperature = item.temperature * 9 / 5 + 32;
+        });
+        
+        setTimeout(() => {
+            this.chartData.temperature = data;
+        }, 100);
+      }
 }

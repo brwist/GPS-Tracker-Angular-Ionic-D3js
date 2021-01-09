@@ -129,7 +129,7 @@ export class VoltChartComponent implements OnInit {
       .append('svg')
       .attr('width', '90%')
       .attr('height', '100%')
-      .attr('viewBox', [-9, 0, width, height + 20])
+      .attr('viewBox', [-15, 0, width, height + 20])
       .call(this.zoom);
     // this.svg.select('*').remove();
     const g = this.svg.append('g').attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');
