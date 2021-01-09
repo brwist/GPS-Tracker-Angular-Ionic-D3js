@@ -576,6 +576,9 @@ export class DeviceGPSChartsPage implements OnInit {
     }
 
     fToC(type) {
+        if(this.tempUnit === type) {
+            return;
+        }
         this.tempUnit = type;
         const tempdata = JSON.stringify(this.chartData.temperature);
         const data = JSON.parse(tempdata);
@@ -593,6 +596,9 @@ export class DeviceGPSChartsPage implements OnInit {
       }
     
       cToF(type) {
+        if(this.tempUnit === type) {
+            return;
+        }
         this.tempUnit = type;
         const tempdata = JSON.stringify(this.chartData.temperature);
         const data = JSON.parse(tempdata);
