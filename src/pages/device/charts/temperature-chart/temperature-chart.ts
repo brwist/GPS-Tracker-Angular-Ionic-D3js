@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 import * as d3 from 'd3';
 
 import * as moment from 'moment';
@@ -63,7 +64,7 @@ export class TemperatureChartComponent implements OnInit {
   selectedDetailLeft = 10;
   verticalLineH: any;
 
-  constructor(private deviceProvider: DeviceProvider) {}
+  constructor(private deviceProvider: DeviceProvider, private decimalPipe: DecimalPipe) {}
 
   ngOnInit() {
     this.width = window.innerWidth - this.margin.left - this.margin.right - 20;
@@ -165,7 +166,7 @@ export class TemperatureChartComponent implements OnInit {
         var temp = this.data.map(d => Math.abs(selectedTime - new Date(d.sortTime).getTime()));
         var idx = temp.indexOf(Math.min(...temp));
         var d = this.data[idx];
-        this.chartValueAround = this.formatDate(x0) + ' ' + d.temperature + '\u00B0';
+        this.chartValueAround = this.formatDate(x0) + ' ' + this.decimalPipe.transform(d.temperature, '1.1-1') + '\u00B0';
 
         const xCor = d3.event.x - 44;
         this.selectedDetailLeft = xCor;

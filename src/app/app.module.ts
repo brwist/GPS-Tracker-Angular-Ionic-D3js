@@ -109,6 +109,7 @@ import { MeasurementProvider } from '../providers/measurement';
 import { HumidityConditionPage } from '../pages/rules/common/conditions/humidity/humidity'
 import { TemperatureChartComponent } from '../pages/device/charts/temperature-chart/temperature-chart';
 import { VoltChartComponent } from '../pages/device/charts/volt-chart/volt-chart';
+import { DecimalPipe } from '@angular/common';
 
 // @mergeTHS
 Sentry.init({
@@ -279,7 +280,7 @@ Sentry.init({
         Network,
         NetworkInterface,
         TrakkitProvider,
-        HTTP,
+        HTTP, DecimalPipe,
         SplashScreen, StatusBar, Push, ApiProvider, DeviceProvider, RuleProvider, AlertProvider, TrackProvider,
         NotificationProvider, Logger, AppVersion, Geolocation, Settings, NativeRingtones, Device, /*ImagePicker,*/
         Base64, UniqueDeviceID, Keyboard, OpenNativeSettings, FirstAlertProvider,
