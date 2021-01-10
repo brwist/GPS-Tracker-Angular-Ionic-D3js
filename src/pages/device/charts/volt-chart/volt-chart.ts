@@ -63,12 +63,25 @@ export class VoltChartComponent implements OnInit {
 
   selectedDetailLeft = 10;
 
+  noData = false;
+
   constructor(private deviceProvider: DeviceProvider) {}
 
   ngOnInit() {
-    // const event = document.createEvent('tempZoom').;
     this.width = window.innerWidth - this.margin.left - this.margin.right - 20;
     this.height = 500 - this.margin.top - this.margin.bottom;
+    if(this.data.length <= 0) {
+      this.noData = true;
+    } else {
+      this.noData = false;
+      this.loadSvg();
+    }
+  }
+
+  loadSvg() {
+    // const event = document.createEvent('tempZoom').;
+    // this.width = window.innerWidth - this.margin.left - this.margin.right - 20;
+    // this.height = 500 - this.margin.top - this.margin.bottom;
     this.verticalLineH = this.height - 70;
     this.x = d3.scaleTime().range([0, this.width]);
     this.y = d3.scaleLinear().rangeRound([this.height, 0]);
