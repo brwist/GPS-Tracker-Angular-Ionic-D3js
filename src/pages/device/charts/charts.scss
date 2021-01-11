@@ -79,6 +79,14 @@ page-charts {
   }
 }
 
+div.disabled
+{
+  pointer-events: none;
+
+  opacity: 0.5;
+  background: #CCC;
+}
+
 .chart-title {
   padding-left: 16px;
 }

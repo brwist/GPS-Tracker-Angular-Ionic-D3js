@@ -80,6 +80,27 @@ export class TemperatureChartComponent implements OnInit {
   }
 
   loadSvg() {
+    if(this.data.length > 80000) {
+      this.data = this.filterDate(this.data);
+    }
+    if(this.data.length > 50000) {
+      this.data = this.filterDate(this.data);
+    }
+    if(this.data.length > 20000) {
+      this.data = this.filterDate(this.data);
+    }
+    if(this.data.length > 10000) {
+      this.data = this.filterDate(this.data);
+    }
+    if(this.data.length > 5000) {
+      this.data = this.filterDate(this.data);
+    }
+    if(this.data.length > 2000) {
+      this.data = this.filterDate(this.data);
+    }
+    if(this.data.length > 1000) {
+      this.data = this.filterDate(this.data);
+    }
     this.x = d3.scaleTime().range([0, this.width]);
     this.y = d3.scaleLinear().rangeRound([this.height, 0]);
     this.xAxis = d3
@@ -237,7 +258,6 @@ export class TemperatureChartComponent implements OnInit {
   private zoomed(): void {
     this.chartValueAround = undefined;
     const event = d3.event;
-    this.deviceProvider.zoomedVolt(event);
     this.gX.call(this.xAxis.scale(d3.event.transform.rescaleX(this.x)));
     this.xt = d3.event.transform.rescaleX(this.x);
     const domain = this.xt.domain();
@@ -245,23 +265,24 @@ export class TemperatureChartComponent implements OnInit {
     this.rangeDateEnd = moment(domain[1]).isValid() ? moment(domain[1]) : undefined;
     // this.rangeTimeChange.emit({start: domain[0], end: domain[1]});
     const newLine = d3
-      .line()
-      .x((d: any) => this.xt(d.sortTime))
-      .y((d: any) => this.y(d.temperature));
+    .line()
+    .x((d: any) => this.xt(d.sortTime))
+    .y((d: any) => this.y(d.temperature));
     d3.voronoi()
-      .x((d: any) => {
-        return this.xt(d.sortTime);
-      })
-      .y((d: any) => {
-        return this.y(d.temperature);
-      })
-      .extent([
-        [-this.margin.left, -this.margin.top],
-        [this.width + this.margin.right, this.height + this.margin.bottom]
-      ]);
-
+    .x((d: any) => {
+      return this.xt(d.sortTime);
+    })
+    .y((d: any) => {
+      return this.y(d.temperature);
+    })
+    .extent([
+      [-this.margin.left, -this.margin.top],
+      [this.width + this.margin.right, this.height + this.margin.bottom]
+    ]);
+    
     this.chartBody.selectAll('path').attr('d', newLine);
     this.voronoiGroup.attr('transform', d3.event.transform);
+    this.deviceProvider.zoomedVolt(event);
   }
 
   private customeZoom(event) {
@@ -290,5 +311,18 @@ export class TemperatureChartComponent implements OnInit {
 
     this.chartBody.selectAll('path').attr('d', newLine);
     this.voronoiGroup.attr('transform', event.transform);
+  }
+
+  private filterDate(data: any[]) {
+    let res = data.map((item, index) => {
+        return (index % 2 !== 1) ? {
+            sortTime: item.sortTime,
+            temperature: item.temperature
+        } : null;
+    }).filter(function(entry) {
+        return entry != null;
+    });
+
+    return res;
   }
 }

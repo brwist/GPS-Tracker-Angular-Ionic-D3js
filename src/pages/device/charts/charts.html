@@ -57,7 +57,7 @@
         </div>
         <div
           class="tabs-container_name"
-          [ngClass]="{'active-tab': activeTab === 5 }"
+          [ngClass]="{'active-tab': activeTab === 5, 'disabled': dataYear.length <= 0 }"
           (click)="selectTimeDurationYear(5)"
         >
           <span>Year</span>

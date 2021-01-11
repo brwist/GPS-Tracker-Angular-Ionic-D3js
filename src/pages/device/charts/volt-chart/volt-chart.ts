@@ -79,9 +79,27 @@ export class VoltChartComponent implements OnInit {
   }
 
   loadSvg() {
-    // const event = document.createEvent('tempZoom').;
-    // this.width = window.innerWidth - this.margin.left - this.margin.right - 20;
-    // this.height = 500 - this.margin.top - this.margin.bottom;
+    if(this.data.length > 80000) {
+      this.data = this.filterDate(this.data);
+    }
+    if(this.data.length > 50000) {
+      this.data = this.filterDate(this.data);
+    }
+    if(this.data.length > 20000) {
+      this.data = this.filterDate(this.data);
+    }
+    if(this.data.length > 10000) {
+      this.data = this.filterDate(this.data);
+    }
+    if(this.data.length > 5000) {
+      this.data = this.filterDate(this.data);
+    }
+    if(this.data.length > 2000) {
+      this.data = this.filterDate(this.data);
+    }
+    if(this.data.length > 1000) {
+      this.data = this.filterDate(this.data);
+    }
     this.verticalLineH = this.height - 70;
     this.x = d3.scaleTime().range([0, this.width]);
     this.y = d3.scaleLinear().rangeRound([this.height, 0]);
@@ -239,30 +257,30 @@ export class VoltChartComponent implements OnInit {
   private zoomed(): void {
     this.chartValueAround = undefined;
     const event = d3.event;
-    this.deviceProvider.zoomedTemp(event);
     this.gX.call(this.xAxis.scale(d3.event.transform.rescaleX(this.x)));
     this.xt = d3.event.transform.rescaleX(this.x);
     const domain = this.xt.domain();
     this.rangeDateStart = moment(domain[0]).isValid() ? moment(domain[0]) : undefined;
     this.rangeDateEnd = moment(domain[1]).isValid() ? moment(domain[1]) : undefined;
     const newLine = d3
-      .line()
-      .x((d: any) => this.xt(d.sortTime))
-      .y((d: any) => this.y(d.batteryOrVolts));
+    .line()
+    .x((d: any) => this.xt(d.sortTime))
+    .y((d: any) => this.y(d.batteryOrVolts));
     d3.voronoi()
-      .x((d: any) => {
-        return this.xt(d.sortTime);
-      })
-      .y((d: any) => {
-        return this.y(d.batteryOrVolts);
-      })
-      .extent([
-        [-this.margin.left, -this.margin.top],
-        [this.width + this.margin.right, this.height + this.margin.bottom]
-      ]);
-
+    .x((d: any) => {
+      return this.xt(d.sortTime);
+    })
+    .y((d: any) => {
+      return this.y(d.batteryOrVolts);
+    })
+    .extent([
+      [-this.margin.left, -this.margin.top],
+      [this.width + this.margin.right, this.height + this.margin.bottom]
+    ]);
+    
     this.chartBody.selectAll('path').attr('d', newLine);
     this.voronoiGroup.attr('transform', d3.event.transform);
+    this.deviceProvider.zoomedTemp(event);
   }
 
   private customeZoom(event) {
@@ -290,5 +308,18 @@ export class VoltChartComponent implements OnInit {
 
     this.chartBody.selectAll('path').attr('d', newLine);
     this.voronoiGroup.attr('transform', event.transform);
+  }
+
+  private filterDate(data: any[]) {
+    let res = data.map((item, index) => {
+        return (index % 2 !== 1) ? {
+            sortTime: item.sortTime,
+            batteryOrVolts: item.batteryOrVolts
+        } : null;
+    }).filter(function(entry) {
+        return entry != null;
+    });
+
+    return res;
   }
 }

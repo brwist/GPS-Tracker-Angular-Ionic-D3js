@@ -53,7 +53,7 @@ export class DeviceGPSChartsPage implements OnInit {
     public datePipeFormat = 'MMM d h:mm a';
     private data: any;
 
-    private dataYear: any;
+    public dataYear: any[] =[];
 
     private chartTypeModel: string = 'batteryOrVolts';
 
@@ -322,7 +322,9 @@ export class DeviceGPSChartsPage implements OnInit {
     }
 
     private loadChartYear() {
-        // localStorage.setItem('yearData', undefined);
+        if(this.dataYear.length > 0) {
+            return;
+        }
         const currentTime = moment().format();
         const start = moment(currentTime).add(-1, 'year');
         const end = moment(currentTime);
@@ -347,33 +349,6 @@ export class DeviceGPSChartsPage implements OnInit {
                 select,
                 lean: true
             }).then((data: any) => {
-
-                // this.dataYearthis.dataYear = data;
-                
-                // if (this.isCableKitConnected) {
-
-                //     let ntcIsValid = false;
-
-                //     for (const item of dataYear.items) {
-
-                //         if (/\d+\.?\d?/.test(item.ntc1)) {
-
-                //             ntcIsValid = true;
-
-                //             break;
-                //         }
-                //     }
-
-                //     if (ntcIsValid) {
-
-                //         this.dataYear.items = dataYear.items.map((item) => {
-
-                //             item.temperature = item.ntc1;
-
-                //             return item;
-                //         });
-                //     }
-                // }
                 this.dataYear = data.items.map((item: ITrack) => {
                     return {
                         timestamp: item.timestamp,
@@ -381,8 +356,6 @@ export class DeviceGPSChartsPage implements OnInit {
                         temperature: item.temperature
                     };
                 });
-
-                // localStorage.setItem('yearData', JSON.stringify(dataYear));
 
             }).catch((err) => {
                 this.logger.error(err);
@@ -392,8 +365,6 @@ export class DeviceGPSChartsPage implements OnInit {
 
     private renderCharts() {
         if(this.yearSelected) {
-            // const dataYear = localStorage.getItem('yearData');
-            // this.data = JSON.parse(dataYear);
             this.data = undefined;
             this.loadData(this.dataYear);
         } else {
@@ -546,6 +517,9 @@ export class DeviceGPSChartsPage implements OnInit {
     }
 
     public selectTimeDurationYear(tab) {
+        if(this.dataYear.length <= 0) {
+            return;
+        }
         this.datePipeFormat = 'MMM d, y, h:mm a';
         this.yearSelected = true;
         this.activeTab = tab;
