@@ -72,8 +72,8 @@
     <ion-card-content>
       <ion-item class="temp-unit">
         <ion-label item-left>Temperature unit</ion-label>
-        <button ion-button item-right color="light" [ngClass]="{'active': tempUnit === 'fTemp'}" (click)="cToF('fTemp')">\u00B0F</button>
-        <button ion-button item-right color="light" [ngClass]="{'active': tempUnit === 'cTemp'}" (click)="fToC('cTemp')">\u00B0C</button>
+        <button ion-button item-right color="light" [ngClass]="{'active': tempUnit === 'fTemp'}" (click)="cToF('fTemp')">F</button>
+        <button ion-button item-right color="light" [ngClass]="{'active': tempUnit === 'cTemp'}" (click)="fToC('cTemp')">C</button>
       </ion-item>
       <page-temperature-chart [data]="chartData?.temperature" *ngIf="chartData.temperature" [tempUnit]></page-temperature-chart>
     </ion-card-content>
