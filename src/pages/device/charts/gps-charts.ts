@@ -72,7 +72,7 @@ export class DeviceGPSChartsPage implements OnInit {
     private endDate: any;
     private yearSelected = false;
     yearPoints: any;
-    tempUnit = 'cTemp';
+    tempUnit = 'fTemp';
 
     constructor(private logger: Logger,
                 private params: NavParams,
@@ -257,7 +257,7 @@ export class DeviceGPSChartsPage implements OnInit {
 
                         this.data.items = this.data.items.map((item) => {
 
-                            item.temperature = item.ntc1;
+                            item.temperature = item.temperature;
 
                             return item;
                         });
@@ -306,7 +306,7 @@ export class DeviceGPSChartsPage implements OnInit {
 
                     this.data.items = this.data.items.map((item) => {
 
-                        item.temperature = item.ntc1;
+                        item.temperature = item.temperature;
 
                         return item;
                     });
@@ -427,7 +427,7 @@ export class DeviceGPSChartsPage implements OnInit {
                     }
                     return {
                         sortTime: new Date(item.timestamp).getTime(),
-                        temperature: this.tempUnit === 'fTemp' ? (item.temperature * 9 / 5 + 32) : item.temperature
+                        temperature: this.tempUnit === 'cTemp' ? ((item.temperature - 32) * 5 / 9) : item.temperature
                     }
                 })
                 .sort((a, b) =>
