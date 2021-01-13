@@ -18,10 +18,11 @@ interface rangeModelArgs{
 })
 export class TemperatureChartComponent implements OnInit {
   @Input() data = [];
+  @Input() tempType;
   @Output() public rangeTabChange = new EventEmitter<number>();
   @Output() public rangeTimeChange = new EventEmitter<rangeModelArgs>();
 
-  public datePipeFormat = 'MMM d h:mm a';
+  public datePipeFormat;
   public rangeDateStart: any;
   public rangeDateEnd: any;
   chartValueAround;
@@ -100,6 +101,17 @@ export class TemperatureChartComponent implements OnInit {
     // if(this.data.length > 1000) {
     //   this.data = this.filterDate(this.data);
     // }
+    if(this.tempType === 'cTemp') {
+      this.formatDate = d3.timeFormat('%d-%b, %H:%M');
+      this.datePipeFormat = 'd-MMM h:mm a';
+      this.formatDay = d3.timeFormat('%d-%a');
+      this.formatWeek = d3.timeFormat('%d-%b');
+    } else {
+      this.formatDate = d3.timeFormat('%b-%d-%y, %H:%M');
+      this.datePipeFormat = 'MMM-d-yy h:mm a';
+      this.formatDay = d3.timeFormat('%a-%d');
+      this.formatWeek = d3.timeFormat('%b-%d');
+    }
     this.x = d3.scaleTime().range([0, this.width]);
     this.y = d3.scaleLinear().rangeRound([this.height, 0]);
     this.xAxis = d3
@@ -136,7 +148,7 @@ export class TemperatureChartComponent implements OnInit {
 
     
     // d3.selectAll('#stacked-area > *').remove();
-    this.formatDate = d3.timeFormat('%d-%b, %H:%M');
+    
     // this.y = d3.scaleLinear().rangeRound([this.height, 0]);
     this.yAxis = d3
       .axisRight(this.y)
