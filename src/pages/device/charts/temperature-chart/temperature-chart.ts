@@ -91,9 +91,9 @@ export class TemperatureChartComponent implements OnInit {
     if(this.data.length > 10000) {
       this.data = this.filterDate(this.data);
     }
-    // if(this.data.length > 5000) {
-    //   this.data = this.filterDate(this.data);
-    // }
+    if(this.data.length > 5000) {
+      this.data = this.filterDate(this.data);
+    }
     // if(this.data.length > 2000) {
     //   this.data = this.filterDate(this.data);
     // }
@@ -248,7 +248,7 @@ export class TemperatureChartComponent implements OnInit {
 
       this.rezoom(start.valueOf(), endDate.valueOf());
     });
-    
+
     this.deviceProvider.$zoomChangeTemp.subscribe(val => {
       if(val) {
         this.customeZoom(val);

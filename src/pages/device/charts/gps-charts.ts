@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertPage } from '../alert/alert';
-import { LoadingController, NavParams, NavController, ModalController } from 'ionic-angular';
+import { LoadingController, NavParams, NavController, ModalController, Loading } from 'ionic-angular';
 import { AlertsPopoverPage } from './popover';
 import { Logger } from '../../../providers/logger';
 import { DeviceProvider, IDevice, ITrack } from '../../../providers/device';
@@ -71,8 +71,10 @@ export class DeviceGPSChartsPage implements OnInit {
     private startDate: any;
     private endDate: any;
     private yearSelected = false;
+    private loader: Loading;
     yearPoints: any;
     tempUnit = 'fTemp';
+    dataLoading: boolean = true;
 
     constructor(private logger: Logger,
                 private params: NavParams,
@@ -186,6 +188,7 @@ export class DeviceGPSChartsPage implements OnInit {
     }
 
     private loadChartData() {
+        this.showLoader();
         if(moment(this.dateSettings.startDate).isSame(this.dateSettings.endDate)) {
             this.dateSettings.startDate = moment(this.dateSettings.startDate).add(-1, 'hours');
         }
@@ -324,7 +327,18 @@ export class DeviceGPSChartsPage implements OnInit {
         // this.loadChartYear();
     }
 
+    private showLoader() {
+        this.loader = this.loadingCtrl.create({ content: 'Loading data' });
+
+        this.loader.present();
+    }
+
+    private hideLoader() {
+        this.loader.dismiss();
+    }
+
     private loadChartYear() {
+        
         if(this.dataYear.length > 0) {
             return;
         }
@@ -443,6 +457,8 @@ export class DeviceGPSChartsPage implements OnInit {
             this.chartData.batteryOrVolts = batteryOrVolts;
             this.chartData.temperature = temperature;
             this.selectTimeDurationHour(1);
+            this.dataLoading = false;
+            this.hideLoader();
         }, 100);
     }
 
@@ -505,7 +521,7 @@ export class DeviceGPSChartsPage implements OnInit {
         });
         this.rangeDateStart = start;
         this.rangeDateEnd = end;
-        
+
         this.deviceProvider.setSelectedRange('week');
         // this.loadChartData();
     }
