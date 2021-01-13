@@ -3,7 +3,7 @@ import { AlertPage } from '../alert/alert';
 import { LoadingController, NavParams, NavController, ModalController } from 'ionic-angular';
 import { AlertsPopoverPage } from './popover';
 import { Logger } from '../../../providers/logger';
-import { IDevice, ITrack } from '../../../providers/device';
+import { DeviceProvider, IDevice, ITrack } from '../../../providers/device';
 import { TrackProvider } from '../../../providers/track';
 import { TrackPage } from './track';
 import { DateSettingsPage } from '../date-settings';
@@ -81,7 +81,8 @@ export class DeviceGPSChartsPage implements OnInit {
                 private storage: Storage,
                 private modalCtrl: ModalController,
                 private trackProvider: TrackProvider,
-                private apiProvider: ApiProvider) {
+                private apiProvider: ApiProvider,
+                private deviceProvider: DeviceProvider) {
 
         this.device = this.params.get('device');
     }
@@ -224,54 +225,56 @@ export class DeviceGPSChartsPage implements OnInit {
         var duration = moment.duration(this.endDate.diff(this.startDate));
         var hours = duration.asHours();
         if(hours === 1) {
-            this.getHourData(select);
-        } else if(!this.yearSelected){
-            this.trackProvider.getListForChart(this.device.id, {
-                filter: {
-                    startDate:
-                        encodeURIComponent(momentTimezone(this.startDate).tz(this.timeZone).format()),
-                    endDate:
-                        encodeURIComponent(momentTimezone(this.endDate).tz(this.timeZone).format())
-                },
-                select,
-                lean: true
-            }).then((data: any) => {
+            this.yearSelected = true;
+            this.loadChartYear();
+        } 
+        // else if(!this.yearSelected){
+        //     this.trackProvider.getListForChart(this.device.id, {
+        //         filter: {
+        //             startDate:
+        //                 encodeURIComponent(momentTimezone(this.startDate).tz(this.timeZone).format()),
+        //             endDate:
+        //                 encodeURIComponent(momentTimezone(this.endDate).tz(this.timeZone).format())
+        //         },
+        //         select,
+        //         lean: true
+        //     }).then((data: any) => {
 
-                this.data = data;
+        //         this.data = data;
 
-                if (this.isCableKitConnected) {
+        //         if (this.isCableKitConnected) {
 
-                    let ntcIsValid = false;
+        //             let ntcIsValid = false;
 
-                    for (const item of this.data.items) {
+        //             for (const item of this.data.items) {
 
-                        if (/\d+\.?\d?/.test(item.ntc1)) {
+        //                 if (/\d+\.?\d?/.test(item.ntc1)) {
 
-                            ntcIsValid = true;
+        //                     ntcIsValid = true;
 
-                            break;
-                        }
-                    }
+        //                     break;
+        //                 }
+        //             }
 
-                    if (ntcIsValid) {
+        //             if (ntcIsValid) {
 
-                        this.data.items = this.data.items.map((item) => {
+        //                 this.data.items = this.data.items.map((item) => {
 
-                            item.temperature = item.temperature;
+        //                     item.temperature = item.temperature;
 
-                            return item;
-                        });
-                    }
-                }
+        //                     return item;
+        //                 });
+        //             }
+        //         }
 
-                this.renderCharts();
+        //         this.renderCharts();
 
-            }).catch((err) => {
-                this.logger.error(err);
-            });
-        } else {
-            this.renderCharts();
-        }
+        //     }).catch((err) => {
+        //         this.logger.error(err);
+        //     });
+        // } else {
+        //     this.renderCharts();
+        // }
     }
 
     private getHourData(select) {
@@ -318,7 +321,7 @@ export class DeviceGPSChartsPage implements OnInit {
         }).catch((err) => {
             this.logger.error(err);
         });
-        this.loadChartYear();
+        // this.loadChartYear();
     }
 
     private loadChartYear() {
@@ -356,6 +359,8 @@ export class DeviceGPSChartsPage implements OnInit {
                         temperature: item.temperature
                     };
                 });
+
+                this.renderCharts();
 
             }).catch((err) => {
                 this.logger.error(err);
@@ -437,6 +442,7 @@ export class DeviceGPSChartsPage implements OnInit {
 
             this.chartData.batteryOrVolts = batteryOrVolts;
             this.chartData.temperature = temperature;
+            this.selectTimeDurationHour(1);
         }, 100);
     }
 
@@ -459,7 +465,9 @@ export class DeviceGPSChartsPage implements OnInit {
         });
         this.rangeDateStart = start;
         this.rangeDateEnd = end;
-        this.loadChartData();
+
+        this.deviceProvider.setSelectedRange('hour');
+        // this.loadChartData();
     }
 
     public selectTimeDurationDay(tab) {
@@ -477,7 +485,8 @@ export class DeviceGPSChartsPage implements OnInit {
         this.rangeDateStart = start;
         this.rangeDateEnd = end;
 
-        this.loadChartData();
+        this.deviceProvider.setSelectedRange('day');
+        // this.loadChartData();
     }
 
     public selectTimeDurationWeek(tab) {
@@ -487,6 +496,8 @@ export class DeviceGPSChartsPage implements OnInit {
         const currentTime = moment().format();
         const start = moment(currentTime).add(-1, 'week');
         const end = moment(currentTime);
+        
+        
         this.dateSettings.startDate = start;
         this.dateSettings.endDate = end;
         this.storage.set(DATE_SETTINGS_STORAGE_KEY, this.dateSettings).catch((err) => {
@@ -494,8 +505,9 @@ export class DeviceGPSChartsPage implements OnInit {
         });
         this.rangeDateStart = start;
         this.rangeDateEnd = end;
-
-        this.loadChartData();
+        
+        this.deviceProvider.setSelectedRange('week');
+        // this.loadChartData();
     }
 
     public selectTimeDurationMonth(tab) {
@@ -513,7 +525,8 @@ export class DeviceGPSChartsPage implements OnInit {
         this.rangeDateStart = start;
         this.rangeDateEnd = end;
 
-        this.loadChartData();
+        this.deviceProvider.setSelectedRange('month');
+        // this.loadChartData();
     }
 
     public selectTimeDurationYear(tab) {
@@ -534,7 +547,9 @@ export class DeviceGPSChartsPage implements OnInit {
         this.rangeDateStart = start;
         this.rangeDateEnd = end;
 
-        this.loadChartData();
+        this.deviceProvider.setSelectedRange('year');
+
+        // this.loadChartData();
     }
 
     private prepareBatteryOrVoltsData(batteryOrVolts: any) {

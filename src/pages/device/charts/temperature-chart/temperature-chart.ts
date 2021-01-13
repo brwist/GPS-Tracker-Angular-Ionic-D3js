@@ -3,7 +3,7 @@ import { DecimalPipe } from '@angular/common';
 import * as d3 from 'd3';
 
 import * as moment from 'moment';
-import { DeviceProvider } from '../../../../providers/device';
+import { DeviceProvider, SelectedRange } from '../../../../providers/device';
 
 declare var window: any;
 
@@ -18,7 +18,6 @@ interface rangeModelArgs{
 })
 export class TemperatureChartComponent implements OnInit {
   @Input() data = [];
-  @Input() tempUnit;
   @Output() public rangeTabChange = new EventEmitter<number>();
   @Output() public rangeTimeChange = new EventEmitter<rangeModelArgs>();
 
@@ -92,15 +91,15 @@ export class TemperatureChartComponent implements OnInit {
     if(this.data.length > 10000) {
       this.data = this.filterDate(this.data);
     }
-    if(this.data.length > 5000) {
-      this.data = this.filterDate(this.data);
-    }
-    if(this.data.length > 2000) {
-      this.data = this.filterDate(this.data);
-    }
-    if(this.data.length > 1000) {
-      this.data = this.filterDate(this.data);
-    }
+    // if(this.data.length > 5000) {
+    //   this.data = this.filterDate(this.data);
+    // }
+    // if(this.data.length > 2000) {
+    //   this.data = this.filterDate(this.data);
+    // }
+    // if(this.data.length > 1000) {
+    //   this.data = this.filterDate(this.data);
+    // }
     this.x = d3.scaleTime().range([0, this.width]);
     this.y = d3.scaleLinear().rangeRound([this.height, 0]);
     this.xAxis = d3
@@ -162,6 +161,7 @@ export class TemperatureChartComponent implements OnInit {
       .attr('height', '100%')
       .attr('viewBox', [-5, 0, width, height + 20])
       .call(this.zoom);
+      
     // this.svg.select('*').remove();
     const g = this.svg.append('g').attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');
 
@@ -222,8 +222,33 @@ export class TemperatureChartComponent implements OnInit {
 
     this.verticalLineH = d3.select('rect').node().getBoundingClientRect().height + 8;
 
-    this.resetZoom();
+    this.deviceProvider.$zoomDateRange.subscribe((res) => {
+      const lastEl = this.data[0];
+      const endDate = moment(lastEl.sortTime);
+      let start;
+      switch (res) {
+        case 'hour':
+          start = moment(endDate).add(-1, 'hours');
+          break;
+        case 'day':
+            start = moment(endDate).add(-1, 'day');
+            break;
+        case 'week':
+            start = moment(endDate).add(-1, 'week');
+            break;
+        case 'month':
+            start = moment(endDate).add(-1, 'month');
+            break;
+        case 'year':
+          start = moment(endDate).add(-1, 'year');
+          break;
+        default:
+          break;
+      }
 
+      this.rezoom(start.valueOf(), endDate.valueOf());
+    });
+    
     this.deviceProvider.$zoomChangeTemp.subscribe(val => {
       if(val) {
         this.customeZoom(val);
@@ -235,6 +260,17 @@ export class TemperatureChartComponent implements OnInit {
     d3.selectAll('.axis--x').style('stroke-width', 0.3);
     d3.selectAll('.axis--y').style('stroke-width', 0.3);
     this.chartBody.select('rect').transition().duration(1000).call(this.zoom.scaleTo, this.scaleValue, [0, 0]);
+  }
+
+  rezoom(dateS, dateE) {
+    const width = this.width + this.margin.left + this.margin.right;
+
+    this.svg.call(this.zoom)
+      .transition()
+      .duration(1500)
+      .call(this.zoom.transform, d3.zoomIdentity
+          .scale(width / (this.x(dateE) - this.x(dateS)))
+          .translate(-this.x(dateS), 0));
   }
 
   multiFormat(date) {
