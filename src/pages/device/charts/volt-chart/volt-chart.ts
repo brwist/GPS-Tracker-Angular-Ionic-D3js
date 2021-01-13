@@ -88,12 +88,12 @@ export class VoltChartComponent implements OnInit {
     if(this.data.length > 20000) {
       this.data = this.filterDate(this.data);
     }
-    if(this.data.length > 10000) {
-      this.data = this.filterDate(this.data);
-    }
-    if(this.data.length > 5000) {
-      this.data = this.filterDate(this.data);
-    }
+    // if(this.data.length > 10000) {
+    //   this.data = this.filterDate(this.data);
+    // }
+    // if(this.data.length > 5000) {
+    //   this.data = this.filterDate(this.data);
+    // }
     // if(this.data.length > 2000) {
     //   this.data = this.filterDate(this.data);
     // }

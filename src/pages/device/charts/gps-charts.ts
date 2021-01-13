@@ -280,53 +280,6 @@ export class DeviceGPSChartsPage implements OnInit {
         // }
     }
 
-    private getHourData(select) {
-        this.trackProvider.getListForChart(this.device.id, {
-            filter: {
-                startDate:
-                    encodeURIComponent(momentTimezone(this.startDate).tz(this.timeZone).startOf('date').format('YYYY-MM-DD HH:mm:ss')),
-                endDate:
-                    encodeURIComponent(momentTimezone(this.endDate).tz(this.timeZone).endOf('date').format('YYYY-MM-DD HH:mm:ss'))
-            },
-            select,
-            lean: true
-        }).then((data: any) => {
-
-            this.data = data;
-
-            if (this.isCableKitConnected) {
-
-                let ntcIsValid = false;
-
-                for (const item of this.data.items) {
-
-                    if (/\d+\.?\d?/.test(item.ntc1)) {
-
-                        ntcIsValid = true;
-
-                        break;
-                    }
-                }
-
-                if (ntcIsValid) {
-
-                    this.data.items = this.data.items.map((item) => {
-
-                        item.temperature = item.temperature;
-
-                        return item;
-                    });
-                }
-            }
-
-            this.renderCharts();
-
-        }).catch((err) => {
-            this.logger.error(err);
-        });
-        // this.loadChartYear();
-    }
-
     private showLoader() {
         this.loader = this.loadingCtrl.create({ content: 'Loading data' });
 
@@ -370,7 +323,7 @@ export class DeviceGPSChartsPage implements OnInit {
                     return {
                         timestamp: item.timestamp,
                         batteryOrVolts: this.prepareBatteryOrVoltsData(this.isCableKitConnected ? item.volts : item.battery),
-                        temperature: item.temperature
+                        temperature: this.isCableKitConnected ? item.ntc1 : item.temperature
                     };
                 });
 
