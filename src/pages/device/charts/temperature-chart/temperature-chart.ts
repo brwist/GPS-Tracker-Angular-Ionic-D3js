@@ -186,7 +186,7 @@ export class TemperatureChartComponent implements OnInit {
       .attr('transform', 'translate(0,' + this.height + ')')
       .call(this.xAxis);
 
-    this.gY = g.append('g').attr('class', 'axis axis--y').call(this.yAxis);
+    this.gY = g.append('g').attr('class', 'axis axis-temp-y').call(this.yAxis);
 
     g.append('g')
       .attr('transform', 'translate(0,' + this.height + ')')
@@ -273,7 +273,7 @@ export class TemperatureChartComponent implements OnInit {
 
   resetZoom() {
     d3.selectAll('.axis--x').style('stroke-width', 0.3);
-    d3.selectAll('.axis--y').style('stroke-width', 0.3);
+    d3.selectAll('.axis-temp-y').style('stroke-width', 0.3);
     this.chartBody.select('rect').transition().duration(1000).call(this.zoom.scaleTo, this.scaleValue, [0, 0]);
   }
 
@@ -380,7 +380,7 @@ export class TemperatureChartComponent implements OnInit {
       ymax_new = this.dataYrange[1];
     }
     this.y.domain([0, ymax_new * 1.05]);
-    d3.selectAll('.axis--y').transition().call(this.yAxis);
+    d3.selectAll('.axis-temp-y').transition().call(this.yAxis);
 
   }
 
