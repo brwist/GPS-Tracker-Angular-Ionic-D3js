@@ -152,7 +152,7 @@ export class TemperatureChartComponent implements OnInit {
     // d3.selectAll('#stacked-area > *').remove();
     
     // this.y = d3.scaleLinear().rangeRound([this.height, 0]);
-    this.dataYrange = [0,d3.max(this.data, (d) => d.temperature)]; // d3.extent(this.data, (d) => d.temperature)
+    this.dataYrange = [-5, d3.max(this.data, (d) => d.temperature)]; // d3.extent(this.data, (d) => d.temperature)
     this.yAxis = d3
       .axisRight(this.y)
       .ticks(10)
@@ -375,13 +375,13 @@ export class TemperatureChartComponent implements OnInit {
     countSubset.push(yleft);
     countSubset.push(yright);
     let ymax_new = d3.max(countSubset);
+    let ymin_new = d3.min(countSubset);
 
     if (ymax_new == 0) {
       ymax_new = this.dataYrange[1];
     }
-    this.y.domain([0, ymax_new * 1.05]);
+    this.y.domain([ymin_new - 4, ymax_new * 1.05]);
     d3.selectAll('.axis-temp-y').transition().call(this.yAxis);
-
   }
 
   private zoomed(): void {
