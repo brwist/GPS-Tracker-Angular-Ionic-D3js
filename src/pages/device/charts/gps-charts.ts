@@ -409,7 +409,7 @@ export class DeviceGPSChartsPage implements OnInit {
 
             this.chartData.batteryOrVolts = batteryOrVolts;
             this.chartData.temperature = temperature;
-            this.selectTimeDurationHour(1);
+            this.selectTimeDurationYear(5);
             this.dataLoading = false;
             this.hideLoader();
         }, 100);

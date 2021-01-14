@@ -65,6 +65,7 @@ export class TemperatureChartComponent implements OnInit {
   verticalLineH: any;
 
   noData = false;
+  xp: any;
 
   constructor(private deviceProvider: DeviceProvider, private decimalPipe: DecimalPipe) {}
 
@@ -303,11 +304,74 @@ export class TemperatureChartComponent implements OnInit {
       : this.formatYear)(date);
   }
 
+  setYdomain() {
+    var xleft = this.rangeDateStart.valueOf();
+    var xright = this.rangeDateEnd.valueOf();
+
+    var bisectDate = d3.bisector(function (d) {
+      return d.sortTime;
+    }).right;
+
+    var iL = bisectDate(this.data, xleft);
+
+    if (this.data[iL] !== undefined && this.data[iL - 1] !== undefined) {
+      var left_dateBefore = this.data[iL - 1].month,
+        left_dateAfter = this.data[iL].month;
+
+      var intfun = d3.interpolateNumber(
+        this.data[iL - 1].count,
+        this.data[iL].count
+      );
+      var yleft = intfun(
+        (xleft - left_dateBefore) / (left_dateAfter - left_dateBefore)
+      );
+    } else {
+      let yleft = 0;
+    }
+
+    var iR = bisectDate(this.data, xright);
+
+    if (this.data[iR] !== undefined && this.data[iR - 1] !== undefined) {
+      var right_dateBefore = this.data[iR - 1].month,
+        right_dateAfter = this.data[iR].month;
+
+      var intfun = d3.interpolateNumber(
+        this.data[iR - 1].count,
+        this.data[iR].count
+      );
+      var yright = intfun(
+        (xright - right_dateBefore) / (right_dateAfter - right_dateBefore)
+      );
+    } else {
+      let yright = 0;
+    }
+
+    var dataSubset = this.data.filter(function (d) {
+      return d.sortTime >= xleft && d.sortTime <= xright;
+    });
+
+    var countSubset = [];
+    dataSubset.map(function (d) {
+      countSubset.push(d.temperature);
+    });
+
+    countSubset.push(yleft);
+    countSubset.push(yright);
+    var ymax_new = d3.max(countSubset);
+
+    if (ymax_new == 0) {
+      ymax_new = this.y[1];
+    }
+
+  }
+
   private zoomed(): void {
     this.chartValueAround = undefined;
     const event = d3.event;
     this.gX.call(this.xAxis.scale(d3.event.transform.rescaleX(this.x)));
+    this.gY.call(this.yAxis.scale(d3.event.transform.rescaleY(this.y)));
     this.xt = d3.event.transform.rescaleX(this.x);
+    this.xp = d3.event.transform.rescaleY(this.y);
     const domain = this.xt.domain();
     this.rangeDateStart = moment(domain[0]).isValid() ? moment(domain[0]) : undefined;
     this.rangeDateEnd = moment(domain[1]).isValid() ? moment(domain[1]) : undefined;
@@ -315,13 +379,13 @@ export class TemperatureChartComponent implements OnInit {
     const newLine = d3
     .line()
     .x((d: any) => this.xt(d.sortTime))
-    .y((d: any) => this.y(d.temperature));
+    .y((d: any) => this.xp(d.temperature));
     d3.voronoi()
     .x((d: any) => {
       return this.xt(d.sortTime);
     })
     .y((d: any) => {
-      return this.y(d.temperature);
+      return this.xp(d.temperature);
     })
     .extent([
       [-this.margin.left, -this.margin.top],
@@ -337,6 +401,8 @@ export class TemperatureChartComponent implements OnInit {
     this.chartValueAround = undefined;
     this.gX.call(this.xAxis.scale(event.transform.rescaleX(this.x)));
     this.xt = event.transform.rescaleX(this.x);
+    this.gY.call(this.yAxis.scale(event.transform.rescaleY(this.y)));
+    this.xp = event.transform.rescaleY(this.y);
     const domain = this.xt.domain();
     this.rangeDateStart = moment(domain[0]).isValid() ? moment(domain[0]) : undefined;
     this.rangeDateEnd = moment(domain[1]).isValid() ? moment(domain[1]) : undefined;
@@ -344,13 +410,13 @@ export class TemperatureChartComponent implements OnInit {
     const newLine = d3
       .line()
       .x((d: any) => this.xt(d.sortTime))
-      .y((d: any) => this.y(d.temperature));
+      .y((d: any) => this.xp(d.temperature));
     d3.voronoi()
       .x((d: any) => {
         return this.xt(d.sortTime);
       })
       .y((d: any) => {
-        return this.y(d.temperature);
+        return this.xp(d.temperature);
       })
       .extent([
         [-this.margin.left, -this.margin.top],
