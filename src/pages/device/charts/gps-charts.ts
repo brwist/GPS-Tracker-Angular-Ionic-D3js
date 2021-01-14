@@ -47,7 +47,7 @@ export class DeviceGPSChartsPage implements OnInit {
     }]];
     
     public maxNumberOfPointsModel: number | string;
-    public activeTab = 1;
+    public activeTab = 2;
     public rangeDateStart: any;
     public rangeDateEnd: any;
     public datePipeFormat = 'MMM d h:mm a';
@@ -409,7 +409,7 @@ export class DeviceGPSChartsPage implements OnInit {
 
             this.chartData.batteryOrVolts = batteryOrVolts;
             this.chartData.temperature = temperature;
-            this.selectTimeDurationYear(5);
+            this.selectTimeDurationDay(2);
             this.dataLoading = false;
             this.hideLoader();
         }, 100);
