@@ -446,7 +446,7 @@ export class TemperatureChartComponent implements OnInit {
 
     this.chartBody.selectAll('path').attr('d', newLine);
     this.voronoiGroup.attr('transform', event.transform);
-    // this.setYdomain();
+    this.setYdomain();
   }
 
   private filterDate(data: any[]) {

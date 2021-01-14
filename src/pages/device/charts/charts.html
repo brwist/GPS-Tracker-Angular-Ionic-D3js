@@ -71,7 +71,8 @@
   </ion-card>
   <ion-card>
     <ion-card-header>
-      <ion-card-title>Temperature</ion-card-title>
+      <ion-card-title *ngIf="isCableKitConnected">NTC1</ion-card-title>
+      <ion-card-title *ngIf="!isCableKitConnected">Temperature</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <ion-item class="temp-unit">
