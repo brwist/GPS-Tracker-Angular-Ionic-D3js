@@ -66,6 +66,7 @@ export class TemperatureChartComponent implements OnInit {
 
   noData = false;
   xp: any;
+  dataYrange: any;
 
   constructor(private deviceProvider: DeviceProvider, private decimalPipe: DecimalPipe) {}
 
@@ -151,13 +152,14 @@ export class TemperatureChartComponent implements OnInit {
     // d3.selectAll('#stacked-area > *').remove();
     
     // this.y = d3.scaleLinear().rangeRound([this.height, 0]);
+    this.dataYrange = [0,d3.max(this.data, (d) => d.temperature)]; // d3.extent(this.data, (d) => d.temperature)
     this.yAxis = d3
       .axisRight(this.y)
       .ticks(10)
       .tickSize(this.width)
       .tickPadding(-25 - this.width);
     this.x.domain(d3.extent(this.data, (d) => d.sortTime));
-    this.y.domain(d3.extent(this.data, (d) => d.temperature));
+    this.y.domain(this.dataYrange);
     this.xAxis = d3
       .axisBottom(this.x)
       .ticks((this.width / this.height) * 5)
@@ -284,6 +286,7 @@ export class TemperatureChartComponent implements OnInit {
       .call(this.zoom.transform, d3.zoomIdentity
           .scale(width / (this.x(dateE) - this.x(dateS)))
           .translate(-this.x(dateS), 0));
+
   }
 
   multiFormat(date) {
@@ -305,73 +308,90 @@ export class TemperatureChartComponent implements OnInit {
   }
 
   setYdomain() {
-    var xleft = this.rangeDateStart.valueOf();
-    var xright = this.rangeDateEnd.valueOf();
+    const domain = this.xt.domain();
+    let xleft = moment(domain[0]).valueOf(); // this.rangeDateStart.valueOf();
+    let xright = moment(domain[1]).valueOf(); // this.rangeDateEnd.valueOf();
 
-    var bisectDate = d3.bisector(function (d) {
-      return d.sortTime;
-    }).right;
+    // const selectedTime: any = new Date(x0).getTime();
+    let temp1 = this.data.map(d => Math.abs(xleft - new Date(d.sortTime).getTime()));
+    let iL = temp1.indexOf(Math.min(...temp1));
+    // var d = this.data[idx];
 
-    var iL = bisectDate(this.data, xleft);
+    // var iL = bisectDate(this.data, xleft);
 
+    let left_dateBefore;
+    let left_dateAfter;
+    
+    let yleft;
     if (this.data[iL] !== undefined && this.data[iL - 1] !== undefined) {
-      var left_dateBefore = this.data[iL - 1].month,
-        left_dateAfter = this.data[iL].month;
+      left_dateBefore = this.data[iL - 1].sortTime;
+      left_dateAfter = this.data[iL].sortTime;
 
-      var intfun = d3.interpolateNumber(
-        this.data[iL - 1].count,
-        this.data[iL].count
+      let intfun = d3.interpolateNumber(
+        this.data[iL - 1].temperature,
+        this.data[iL].temperature
       );
-      var yleft = intfun(
+      yleft = intfun(
         (xleft - left_dateBefore) / (left_dateAfter - left_dateBefore)
       );
     } else {
-      let yleft = 0;
+      yleft = 0;
     }
 
-    var iR = bisectDate(this.data, xright);
+    let temp2 = this.data.map(d => Math.abs(xright - new Date(d.sortTime).getTime()));
+    let iR = temp2.indexOf(Math.min(...temp2));
+
+    // var iR = bisectDate(this.data, xright);
+
+    let right_dateBefore;
+    let right_dateAfter;
+
+    let yright;
 
     if (this.data[iR] !== undefined && this.data[iR - 1] !== undefined) {
-      var right_dateBefore = this.data[iR - 1].month,
-        right_dateAfter = this.data[iR].month;
+      right_dateBefore = this.data[iR - 1].sortTime;
+      right_dateAfter = this.data[iR].sortTime;
 
-      var intfun = d3.interpolateNumber(
-        this.data[iR - 1].count,
-        this.data[iR].count
+      let intfun = d3.interpolateNumber(
+        this.data[iR - 1].temperature,
+        this.data[iR].temperature
       );
-      var yright = intfun(
+      yright = intfun(
         (xright - right_dateBefore) / (right_dateAfter - right_dateBefore)
       );
     } else {
-      let yright = 0;
+      yright = 0;
     }
 
-    var dataSubset = this.data.filter(function (d) {
+    let dataSubset = this.data.filter(function (d) {
       return d.sortTime >= xleft && d.sortTime <= xright;
     });
 
-    var countSubset = [];
+    let countSubset = [];
     dataSubset.map(function (d) {
       countSubset.push(d.temperature);
     });
 
     countSubset.push(yleft);
     countSubset.push(yright);
-    var ymax_new = d3.max(countSubset);
+    let ymax_new = d3.max(countSubset);
 
     if (ymax_new == 0) {
-      ymax_new = this.y[1];
+      ymax_new = this.dataYrange[1];
     }
+    this.y.domain([0, ymax_new * 1.05]);
+    d3.selectAll('.axis--y').transition().call(this.yAxis);
 
   }
 
   private zoomed(): void {
+    
     this.chartValueAround = undefined;
     const event = d3.event;
     this.gX.call(this.xAxis.scale(d3.event.transform.rescaleX(this.x)));
-    this.gY.call(this.yAxis.scale(d3.event.transform.rescaleY(this.y)));
+    // this.gY.call(this.yAxis.scale(d3.event.transform.rescaleY(this.y)));
     this.xt = d3.event.transform.rescaleX(this.x);
-    this.xp = d3.event.transform.rescaleY(this.y);
+    // this.xp = d3.event.transform.rescaleY(this.y);
     const domain = this.xt.domain();
     this.rangeDateStart = moment(domain[0]).isValid() ? moment(domain[0]) : undefined;
     this.rangeDateEnd = moment(domain[1]).isValid() ? moment(domain[1]) : undefined;
@@ -379,13 +399,13 @@ export class TemperatureChartComponent implements OnInit {
     const newLine = d3
     .line()
     .x((d: any) => this.xt(d.sortTime))
-    .y((d: any) => this.xp(d.temperature));
+    .y((d: any) => this.y(d.temperature));
     d3.voronoi()
     .x((d: any) => {
       return this.xt(d.sortTime);
     })
     .y((d: any) => {
-      return this.xp(d.temperature);
+      return this.y(d.temperature);
     })
     .extent([
       [-this.margin.left, -this.margin.top],
@@ -394,6 +414,7 @@ export class TemperatureChartComponent implements OnInit {
     
     this.chartBody.selectAll('path').attr('d', newLine);
     this.voronoiGroup.attr('transform', d3.event.transform);
+    this.setYdomain();
     this.deviceProvider.zoomedVolt(event);
   }
 
@@ -401,8 +422,8 @@ export class TemperatureChartComponent implements OnInit {
     this.chartValueAround = undefined;
     this.gX.call(this.xAxis.scale(event.transform.rescaleX(this.x)));
     this.xt = event.transform.rescaleX(this.x);
-    this.gY.call(this.yAxis.scale(event.transform.rescaleY(this.y)));
-    this.xp = event.transform.rescaleY(this.y);
+    // this.gY.call(this.yAxis.scale(event.transform.rescaleY(this.y)));
+    // this.xp = event.transform.rescaleY(this.y);
     const domain = this.xt.domain();
     this.rangeDateStart = moment(domain[0]).isValid() ? moment(domain[0]) : undefined;
     this.rangeDateEnd = moment(domain[1]).isValid() ? moment(domain[1]) : undefined;
@@ -410,13 +431,13 @@ export class TemperatureChartComponent implements OnInit {
     const newLine = d3
       .line()
       .x((d: any) => this.xt(d.sortTime))
-      .y((d: any) => this.xp(d.temperature));
+      .y((d: any) => this.y(d.temperature));
     d3.voronoi()
       .x((d: any) => {
         return this.xt(d.sortTime);
       })
       .y((d: any) => {
-        return this.xp(d.temperature);
+        return this.y(d.temperature);
       })
       .extent([
         [-this.margin.left, -this.margin.top],
@@ -425,6 +446,7 @@ export class TemperatureChartComponent implements OnInit {
 
     this.chartBody.selectAll('path').attr('d', newLine);
     this.voronoiGroup.attr('transform', event.transform);
+    // this.setYdomain();
   }
 
   private filterDate(data: any[]) {
