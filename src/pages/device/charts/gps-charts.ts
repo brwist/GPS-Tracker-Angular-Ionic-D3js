@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertPage } from '../alert/alert';
-import { LoadingController, NavParams, NavController, ModalController } from 'ionic-angular';
+import { LoadingController, NavParams, NavController, ModalController, Loading } from 'ionic-angular';
 import { AlertsPopoverPage } from './popover';
 import { Logger } from '../../../providers/logger';
-import { IDevice, ITrack } from '../../../providers/device';
+import { DeviceProvider, IDevice, ITrack } from '../../../providers/device';
 import { TrackProvider } from '../../../providers/track';
 import { TrackPage } from './track';
 import { DateSettingsPage } from '../date-settings';
@@ -47,13 +47,13 @@ export class DeviceGPSChartsPage implements OnInit {
     }]];
     
     public maxNumberOfPointsModel: number | string;
-    public activeTab = 1;
+    public activeTab = 2;
     public rangeDateStart: any;
     public rangeDateEnd: any;
     public datePipeFormat = 'MMM d h:mm a';
     private data: any;
 
-    private dataYear: any;
+    public dataYear: any[] =[];
 
     private chartTypeModel: string = 'batteryOrVolts';
 
@@ -70,9 +70,11 @@ export class DeviceGPSChartsPage implements OnInit {
 
     private startDate: any;
     private endDate: any;
-    private firstLoad = true;
     private yearSelected = false;
+    private loader: Loading;
     yearPoints: any;
+    tempUnit = 'fTemp';
+    dataLoading: boolean = true;
 
     constructor(private logger: Logger,
                 private params: NavParams,
@@ -81,7 +83,8 @@ export class DeviceGPSChartsPage implements OnInit {
                 private storage: Storage,
                 private modalCtrl: ModalController,
                 private trackProvider: TrackProvider,
-                private apiProvider: ApiProvider) {
+                private apiProvider: ApiProvider,
+                private deviceProvider: DeviceProvider) {
 
         this.device = this.params.get('device');
     }
@@ -185,7 +188,7 @@ export class DeviceGPSChartsPage implements OnInit {
     }
 
     private loadChartData() {
-        this.firstLoad = true;
+        this.showLoader();
         if(moment(this.dateSettings.startDate).isSame(this.dateSettings.endDate)) {
             this.dateSettings.startDate = moment(this.dateSettings.startDate).add(-1, 'hours');
         }
@@ -225,106 +228,73 @@ export class DeviceGPSChartsPage implements OnInit {
         var duration = moment.duration(this.endDate.diff(this.startDate));
         var hours = duration.asHours();
         if(hours === 1) {
-            this.getHourData(select);
-        } else if(!this.yearSelected){
-            this.trackProvider.getListForChart(this.device.id, {
-                filter: {
-                    startDate:
-                        encodeURIComponent(momentTimezone(this.startDate).tz(this.timeZone).format()),
-                    endDate:
-                        encodeURIComponent(momentTimezone(this.endDate).tz(this.timeZone).format())
-                },
-                select,
-                lean: true
-            }).then((data: any) => {
-
-                this.data = data;
-
-                if (this.isCableKitConnected) {
-
-                    let ntcIsValid = false;
-
-                    for (const item of this.data.items) {
-
-                        if (/\d+\.?\d?/.test(item.ntc1)) {
-
-                            ntcIsValid = true;
-
-                            break;
-                        }
-                    }
-
-                    if (ntcIsValid) {
-
-                        this.data.items = this.data.items.map((item) => {
-
-                            item.temperature = item.ntc1;
-
-                            return item;
-                        });
-                    }
-                }
-
-                this.renderCharts();
-
-            }).catch((err) => {
-                this.logger.error(err);
-            });
-        } else {
-            this.renderCharts();
-        }
-        if(!this.yearSelected && !this.dataYear)  {
+            this.yearSelected = true;
             this.loadChartYear();
-        }
+        } 
+        // else if(!this.yearSelected){
+        //     this.trackProvider.getListForChart(this.device.id, {
+        //         filter: {
+        //             startDate:
+        //                 encodeURIComponent(momentTimezone(this.startDate).tz(this.timeZone).format()),
+        //             endDate:
+        //                 encodeURIComponent(momentTimezone(this.endDate).tz(this.timeZone).format())
+        //         },
+        //         select,
+        //         lean: true
+        //     }).then((data: any) => {
+
+        //         this.data = data;
+
+        //         if (this.isCableKitConnected) {
+
+        //             let ntcIsValid = false;
+
+        //             for (const item of this.data.items) {
+
+        //                 if (/\d+\.?\d?/.test(item.ntc1)) {
+
+        //                     ntcIsValid = true;
+
+        //                     break;
+        //                 }
+        //             }
+
+        //             if (ntcIsValid) {
+
+        //                 this.data.items = this.data.items.map((item) => {
+
+        //                     item.temperature = item.temperature;
+
+        //                     return item;
+        //                 });
+        //             }
+        //         }
+
+        //         this.renderCharts();
+
+        //     }).catch((err) => {
+        //         this.logger.error(err);
+        //     });
+        // } else {
+        //     this.renderCharts();
+        // }
     }
 
-    private getHourData(select) {
-        this.trackProvider.getListForChart(this.device.id, {
-            filter: {
-                startDate:
-                    encodeURIComponent(momentTimezone(this.startDate).tz(this.timeZone).startOf('date').format('YYYY-MM-DD HH:mm:ss')),
-                endDate:
-                    encodeURIComponent(momentTimezone(this.endDate).tz(this.timeZone).endOf('date').format('YYYY-MM-DD HH:mm:ss'))
-            },
-            select,
-            lean: true
-        }).then((data: any) => {
+    private showLoader() {
+        this.loader = this.loadingCtrl.create({ content: 'Loading data' });
 
-            this.data = data;
+        this.loader.present();
+    }
 
-            if (this.isCableKitConnected) {
-
-                let ntcIsValid = false;
-
-                for (const item of this.data.items) {
-
-                    if (/\d+\.?\d?/.test(item.ntc1)) {
-
-                        ntcIsValid = true;
-
-                        break;
-                    }
-                }
-
-                if (ntcIsValid) {
-
-                    this.data.items = this.data.items.map((item) => {
-
-                        item.temperature = item.ntc1;
-
-                        return item;
-                    });
-                }
-            }
-
-            this.renderCharts();
-
-        }).catch((err) => {
-            this.logger.error(err);
-        });
+    private hideLoader() {
+        this.loader.dismiss();
     }
 
     private loadChartYear() {
+        
+        if(this.dataYear.length > 0) {
+            return;
+        }
         const currentTime = moment().format();
         const start = moment(currentTime).add(-1, 'year');
         const end = moment(currentTime);
@@ -349,39 +319,15 @@ export class DeviceGPSChartsPage implements OnInit {
                 select,
                 lean: true
             }).then((data: any) => {
-
-                this.dataYear = data;
-                this.yearPoints = data.items.map((item: ITrack) => {
+                this.dataYear = data.items.map((item: ITrack) => {
                     return {
                         timestamp: item.timestamp,
                         batteryOrVolts: this.prepareBatteryOrVoltsData(this.isCableKitConnected ? item.volts : item.battery),
-                        temperature: item.temperature
+                        temperature: this.isCableKitConnected ? item.ntc1 : item.temperature
                     };
                 });
-                if (this.isCableKitConnected) {
 
-                    let ntcIsValid = false;
-
-                    for (const item of this.dataYear.items) {
-
-                        if (/\d+\.?\d?/.test(item.ntc1)) {
-
-                            ntcIsValid = true;
-
-                            break;
-                        }
-                    }
-
-                    if (ntcIsValid) {
-
-                        this.dataYear.items = this.dataYear.items.map((item) => {
-
-                            item.temperature = item.ntc1;
-
-                            return item;
-                        });
-                    }
-                }
+                this.renderCharts();
 
             }).catch((err) => {
                 this.logger.error(err);
@@ -391,13 +337,14 @@ export class DeviceGPSChartsPage implements OnInit {
 
     private renderCharts() {
         if(this.yearSelected) {
-            this.loadData(this.dataYear, this.yearPoints);
+            this.data = undefined;
+            this.loadData(this.dataYear);
         } else {
             this.loadData(this.data);
         }
     }
 
-    loadData(data, yearPoints?) {
+    loadData(data) {
         let points;
         if(!data) {
             return;
@@ -413,7 +360,7 @@ export class DeviceGPSChartsPage implements OnInit {
                 };
             });
         } else {
-            points = yearPoints;
+            points = data;
         }
 
         this.chartData = {};
@@ -452,7 +399,7 @@ export class DeviceGPSChartsPage implements OnInit {
                     }
                     return {
                         sortTime: new Date(item.timestamp).getTime(),
-                        temperature: item.temperature
+                        temperature: this.tempUnit === 'cTemp' ? ((item.temperature - 32) * 5 / 9) : item.temperature
                     }
                 })
                 .sort((a, b) =>
@@ -462,16 +409,10 @@ export class DeviceGPSChartsPage implements OnInit {
 
             this.chartData.batteryOrVolts = batteryOrVolts;
             this.chartData.temperature = temperature;
-            setTimeout(() => {
-                this.firstLoad = false;
-            }, 4000);
+            this.selectTimeDurationDay(2);
+            this.dataLoading = false;
+            this.hideLoader();
         }, 100);
-    }
-
-    rangeTabChange(e) {
-        // if(!this.firstLoad) {
-        //     this.activeTab = e;
-        // }
     }
 
     rangeTimeChange(event) {
@@ -493,7 +434,9 @@ export class DeviceGPSChartsPage implements OnInit {
         });
         this.rangeDateStart = start;
         this.rangeDateEnd = end;
-        this.loadChartData();
+
+        this.deviceProvider.setSelectedRange('hour');
+        // this.loadChartData();
     }
 
     public selectTimeDurationDay(tab) {
@@ -511,7 +454,8 @@ export class DeviceGPSChartsPage implements OnInit {
         this.rangeDateStart = start;
         this.rangeDateEnd = end;
 
-        this.loadChartData();
+        this.deviceProvider.setSelectedRange('day');
+        // this.loadChartData();
     }
 
     public selectTimeDurationWeek(tab) {
@@ -521,6 +465,8 @@ export class DeviceGPSChartsPage implements OnInit {
         const currentTime = moment().format();
         const start = moment(currentTime).add(-1, 'week');
         const end = moment(currentTime);
+        
+        
         this.dateSettings.startDate = start;
         this.dateSettings.endDate = end;
         this.storage.set(DATE_SETTINGS_STORAGE_KEY, this.dateSettings).catch((err) => {
@@ -529,7 +475,8 @@ export class DeviceGPSChartsPage implements OnInit {
         this.rangeDateStart = start;
         this.rangeDateEnd = end;
 
-        this.loadChartData();
+        this.deviceProvider.setSelectedRange('week');
+        // this.loadChartData();
     }
 
     public selectTimeDurationMonth(tab) {
@@ -547,10 +494,14 @@ export class DeviceGPSChartsPage implements OnInit {
         this.rangeDateStart = start;
         this.rangeDateEnd = end;
 
-        this.loadChartData();
+        this.deviceProvider.setSelectedRange('month');
+        // this.loadChartData();
     }
 
     public selectTimeDurationYear(tab) {
+        if(this.dataYear.length <= 0) {
+            return;
+        }
         this.datePipeFormat = 'MMM d, y, h:mm a';
         this.yearSelected = true;
         this.activeTab = tab;
@@ -565,12 +516,9 @@ export class DeviceGPSChartsPage implements OnInit {
         this.rangeDateStart = start;
         this.rangeDateEnd = end;
 
-        this.loadChartData();
-    }
+        this.deviceProvider.setSelectedRange('year');
 
-    private formatTimeLabel(dateTime: string, outFormat: string, format?: string) {
-
-        return momentTimezone(moment.utc(dateTime, format)).tz(this.timeZone).format(outFormat);
+        // this.loadChartData();
     }
 
     private prepareBatteryOrVoltsData(batteryOrVolts: any) {
@@ -584,4 +532,43 @@ export class DeviceGPSChartsPage implements OnInit {
             return 100;
         }
     }
+
+    fToC(type) {
+        if(this.tempUnit === type) {
+            return;
+        }
+        this.tempUnit = type;
+        const tempdata = JSON.stringify(this.chartData.temperature);
+        const data = JSON.parse(tempdata);
+
+        this.chartData.temperature = undefined;
+
+        data.forEach(item => {
+          item.temperature = (item.temperature - 32) * 5 / 9;
+        });
+
+        setTimeout(() => {
+            this.chartData.temperature = data;
+        }, 100);
+
+      }
+    
+      cToF(type) {
+        if(this.tempUnit === type) {
+            return;
+        }
+        this.tempUnit = type;
+        const tempdata = JSON.stringify(this.chartData.temperature);
+        const data = JSON.parse(tempdata);
+
+        this.chartData.temperature = undefined;
+
+        data.forEach(item => {
+            item.temperature = item.temperature * 9 / 5 + 32;
+        });
+        
+        setTimeout(() => {
+            this.chartData.temperature = data;
+        }, 100);
+      }
 }

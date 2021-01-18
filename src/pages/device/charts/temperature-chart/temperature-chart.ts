@@ -1,8 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 import * as d3 from 'd3';
 
 import * as moment from 'moment';
-import { DeviceProvider } from '../../../../providers/device';
+import { DeviceProvider, SelectedRange } from '../../../../providers/device';
 
 declare var window: any;
 
@@ -17,10 +18,11 @@ interface rangeModelArgs{
 })
 export class TemperatureChartComponent implements OnInit {
   @Input() data = [];
+  @Input() tempType;
   @Output() public rangeTabChange = new EventEmitter<number>();
   @Output() public rangeTimeChange = new EventEmitter<rangeModelArgs>();
 
-  public datePipeFormat = 'MMM d h:mm a';
+  public datePipeFormat;
   public rangeDateStart: any;
   public rangeDateEnd: any;
   chartValueAround;
@@ -62,11 +64,56 @@ export class TemperatureChartComponent implements OnInit {
   selectedDetailLeft = 10;
   verticalLineH: any;
 
-  constructor(private deviceProvider: DeviceProvider) {}
+  noData = false;
+  xp: any;
+  dataYrange: any;
+
+  constructor(private deviceProvider: DeviceProvider, private decimalPipe: DecimalPipe) {}
 
   ngOnInit() {
     this.width = window.innerWidth - this.margin.left - this.margin.right - 20;
     this.height = 500 - this.margin.top - this.margin.bottom;
+    if(this.data.length <= 0) {
+      this.noData = true;
+    } else {
+      this.noData = false;
+      this.loadSvg();
+    }
+  }
+
+  loadSvg() {
+    if(this.data.length > 80000) {
+      this.data = this.filterDate(this.data);
+    }
+    if(this.data.length > 50000) {
+      this.data = this.filterDate(this.data);
+    }
+    if(this.data.length > 20000) {
+      this.data = this.filterDate(this.data);
+    }
+    // if(this.data.length > 10000) {
+    //   this.data = this.filterDate(this.data);
+    // }
+    // if(this.data.length > 5000) {
+    //   this.data = this.filterDate(this.data);
+    // }
+    // if(this.data.length > 2000) {
+    //   this.data = this.filterDate(this.data);
+    // }
+    // if(this.data.length > 1000) {
+    //   this.data = this.filterDate(this.data);
+    // }
+    if(this.tempType === 'cTemp') {
+      this.formatDate = d3.timeFormat('%d-%b, %H:%M');
+      this.datePipeFormat = 'd-MMM h:mm a';
+      this.formatDay = d3.timeFormat('%d-%a');
+      this.formatWeek = d3.timeFormat('%d-%b');
+    } else {
+      this.formatDate = d3.timeFormat('%b-%d-%y, %H:%M');
+      this.datePipeFormat = 'MMM-d-yy h:mm a';
+      this.formatDay = d3.timeFormat('%a-%d');
+      this.formatWeek = d3.timeFormat('%b-%d');
+    }
     this.x = d3.scaleTime().range([0, this.width]);
     this.y = d3.scaleLinear().rangeRound([this.height, 0]);
     this.xAxis = d3
@@ -80,7 +127,7 @@ export class TemperatureChartComponent implements OnInit {
       .axisRight(this.y)
       .ticks(5)
       .tickSize(this.width)
-      .tickPadding(-20 - this.width);
+      .tickPadding(-23 - this.width);
     this.line = d3
       .line()
       .x((d: any) => this.x(d.sortTime))
@@ -103,15 +150,16 @@ export class TemperatureChartComponent implements OnInit {
 
     
     // d3.selectAll('#stacked-area > *').remove();
-    this.formatDate = d3.timeFormat('%d-%b, %H:%M');
+    
     // this.y = d3.scaleLinear().rangeRound([this.height, 0]);
+    this.dataYrange = [-5, d3.max(this.data, (d) => d.temperature)]; // d3.extent(this.data, (d) => d.temperature)
     this.yAxis = d3
       .axisRight(this.y)
       .ticks(10)
       .tickSize(this.width)
-      .tickPadding(-20 - this.width);
+      .tickPadding(-25 - this.width);
     this.x.domain(d3.extent(this.data, (d) => d.sortTime));
-    this.y.domain(d3.extent(this.data, (d) => d.temperature));
+    this.y.domain(this.dataYrange);
     this.xAxis = d3
       .axisBottom(this.x)
       .ticks((this.width / this.height) * 5)
@@ -128,6 +176,7 @@ export class TemperatureChartComponent implements OnInit {
       .attr('height', '100%')
       .attr('viewBox', [-5, 0, width, height + 20])
       .call(this.zoom);
+      
     // this.svg.select('*').remove();
     const g = this.svg.append('g').attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');
 
@@ -137,7 +186,7 @@ export class TemperatureChartComponent implements OnInit {
       .attr('transform', 'translate(0,' + this.height + ')')
       .call(this.xAxis);
 
-    this.gY = g.append('g').attr('class', 'axis axis--y').call(this.yAxis);
+    this.gY = g.append('g').attr('class', 'axis axis-temp-y').call(this.yAxis);
 
     g.append('g')
       .attr('transform', 'translate(0,' + this.height + ')')
@@ -164,7 +213,7 @@ export class TemperatureChartComponent implements OnInit {
         var temp = this.data.map(d => Math.abs(selectedTime - new Date(d.sortTime).getTime()));
         var idx = temp.indexOf(Math.min(...temp));
         var d = this.data[idx];
-        this.chartValueAround = this.formatDate(x0) + ' ' + d.temperature + '\u00B0';
+        this.chartValueAround = this.formatDate(x0) + ' ' + this.decimalPipe.transform(d.temperature, '1.1-1') + '\u00B0';
 
         const xCor = d3.event.x - 44;
         this.selectedDetailLeft = xCor;
@@ -188,7 +237,32 @@ export class TemperatureChartComponent implements OnInit {
 
     this.verticalLineH = d3.select('rect').node().getBoundingClientRect().height + 8;
 
-    this.resetZoom();
+    this.deviceProvider.$zoomDateRange.subscribe((res) => {
+      const lastEl = this.data[0];
+      const endDate = moment(lastEl.sortTime);
+      let start;
+      switch (res) {
+        case 'hour':
+          start = moment(endDate).add(-1, 'hours');
+          break;
+        case 'day':
+            start = moment(endDate).add(-1, 'day');
+            break;
+        case 'week':
+            start = moment(endDate).add(-1, 'week');
+            break;
+        case 'month':
+            start = moment(endDate).add(-1, 'month');
+            break;
+        case 'year':
+          start = moment(endDate).add(-1, 'year');
+          break;
+        default:
+          break;
+      }
+
+      this.rezoom(start.valueOf(), endDate.valueOf());
+    });
 
     this.deviceProvider.$zoomChangeTemp.subscribe(val => {
       if(val) {
@@ -199,8 +273,20 @@ export class TemperatureChartComponent implements OnInit {
 
   resetZoom() {
     d3.selectAll('.axis--x').style('stroke-width', 0.3);
-    d3.selectAll('.axis--y').style('stroke-width', 0.3);
+    d3.selectAll('.axis-temp-y').style('stroke-width', 0.3);
     this.chartBody.select('rect').transition().duration(1000).call(this.zoom.scaleTo, this.scaleValue, [0, 0]);
+  }
+
+  rezoom(dateS, dateE) {
+    const width = this.width + this.margin.left + this.margin.right;
+
+    this.svg.call(this.zoom)
+      .transition()
+      .duration(1500)
+      .call(this.zoom.transform, d3.zoomIdentity
+          .scale(width / (this.x(dateE) - this.x(dateS)))
+          .translate(-this.x(dateS), 0));
+
   }
 
   multiFormat(date) {
@@ -221,40 +307,123 @@ export class TemperatureChartComponent implements OnInit {
       : this.formatYear)(date);
   }
 
+  setYdomain() {
+    const domain = this.xt.domain();
+    let xleft = moment(domain[0]).valueOf(); // this.rangeDateStart.valueOf();
+    let xright = moment(domain[1]).valueOf(); // this.rangeDateEnd.valueOf();
+
+    // const selectedTime: any = new Date(x0).getTime();
+    let temp1 = this.data.map(d => Math.abs(xleft - new Date(d.sortTime).getTime()));
+    let iL = temp1.indexOf(Math.min(...temp1));
+    // var d = this.data[idx];
+
+    // var iL = bisectDate(this.data, xleft);
+
+    let left_dateBefore;
+    let left_dateAfter;
+    
+    let yleft;
+    if (this.data[iL] !== undefined && this.data[iL - 1] !== undefined) {
+      left_dateBefore = this.data[iL - 1].sortTime;
+      left_dateAfter = this.data[iL].sortTime;
+
+      let intfun = d3.interpolateNumber(
+        this.data[iL - 1].temperature,
+        this.data[iL].temperature
+      );
+      yleft = intfun(
+        (xleft - left_dateBefore) / (left_dateAfter - left_dateBefore)
+      );
+    } else {
+      yleft = 0;
+    }
+
+    let temp2 = this.data.map(d => Math.abs(xright - new Date(d.sortTime).getTime()));
+    let iR = temp2.indexOf(Math.min(...temp2));
+
+    // var iR = bisectDate(this.data, xright);
+
+    let right_dateBefore;
+    let right_dateAfter;
+
+    let yright;
+
+    if (this.data[iR] !== undefined && this.data[iR - 1] !== undefined) {
+      right_dateBefore = this.data[iR - 1].sortTime;
+      right_dateAfter = this.data[iR].sortTime;
+
+      let intfun = d3.interpolateNumber(
+        this.data[iR - 1].temperature,
+        this.data[iR].temperature
+      );
+      yright = intfun(
+        (xright - right_dateBefore) / (right_dateAfter - right_dateBefore)
+      );
+    } else {
+      yright = 0;
+    }
+
+    let dataSubset = this.data.filter(function (d) {
+      return d.sortTime >= xleft && d.sortTime <= xright;
+    });
+
+    let countSubset = [];
+    dataSubset.map(function (d) {
+      countSubset.push(d.temperature);
+    });
+
+    countSubset.push(yleft);
+    countSubset.push(yright);
+    let ymax_new = d3.max(countSubset);
+    let ymin_new = d3.min(countSubset);
+
+    if (ymax_new == 0) {
+      ymax_new = this.dataYrange[1];
+    }
+    this.y.domain([ymin_new - 4, ymax_new * 1.05]);
+    d3.selectAll('.axis-temp-y').transition().call(this.yAxis);
+  }
+
   private zoomed(): void {
+    
     this.chartValueAround = undefined;
     const event = d3.event;
-    this.deviceProvider.zoomedVolt(event);
     this.gX.call(this.xAxis.scale(d3.event.transform.rescaleX(this.x)));
+    // this.gY.call(this.yAxis.scale(d3.event.transform.rescaleY(this.y)));
     this.xt = d3.event.transform.rescaleX(this.x);
+    // this.xp = d3.event.transform.rescaleY(this.y);
     const domain = this.xt.domain();
     this.rangeDateStart = moment(domain[0]).isValid() ? moment(domain[0]) : undefined;
     this.rangeDateEnd = moment(domain[1]).isValid() ? moment(domain[1]) : undefined;
     // this.rangeTimeChange.emit({start: domain[0], end: domain[1]});
     const newLine = d3
-      .line()
-      .x((d: any) => this.xt(d.sortTime))
-      .y((d: any) => this.y(d.temperature));
+    .line()
+    .x((d: any) => this.xt(d.sortTime))
+    .y((d: any) => this.y(d.temperature));
     d3.voronoi()
-      .x((d: any) => {
-        return this.xt(d.sortTime);
-      })
-      .y((d: any) => {
-        return this.y(d.temperature);
-      })
-      .extent([
-        [-this.margin.left, -this.margin.top],
-        [this.width + this.margin.right, this.height + this.margin.bottom]
-      ]);
-
+    .x((d: any) => {
+      return this.xt(d.sortTime);
+    })
+    .y((d: any) => {
+      return this.y(d.temperature);
+    })
+    .extent([
+      [-this.margin.left, -this.margin.top],
+      [this.width + this.margin.right, this.height + this.margin.bottom]
+    ]);
+    
     this.chartBody.selectAll('path').attr('d', newLine);
     this.voronoiGroup.attr('transform', d3.event.transform);
+    this.setYdomain();
+    this.deviceProvider.zoomedVolt(event);
   }
 
   private customeZoom(event) {
     this.chartValueAround = undefined;
     this.gX.call(this.xAxis.scale(event.transform.rescaleX(this.x)));
     this.xt = event.transform.rescaleX(this.x);
+    // this.gY.call(this.yAxis.scale(event.transform.rescaleY(this.y)));
+    // this.xp = event.transform.rescaleY(this.y);
     const domain = this.xt.domain();
     this.rangeDateStart = moment(domain[0]).isValid() ? moment(domain[0]) : undefined;
     this.rangeDateEnd = moment(domain[1]).isValid() ? moment(domain[1]) : undefined;
@@ -277,5 +446,19 @@ export class TemperatureChartComponent implements OnInit {
 
     this.chartBody.selectAll('path').attr('d', newLine);
     this.voronoiGroup.attr('transform', event.transform);
+    this.setYdomain();
+  }
+
+  private filterDate(data: any[]) {
+    let res = data.map((item, index) => {
+        return (index % 2 !== 1) ? {
+            sortTime: item.sortTime,
+            temperature: item.temperature
+        } : null;
+    }).filter(function(entry) {
+        return entry != null;
+    });
+
+    return res;
   }
 }

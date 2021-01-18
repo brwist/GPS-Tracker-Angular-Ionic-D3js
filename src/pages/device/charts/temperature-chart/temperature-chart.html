@@ -1,4 +1,42 @@
-<div class="temperature-details-con">
+<div *ngIf="noData">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0,0,326,520" width="100%" height="500">
+        <g>
+            <title>background</title>
+            <rect fill="#fff" id="canvas_background" height="402" width="302" y="-1" x="-1"/>
+            <g display="none" overflow="visible" y="0" x="0" height="100%" width="100%" id="canvasGrid">
+            <rect fill="url(#gridpattern)" stroke-width="0" y="0" x="0" height="100%" width="100%"/>
+            </g>
+        </g>
+        <g>
+            <title>Layer 1</title>
+            <line stroke="#000" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_3" y2="369" x2="30" y1="32.89757" x1="29.75864" stroke-width="1.5" fill="none"/>
+            <line stroke="#000" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_6" y2="368.14703" x2="29.75864" y1="369.14703" x1="273" fill-opacity="null" stroke-opacity="null" stroke-width="1.5" fill="none"/>
+            <line stroke="#000" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_8" y2="206.89757" x2="29.75864" y1="207.89757" x1="273" fill-opacity="null" stroke-opacity="null" stroke-width="0.5" fill="none"/>
+            <line stroke="#000" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_10" y2="180.67534" x2="29.75864" y1="180.78646" x1="273" fill-opacity="null" stroke-opacity="null" stroke-width="0.5" fill="none"/>
+            <line stroke="#000" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_11" y2="155.34201" x2="29.75864" y1="155.45312" x1="273" fill-opacity="null" stroke-opacity="null" stroke-width="0.5" fill="none"/>
+            <line stroke="#000" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_12" y2="129.56424" x2="29.75864" y1="129.67535" x1="273" fill-opacity="null" stroke-opacity="null" stroke-width="0.5" fill="none"/>
+            <line stroke="#000" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_13" y2="103.78646" x2="29.75864" y1="103.89757" x1="273" fill-opacity="null" stroke-opacity="null" stroke-width="0.5" fill="none"/>
+            <line stroke="#000" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_14" y2="79.78646" x2="29.75864" y1="79.89757" x1="273" fill-opacity="null" stroke-opacity="null" stroke-width="0.5" fill="none"/>
+            <line stroke="#000" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_15" y2="54.89757" x2="29.75864" y1="55.00869" x1="273" fill-opacity="null" stroke-opacity="null" stroke-width="0.5" fill="none"/>
+            <line stroke="#000" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_16" y2="33.1198" x2="29.75864" y1="33.23091" x1="273" fill-opacity="null" stroke-opacity="null" stroke-width="0.5" fill="none"/>
+            <line stroke="#000" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_17" y2="369" x2="60.36975" y1="32.86806" x1="60.36975" fill-opacity="null" stroke-opacity="null" stroke-width="0.5" fill="none"/>
+            <line stroke="#000" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_18" y2="369" x2="89.25863" y1="32.86806" x1="89.25864" fill-opacity="null" stroke-opacity="null" stroke-width="0.5" fill="none"/>
+            <line stroke="#000" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_19" y2="369" x2="117.88085" y1="32.86806" x1="117.88086" fill-opacity="null" stroke-opacity="null" stroke-width="0.5" fill="none"/>
+            <line stroke="#000" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_20" y2="369" x2="146.59196" y1="32.45139" x1="146.59197" fill-opacity="null" stroke-opacity="null" stroke-width="0.5" fill="none"/>
+            <line stroke="#000" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_21" y2="369" x2="175.56974" y1="32.86806" x1="175.56975" fill-opacity="null" stroke-opacity="null" stroke-width="0.5" fill="none"/>
+            <line stroke="#000" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_22" y2="369" x2="203.48085" y1="32.86806" x1="203.48085" fill-opacity="null" stroke-opacity="null" stroke-width="0.5" fill="none"/>
+            <line stroke="#000" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_23" y2="332.31374" x2="29.75864" y1="333.31374" x1="273" fill-opacity="null" stroke-opacity="null" stroke-width="0.5" fill="none"/>
+            <line stroke="#000" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_24" y2="306.09151" x2="29.75864" y1="306.20263" x1="273" fill-opacity="null" stroke-opacity="null" stroke-width="0.5" fill="none"/>
+            <line stroke="#000" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_25" y2="280.75818" x2="29.75864" y1="280.86929" x1="273" fill-opacity="null" stroke-opacity="null" stroke-width="0.5" fill="none"/>
+            <line stroke="#000" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_26" y2="254.98041" x2="29.75864" y1="255.09152" x1="273" fill-opacity="null" stroke-opacity="null" stroke-width="0.5" fill="none"/>
+            <line stroke="#000" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_27" y2="229.20263" x2="29.75864" y1="229.31374" x1="273" fill-opacity="null" stroke-opacity="null" stroke-width="0.5" fill="none"/>
+            <line stroke="#000" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_28" y2="354.31372" x2="29.75864" y1="355.31372" x1="273" fill-opacity="null" stroke-opacity="null" stroke-width="0.5" fill="none"/>
+            <line stroke="#000" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_30" y2="369" x2="232.36969" y1="32.86806" x1="232.3697" fill-opacity="null" stroke-opacity="null" stroke-width="0.5" fill="none"/>
+            <line stroke="#000" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_31" y2="369" x2="260.2808" y1="32.86806" x1="260.28081" fill-opacity="null" stroke-opacity="null" stroke-width="0.5" fill="none"/>
+        </g>
+    </svg>
+</div>
+<div class="temperature-details-con" *ngIf="!noData">
     <div class="temperature-detail" [style.left.px]="selectedDetailLeft" *ngIf="chartValueAround">  
         <div class="temperature-text">{{chartValueAround}}</div>
         <div class="triangle_down"></div>
@@ -6,7 +44,7 @@
     </div>
 </div>
 <div id="stacked-area-temp"></div>
-<ion-list>
+<ion-list *ngIf="!noData">
     <ion-item class="current-range">
       <ion-label item-left>{{rangeDateStart | date:datePipeFormat}}</ion-label>
       <ion-label item-right text-right>{{rangeDateEnd | date:datePipeFormat}}</ion-label>

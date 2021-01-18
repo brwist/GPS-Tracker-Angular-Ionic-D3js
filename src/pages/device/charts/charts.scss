@@ -66,6 +66,31 @@ page-charts {
       padding: 0px !important;
     }
   }
+
+  ion-item.temp-unit {
+    .item-button {
+      margin: 0px;
+      width: 45px;
+      &.active {
+        background: #387ef5;
+        color: white;
+      }
+    }
+  }
+}
+
+.applying-search {
+  margin-top: 30px;
+  color: #666;
+  text-align: center;
+}
+
+div.disabled
+{
+  pointer-events: none;
+
+  opacity: 0.5;
+  background: #CCC;
 }
 
 .chart-title {

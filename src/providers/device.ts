@@ -104,6 +104,11 @@ export const statusCodes = [{
 
 export const TYPES = ['GPS', 'THS'];
 
+export interface SelectedRange {
+    start: number;
+    end: number;
+}
+
 @Injectable()
 export class DeviceProvider extends BaseProvider {
     private zoomChangeTemp = new BehaviorSubject<any>(undefined);
@@ -111,6 +116,9 @@ export class DeviceProvider extends BaseProvider {
 
     private zoomChangeVolt = new BehaviorSubject<any>(undefined);
     $zoomChangeVolt = this.zoomChangeVolt.asObservable();
+
+    private zoomDateRange = new BehaviorSubject<string>(undefined);
+    $zoomDateRange = this.zoomDateRange.asObservable();
 
     public static codeToString(code: number) {
 
@@ -162,12 +170,14 @@ export class DeviceProvider extends BaseProvider {
 
     public zoomedTemp(event) {
         this.zoomChangeTemp.next(event);
-        // this.zoomChange.
     }
 
     public zoomedVolt(event) {
         this.zoomChangeVolt.next(event);
-        // this.zoomChange.
+    }
+
+    public setSelectedRange(type: string) {
+        this.zoomDateRange.next(type);
     }
 
     /**
