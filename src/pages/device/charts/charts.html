@@ -47,21 +47,21 @@
         </div>
         <div
           class="tabs-container_name"
-          [ngClass]="{'active-tab': activeTab === 3 }"
+          [ngClass]="{'active-tab': activeTab === 3, 'disabled': maxPeriodAvailable < 6 }"
           (click)="selectTimeDurationWeek(3)"
         >
           <span>Week</span>
         </div>
         <div
           class="tabs-container_name"
-          [ngClass]="{'active-tab': activeTab === 4 }"
+          [ngClass]="{'active-tab': activeTab === 4, 'disabled': maxPeriodAvailable < 26  }"
           (click)="selectTimeDurationMonth(4)"
         >
           <span>Month</span>
         </div>
         <div
           class="tabs-container_name"
-          [ngClass]="{'active-tab': activeTab === 5, 'disabled': dataYear?.length <= 0 }"
+          [ngClass]="{'active-tab': activeTab === 5, 'disabled': (dataYear?.length <= 0 || maxPeriodAvailable < 250) }"
           (click)="selectTimeDurationYear(5)"
         >
           <span>Year</span>

@@ -76,6 +76,7 @@ export class DeviceGPSChartsPage implements OnInit {
     tempUnit = 'fTemp';
     dataLoading: boolean = true;
     isGps: boolean;
+    maxPeriodAvailable: number;
 
     constructor(private logger: Logger,
                 private params: NavParams,
@@ -279,6 +280,15 @@ export class DeviceGPSChartsPage implements OnInit {
                         temperature: this.isCableKitConnected ? item.ntc1 : item.temperature
                     };
                 });
+
+                const minDate = this.dataYear[0] ? this.dataYear[0].timestamp : undefined;
+                const maxDate = this.dataYear[this.dataYear.length - 1] ? this.dataYear[this.dataYear.length - 1].timestamp : undefined;
+
+                if(minDate && maxDate) {
+                    const min = moment(minDate);
+                    const max = moment(maxDate);
+                    this.maxPeriodAvailable = max.diff(min, 'day');
+                }
 
                 this.renderCharts();
 

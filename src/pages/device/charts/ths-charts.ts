@@ -61,6 +61,7 @@ export class DeviceTHSChartsPage implements OnInit {
     tempUnit = 'fTemp';
     dataLoading: boolean = true;
     isGps: boolean;
+    maxPeriodAvailable: number;
 
     constructor(private logger: Logger,
                 private params: NavParams,
@@ -218,12 +219,21 @@ export class DeviceTHSChartsPage implements OnInit {
         }).then((data: any) => {
             this.dataYear = data.items.map((item: IMeasurement) => {
                 return {
-                    timestamp:item.createdAt,
+                    timestamp: item.createdAt,
                     temperature: item.temperature,
                     battery: item.battery,
                     humidity: item.humidity
                 };
             });
+
+            const minDate = this.dataYear[0] ? this.dataYear[0].timestamp : undefined;
+            const maxDate = this.dataYear[this.dataYear.length - 1] ? this.dataYear[this.dataYear.length - 1].timestamp : undefined;
+
+            if(minDate && maxDate) {
+                const min = moment(minDate);
+                const max = moment(maxDate);
+                this.maxPeriodAvailable = max.diff(min, 'day');
+            }
 
             this.renderCharts();
 
