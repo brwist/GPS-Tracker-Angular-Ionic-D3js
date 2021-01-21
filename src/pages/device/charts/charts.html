@@ -61,7 +61,7 @@
         </div>
         <div
           class="tabs-container_name"
-          [ngClass]="{'active-tab': activeTab === 5, 'disabled': dataYear.length <= 0 }"
+          [ngClass]="{'active-tab': activeTab === 5, 'disabled': dataYear?.length <= 0 }"
           (click)="selectTimeDurationYear(5)"
         >
           <span>Year</span>
@@ -83,12 +83,20 @@
       <page-temperature-chart [data]="chartData?.temperature" *ngIf="chartData.temperature" [tempType]="tempUnit"></page-temperature-chart>
     </ion-card-content>
   </ion-card>
-  <ion-card>
+  <ion-card *ngIf="isGps">
     <ion-card-header>
       <ion-card-title>Volts</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <page-volt-chart [data]="chartData?.batteryOrVolts" *ngIf="chartData.batteryOrVolts" [tempType]="tempUnit"></page-volt-chart>
+    </ion-card-content>
+  </ion-card>
+  <ion-card *ngIf="!isGps">
+    <ion-card-header>
+      <ion-card-title>Humidity</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <page-humidity-chart [data]="chartData?.humidity" *ngIf="chartData.humidity"></page-humidity-chart>
     </ion-card-content>
   </ion-card>
 </ion-content>

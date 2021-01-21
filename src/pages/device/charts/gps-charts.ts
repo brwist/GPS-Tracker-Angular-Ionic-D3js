@@ -75,6 +75,7 @@ export class DeviceGPSChartsPage implements OnInit {
     yearPoints: any;
     tempUnit = 'fTemp';
     dataLoading: boolean = true;
+    isGps: boolean;
 
     constructor(private logger: Logger,
                 private params: NavParams,
@@ -86,6 +87,8 @@ export class DeviceGPSChartsPage implements OnInit {
                 private apiProvider: ApiProvider,
                 private deviceProvider: DeviceProvider) {
 
+        this.isGps = true;
+        this.deviceProvider.setChartType('gps');
         this.device = this.params.get('device');
     }
 
@@ -222,62 +225,12 @@ export class DeviceGPSChartsPage implements OnInit {
             select.push('battery');
         }
 
-        // this.rangeDateStart = moment(this.startDate);
-        // this.rangeDateEnd = moment(this.endDate);
-
         var duration = moment.duration(this.endDate.diff(this.startDate));
         var hours = duration.asHours();
         if(hours === 1) {
             this.yearSelected = true;
             this.loadChartYear();
-        } 
-        // else if(!this.yearSelected){
-        //     this.trackProvider.getListForChart(this.device.id, {
-        //         filter: {
-        //             startDate:
-        //                 encodeURIComponent(momentTimezone(this.startDate).tz(this.timeZone).format()),
-        //             endDate:
-        //                 encodeURIComponent(momentTimezone(this.endDate).tz(this.timeZone).format())
-        //         },
-        //         select,
-        //         lean: true
-        //     }).then((data: any) => {
-
-        //         this.data = data;
-
-        //         if (this.isCableKitConnected) {
-
-        //             let ntcIsValid = false;
-
-        //             for (const item of this.data.items) {
-
-        //                 if (/\d+\.?\d?/.test(item.ntc1)) {
-
-        //                     ntcIsValid = true;
-
-        //                     break;
-        //                 }
-        //             }
-
-        //             if (ntcIsValid) {
-
-        //                 this.data.items = this.data.items.map((item) => {
-
-        //                     item.temperature = item.temperature;
-
-        //                     return item;
-        //                 });
-        //             }
-        //         }
-
-        //         this.renderCharts();
-
-        //     }).catch((err) => {
-        //         this.logger.error(err);
-        //     });
-        // } else {
-        //     this.renderCharts();
-        // }
+        }
     }
 
     private showLoader() {
