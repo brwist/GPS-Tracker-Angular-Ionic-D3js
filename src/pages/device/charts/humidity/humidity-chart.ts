@@ -131,7 +131,7 @@ export class HumidityChartComponent implements OnInit {
       .axisRight(this.y)
       .ticks(5)
       .tickSize(this.width)
-      .tickPadding(-35 - this.width);
+      .tickPadding(-23 - this.width);
     this.line = d3
       .line()
       .x((d: any) => this.x(d.sortTime))
@@ -161,7 +161,7 @@ export class HumidityChartComponent implements OnInit {
       .axisRight(this.y)
       .ticks(10)
       .tickSize(this.width)
-      .tickPadding(-35 - this.width);
+      .tickPadding(-23 - this.width);
     this.x.domain(d3.extent(this.data, (d) => d.sortTime));
     this.y.domain(this.dataYrange);
     this.xAxis = d3
@@ -178,7 +178,7 @@ export class HumidityChartComponent implements OnInit {
       .append('svg')
       .attr('width', '90%')
       .attr('height', '100%')
-      .attr('viewBox', [-15, 0, width, height + 20])
+      .attr('viewBox', [-5, 0, width, height + 20])
       .call(this.zoom);
     // this.svg.select('*').remove();
     const g = this.svg.append('g').attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');
