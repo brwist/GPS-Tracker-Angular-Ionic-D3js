@@ -93,10 +93,17 @@
   </ion-card>
   <ion-card *ngIf="!isGps">
     <ion-card-header>
-      <ion-card-title>Humidity</ion-card-title>
+      <ion-card-title *ngIf="thsType === 'humidity'">Humidity</ion-card-title>
+      <ion-card-title *ngIf="thsType === 'battery'">Battery</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <page-humidity-chart [data]="chartData?.humidity" *ngIf="chartData.humidity"></page-humidity-chart>
+      <ion-item class="battery-unit">
+        <ion-label item-left></ion-label>
+        <button ion-button item-right color="light" [ngClass]="{'active': thsType === 'humidity'}" (click)="chageTHSType('humidity')">Humidity</button>
+        <button ion-button item-right color="light" [ngClass]="{'active': thsType === 'battery'}" (click)="chageTHSType('battery')">Battery</button>
+      </ion-item>
+      <page-humidity-chart [data]="chartData?.humidity" *ngIf="chartData.humidity && thsType === 'humidity'"></page-humidity-chart>
+      <page-battery-chart [data]="chartData?.battery" *ngIf="chartData.battery && thsType === 'battery'"></page-battery-chart>
     </ion-card-content>
   </ion-card>
 </ion-content>
