@@ -311,28 +311,11 @@ export class VoltChartComponent implements OnInit {
     let xleft = moment(domain[0]).valueOf(); // this.rangeDateStart.valueOf();
     let xright = moment(domain[1]).valueOf(); // this.rangeDateEnd.valueOf();
 
-    // const selectedTime: any = new Date(x0).getTime();
     let temp1 = this.data.map(d => Math.abs(xleft - new Date(d.sortTime).getTime()));
     let iL = temp1.indexOf(Math.min(...temp1));
-    // var d = this.data[idx];
 
-    // var iL = bisectDate(this.data, xleft);
-
-    let left_dateBefore;
-    let left_dateAfter;
-    
     let yleft;
     if (this.data[iL] !== undefined && this.data[iL - 1] !== undefined) {
-      left_dateBefore = this.data[iL - 1].sortTime;
-      left_dateAfter = this.data[iL].sortTime;
-
-      // let intfun = d3.interpolateNumber(
-      //   this.data[iL - 1].batteryOrVolts,
-      //   this.data[iL].batteryOrVolts
-      // );
-      // yleft = intfun(
-      //   (xleft - left_dateBefore) / (left_dateAfter - left_dateBefore)
-      // );
       yleft = this.data[iL].batteryOrVolts;
     } else {
       yleft = 0;
@@ -340,23 +323,10 @@ export class VoltChartComponent implements OnInit {
 
     let temp2 = this.data.map(d => Math.abs(xright - new Date(d.sortTime).getTime()));
     let iR = temp2.indexOf(Math.min(...temp2));
-
-    // var iR = bisectDate(this.data, xright);
-
-    let right_dateBefore;
-    let right_dateAfter;
-
     let yright;
 
     if (this.data[iR] !== undefined) {
       yright = this.data[iR].batteryOrVolts;
-      // let intfun = d3.interpolateNumber(
-      //   this.data[iR - 1].batteryOrVolts,
-      //   this.data[iR].batteryOrVolts
-      // );
-      // yright = intfun(
-      //   (xright - right_dateBefore) / (right_dateAfter - right_dateBefore)
-      // );
     }
 
     let dataSubset = this.data.filter(function (d) {
@@ -377,11 +347,6 @@ export class VoltChartComponent implements OnInit {
       ymax_new = this.dataYrange[1];
     }
     this.y.domain([ymin_new - 0.5, ymax_new * 1.05]);
-    this.yAxis = d3
-      .axisRight(this.y)
-      .ticks(10)
-      .tickSize(this.width)
-      .tickPadding(-25 - this.width);
     d3.selectAll('.axis-volt-y').transition().call(this.yAxis);
   }
 

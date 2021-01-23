@@ -315,55 +315,22 @@ export class HumidityChartComponent implements OnInit {
     let xleft = moment(domain[0]).valueOf(); // this.rangeDateStart.valueOf();
     let xright = moment(domain[1]).valueOf(); // this.rangeDateEnd.valueOf();
 
-    // const selectedTime: any = new Date(x0).getTime();
     let temp1 = this.data.map(d => Math.abs(xleft - new Date(d.sortTime).getTime()));
     let iL = temp1.indexOf(Math.min(...temp1));
-    // var d = this.data[idx];
-
-    // var iL = bisectDate(this.data, xleft);
-
-    let left_dateBefore;
-    let left_dateAfter;
     
     let yleft;
-    if (this.data[iL] !== undefined && this.data[iL - 1] !== undefined) {
-      left_dateBefore = this.data[iL - 1].sortTime;
-      left_dateAfter = this.data[iL].sortTime;
-
-      let intfun = d3.interpolateNumber(
-        this.data[iL - 1].humidity,
-        this.data[iL].humidity
-      );
-      yleft = intfun(
-        (xleft - left_dateBefore) / (left_dateAfter - left_dateBefore)
-      );
+    if (this.data[iL] !== undefined) {
+      yleft = this.data[iL].humidity;
     } else {
       yleft = 0;
     }
 
     let temp2 = this.data.map(d => Math.abs(xright - new Date(d.sortTime).getTime()));
     let iR = temp2.indexOf(Math.min(...temp2));
-
-    // var iR = bisectDate(this.data, xright);
-
-    let right_dateBefore;
-    let right_dateAfter;
-
     let yright;
 
-    if (this.data[iR] !== undefined && this.data[iR - 1] !== undefined) {
-      right_dateBefore = this.data[iR - 1].sortTime;
-      right_dateAfter = this.data[iR].sortTime;
-
-      let intfun = d3.interpolateNumber(
-        this.data[iR - 1].humidity,
-        this.data[iR].humidity
-      );
-      yright = intfun(
-        (xright - right_dateBefore) / (right_dateAfter - right_dateBefore)
-      );
-    } else {
-      yright = 0;
+    if (this.data[iR] !== undefined) {
+      yright = this.data[iR].humidity;
     }
 
     let dataSubset = this.data.filter(function (d) {
