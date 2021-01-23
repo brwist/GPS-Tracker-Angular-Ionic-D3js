@@ -218,7 +218,7 @@ export class HumidityChartComponent implements OnInit {
         var d = this.data[idx];
         this.chartValueAround = this.formatDate(x0) + ' ' + d.humidity;
 
-        const xCor = d3.event.x - 44;
+        const xCor = d3.event.x - 50;
         this.selectedDetailLeft = xCor;
       }));
 

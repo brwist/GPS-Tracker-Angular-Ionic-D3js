@@ -215,7 +215,7 @@ export class TemperatureChartComponent implements OnInit {
         var d = this.data[idx];
         this.chartValueAround = this.formatDate(x0) + ' ' + this.decimalPipe.transform(d.temperature, '1.1-1') + '\u00B0';
 
-        const xCor = d3.event.x - 44;
+        const xCor = d3.event.x - 50;
         this.selectedDetailLeft = xCor;
       }));
 
