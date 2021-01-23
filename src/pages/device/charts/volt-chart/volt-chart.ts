@@ -127,7 +127,7 @@ export class VoltChartComponent implements OnInit {
       .axisRight(this.y)
       .ticks(5)
       .tickSize(this.width)
-      .tickPadding(-20 - this.width);
+      .tickPadding(-25 - this.width);
     this.line = d3
       .line()
       .x((d: any) => this.x(d.sortTime))
@@ -157,7 +157,7 @@ export class VoltChartComponent implements OnInit {
       .axisRight(this.y)
       .ticks(10)
       .tickSize(this.width)
-      .tickPadding(-20 - this.width);
+      .tickPadding(-25 - this.width);
     this.x.domain(d3.extent(this.data, (d) => d.sortTime));
     this.y.domain(this.dataYrange);
     this.xAxis = d3
@@ -326,13 +326,14 @@ export class VoltChartComponent implements OnInit {
       left_dateBefore = this.data[iL - 1].sortTime;
       left_dateAfter = this.data[iL].sortTime;
 
-      let intfun = d3.interpolateNumber(
-        this.data[iL - 1].batteryOrVolts,
-        this.data[iL].batteryOrVolts
-      );
-      yleft = intfun(
-        (xleft - left_dateBefore) / (left_dateAfter - left_dateBefore)
-      );
+      // let intfun = d3.interpolateNumber(
+      //   this.data[iL - 1].batteryOrVolts,
+      //   this.data[iL].batteryOrVolts
+      // );
+      // yleft = intfun(
+      //   (xleft - left_dateBefore) / (left_dateAfter - left_dateBefore)
+      // );
+      yleft = this.data[iL].batteryOrVolts;
     } else {
       yleft = 0;
     }
@@ -347,19 +348,15 @@ export class VoltChartComponent implements OnInit {
 
     let yright;
 
-    if (this.data[iR] !== undefined && this.data[iR - 1] !== undefined) {
-      right_dateBefore = this.data[iR - 1].sortTime;
-      right_dateAfter = this.data[iR].sortTime;
-
-      let intfun = d3.interpolateNumber(
-        this.data[iR - 1].batteryOrVolts,
-        this.data[iR].batteryOrVolts
-      );
-      yright = intfun(
-        (xright - right_dateBefore) / (right_dateAfter - right_dateBefore)
-      );
-    } else {
-      yright = 0;
+    if (this.data[iR] !== undefined) {
+      yright = this.data[iR].batteryOrVolts;
+      // let intfun = d3.interpolateNumber(
+      //   this.data[iR - 1].batteryOrVolts,
+      //   this.data[iR].batteryOrVolts
+      // );
+      // yright = intfun(
+      //   (xright - right_dateBefore) / (right_dateAfter - right_dateBefore)
+      // );
     }
 
     let dataSubset = this.data.filter(function (d) {
@@ -379,7 +376,12 @@ export class VoltChartComponent implements OnInit {
     if (ymax_new == 0) {
       ymax_new = this.dataYrange[1];
     }
-    this.y.domain([ymin_new - 5, ymax_new * 1.05]);
+    this.y.domain([ymin_new - 0.5, ymax_new * 1.05]);
+    this.yAxis = d3
+      .axisRight(this.y)
+      .ticks(10)
+      .tickSize(this.width)
+      .tickPadding(-25 - this.width);
     d3.selectAll('.axis-volt-y').transition().call(this.yAxis);
   }
 
