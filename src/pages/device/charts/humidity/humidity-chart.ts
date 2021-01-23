@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import * as d3 from 'd3';
 
 import * as moment from 'moment';
+import { Subscription } from 'rxjs/Subscription';
 import { DeviceProvider } from '../../../../providers/device';
 
 declare var window: any;
@@ -15,7 +16,7 @@ interface rangeModelArgs{
   selector: 'page-humidity-chart',
   templateUrl: 'humidity-chart.html'
 })
-export class HumidityChartComponent implements OnInit {
+export class HumidityChartComponent implements OnInit, OnDestroy {
   @Input() data = [];
   @Input() tempType;
   @Output() public rangeTabChange = new EventEmitter<number>();
@@ -68,6 +69,9 @@ export class HumidityChartComponent implements OnInit {
   dataYrange: any[];
   isGps: boolean;
 
+  subscriptionZoomDate$: Subscription;
+  subscriptionZoomType$: Subscription;
+
   constructor(private deviceProvider: DeviceProvider) {
     this.isGps = false;
     this.deviceProvider.setChartType('ths');
@@ -83,6 +87,11 @@ export class HumidityChartComponent implements OnInit {
       this.loadSvg();
     }
   }
+
+  ngOnDestroy() {
+    this.subscriptionZoomType$.unsubscribe();
+    this.subscriptionZoomDate$.unsubscribe();
+}
 
   loadSvg() {
     if(this.data.length > 80000) {
@@ -241,7 +250,7 @@ export class HumidityChartComponent implements OnInit {
     this.verticalLineH = d3.select('rect').node().getBoundingClientRect().height + 8;
 
     // this.resetZoom();
-    this.deviceProvider.$zoomDateRange.subscribe((res) => {
+    this.subscriptionZoomDate$ = this.deviceProvider.$zoomDateRange.subscribe((res) => {
       const lastEl = this.data[0];
       const endDate = moment(lastEl.sortTime);
       let start;
@@ -268,7 +277,7 @@ export class HumidityChartComponent implements OnInit {
       this.rezoom(start.valueOf(), endDate.valueOf());
     });
 
-    this.deviceProvider.$zoomChangeVolt.subscribe(val => {
+    this.subscriptionZoomType$ = this.deviceProvider.$zoomChangeVolt.subscribe(val => {
       if(val) {
         this.customeZoom(val);
       }

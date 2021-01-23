@@ -1,9 +1,10 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, OnDestroy } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import * as d3 from 'd3';
 
 import * as moment from 'moment';
 import { DeviceProvider, SelectedRange } from '../../../../providers/device';
+import { Subscription } from 'rxjs/Subscription';
 
 declare var window: any;
 
@@ -16,7 +17,7 @@ interface rangeModelArgs{
   selector: 'page-temperature-chart',
   templateUrl: 'temperature-chart.html'
 })
-export class TemperatureChartComponent implements OnInit {
+export class TemperatureChartComponent implements OnInit, OnDestroy {
   @Input() data = [];
   @Input() tempType;
   @Output() public rangeTabChange = new EventEmitter<number>();
@@ -68,6 +69,9 @@ export class TemperatureChartComponent implements OnInit {
   xp: any;
   dataYrange: any;
 
+  subscriptionZoomDate$: Subscription;
+  subscriptionZoomType$: Subscription;
+
   constructor(private deviceProvider: DeviceProvider, private decimalPipe: DecimalPipe) {}
 
   ngOnInit() {
@@ -79,6 +83,11 @@ export class TemperatureChartComponent implements OnInit {
       this.noData = false;
       this.loadSvg();
     }
+  }
+
+  ngOnDestroy() {
+    this.subscriptionZoomDate$.unsubscribe();
+    this.subscriptionZoomType$.unsubscribe();
   }
 
   loadSvg() {
@@ -116,18 +125,18 @@ export class TemperatureChartComponent implements OnInit {
     }
     this.x = d3.scaleTime().range([0, this.width]);
     this.y = d3.scaleLinear().rangeRound([this.height, 0]);
-    this.xAxis = d3
-      .axisBottom(this.x)
-      .ticks((this.width / this.height) * 5)
-      .tickSize(-this.height)
-      .tickPadding(10)
-      .tickFormat((d) => this.multiFormat(d));
+    // this.xAxis = d3
+    //   .axisBottom(this.x)
+    //   .ticks((this.width / this.height) * 5)
+    //   .tickSize(-this.height)
+    //   .tickPadding(10)
+    //   .tickFormat((d) => this.multiFormat(d));
 
-    this.yAxis = d3
-      .axisRight(this.y)
-      .ticks(5)
-      .tickSize(this.width)
-      .tickPadding(-23 - this.width);
+    // this.yAxis = d3
+    //   .axisRight(this.y)
+    //   .ticks(5)
+    //   .tickSize(this.width)
+    //   .tickPadding(-23 - this.width);
     this.line = d3
       .line()
       .x((d: any) => this.x(d.sortTime))
@@ -237,7 +246,7 @@ export class TemperatureChartComponent implements OnInit {
 
     this.verticalLineH = d3.select('rect').node().getBoundingClientRect().height + 8;
 
-    this.deviceProvider.$zoomDateRange.subscribe((res) => {
+    this.subscriptionZoomDate$ = this.deviceProvider.$zoomDateRange.subscribe((res) => {
       const lastEl = this.data[0];
       const endDate = moment(lastEl.sortTime);
       let start;
@@ -246,7 +255,7 @@ export class TemperatureChartComponent implements OnInit {
           start = moment(endDate).add(-1, 'hours');
           break;
         case 'day':
-            start = moment(endDate).add(-1, 'day');
+            start = moment(endDate).add(-2, 'day');
             break;
         case 'week':
             start = moment(endDate).add(-1, 'week');
@@ -264,7 +273,7 @@ export class TemperatureChartComponent implements OnInit {
       this.rezoom(start.valueOf(), endDate.valueOf());
     });
 
-    this.deviceProvider.$zoomChangeTemp.subscribe(val => {
+    this.subscriptionZoomType$ = this.deviceProvider.$zoomChangeTemp.subscribe(val => {
       if(val) {
         this.customeZoom(val);
       }
@@ -285,7 +294,7 @@ export class TemperatureChartComponent implements OnInit {
       .duration(1500)
       .call(this.zoom.transform, d3.zoomIdentity
           .scale(width / (this.x(dateE) - this.x(dateS)))
-          .translate(-this.x(dateS), 0));
+          );
 
   }
 
@@ -353,7 +362,6 @@ export class TemperatureChartComponent implements OnInit {
   }
 
   private zoomed(): void {
-    
     this.chartValueAround = undefined;
     const event = d3.event;
     this.gX.call(this.xAxis.scale(d3.event.transform.rescaleX(this.x)));

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, OnDestroy } from '@angular/core';
 import * as d3 from 'd3';
 
 import * as moment from 'moment';
@@ -15,7 +15,7 @@ interface rangeModelArgs{
   selector: 'page-volt-chart',
   templateUrl: 'volt-chart.html'
 })
-export class VoltChartComponent implements OnInit {
+export class VoltChartComponent implements OnInit, OnDestroy {
   @Input() data = [];
   @Input() tempType;
   @Output() public rangeTabChange = new EventEmitter<number>();
@@ -67,6 +67,9 @@ export class VoltChartComponent implements OnInit {
   noData = false;
   dataYrange: any[];
 
+  subscriptionZoomDate$: Subscription;
+  subscriptionZoomType$: Subscription;
+
   constructor(private deviceProvider: DeviceProvider) {}
 
   ngOnInit() {
@@ -78,6 +81,11 @@ export class VoltChartComponent implements OnInit {
       this.noData = false;
       this.loadSvg();
     }
+  }
+
+  ngOnDestroy() {
+    this.subscriptionZoomDate$.unsubscribe();
+    this.subscriptionZoomType$.unsubscribe();
   }
 
   loadSvg() {
@@ -237,7 +245,7 @@ export class VoltChartComponent implements OnInit {
     this.verticalLineH = d3.select('rect').node().getBoundingClientRect().height + 8;
 
     // this.resetZoom();
-    this.deviceProvider.$zoomDateRange.subscribe((res) => {
+    this.subscriptionZoomDate$ = this.deviceProvider.$zoomDateRange.subscribe((res) => {
       const lastEl = this.data[0];
       const endDate = moment(lastEl.sortTime);
       let start;
@@ -264,7 +272,7 @@ export class VoltChartComponent implements OnInit {
       this.rezoom(start.valueOf(), endDate.valueOf());
     });
 
-    this.deviceProvider.$zoomChangeVolt.subscribe(val => {
+    this.subscriptionZoomType$ = this.deviceProvider.$zoomChangeVolt.subscribe(val => {
       if(val) {
         this.customeZoom(val);
       }
