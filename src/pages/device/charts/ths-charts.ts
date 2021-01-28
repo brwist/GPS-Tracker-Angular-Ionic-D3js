@@ -63,6 +63,7 @@ export class DeviceTHSChartsPage implements OnInit {
   dataLoading: boolean = true;
   isGps: boolean;
   maxPeriodAvailable: number;
+  loadingMessage: string = 'Sending request';
 
   constructor(
     private logger: Logger,
@@ -181,7 +182,7 @@ export class DeviceTHSChartsPage implements OnInit {
   }
 
   private showLoader() {
-    this.loader = this.loadingCtrl.create({ content: 'Loading data' });
+    this.loader = this.loadingCtrl.create({ content: this.loadingMessage });
 
     this.loader.present();
   }
@@ -199,6 +200,9 @@ export class DeviceTHSChartsPage implements OnInit {
     const end = moment(currentTime);
     const select = ['temperature', 'battery', 'humidity', 'createdAt'];
 
+    this.loadingMessage = 'Waiting callback';
+    this.loader.setContent(this.loadingMessage);
+
     this.measProvider
       .getListForChart(this.device.id, {
         filter: {
@@ -209,6 +213,8 @@ export class DeviceTHSChartsPage implements OnInit {
         lean: true
       })
       .then((data: any) => {
+        this.loadingMessage = 'Data recieved';
+        this.loader.setContent(this.loadingMessage);
         this.dataYear = data.items.map((item: IMeasurement) => {
           return {
             timestamp: item.createdAt,
@@ -237,6 +243,8 @@ export class DeviceTHSChartsPage implements OnInit {
   }
 
   private renderCharts() {
+    this.loadingMessage = 'Processing data';
+    this.loader.setContent(this.loadingMessage);
     if (this.yearSelected) {
       this.data = undefined;
       this.loadData(this.dataYear);
@@ -328,6 +336,8 @@ export class DeviceTHSChartsPage implements OnInit {
       this.chartData.humidity = humidity;
       this.chartData.temperature = temperature;
       this.chartData.battery = battery;
+      this.loadingMessage = 'Creating chart';
+      this.loader.setContent(this.loadingMessage);
       this.selectTimeDurationDay(2);
       this.dataLoading = false;
       this.hideLoader();

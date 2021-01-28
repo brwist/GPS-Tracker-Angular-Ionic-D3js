@@ -77,6 +77,7 @@ export class DeviceGPSChartsPage implements OnInit {
     dataLoading: boolean = true;
     isGps: boolean;
     maxPeriodAvailable: number;
+    loadingMessage: string = 'Sending request';
 
     constructor(private logger: Logger,
                 private params: NavParams,
@@ -235,7 +236,7 @@ export class DeviceGPSChartsPage implements OnInit {
     }
 
     private showLoader() {
-        this.loader = this.loadingCtrl.create({ content: 'Loading data' });
+        this.loader = this.loadingCtrl.create({ content: this.loadingMessage });
 
         this.loader.present();
     }
@@ -262,7 +263,8 @@ export class DeviceGPSChartsPage implements OnInit {
 
             select.push('battery');
         }
-        
+            this.loadingMessage = 'Waiting callback';
+            this.loader.setContent(this.loadingMessage);
             this.trackProvider.getListForChart(this.device.id, {
                 filter: {
                     startDate:
@@ -273,6 +275,8 @@ export class DeviceGPSChartsPage implements OnInit {
                 select,
                 lean: true
             }).then((data: any) => {
+                this.loadingMessage = 'Data recieved';
+                this.loader.setContent(this.loadingMessage);
                 this.dataYear = data.items.map((item: ITrack) => {
                     return {
                         timestamp: item.timestamp,
@@ -299,6 +303,8 @@ export class DeviceGPSChartsPage implements OnInit {
     }
 
     private renderCharts() {
+        this.loadingMessage = 'Processing data';
+        this.loader.setContent(this.loadingMessage);
         if(this.yearSelected) {
             this.data = undefined;
             this.loadData(this.dataYear);
@@ -372,6 +378,8 @@ export class DeviceGPSChartsPage implements OnInit {
 
             this.chartData.batteryOrVolts = batteryOrVolts;
             this.chartData.temperature = temperature;
+            this.loadingMessage = 'Creating chart';
+            this.loader.setContent(this.loadingMessage);
             this.selectTimeDurationDay(2);
             this.dataLoading = false;
             this.hideLoader();

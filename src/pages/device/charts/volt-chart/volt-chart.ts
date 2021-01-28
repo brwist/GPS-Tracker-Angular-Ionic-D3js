@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output, OnDestroy } from '@angu
 import * as d3 from 'd3';
 
 import * as moment from 'moment';
+import { Subscription } from 'rxjs';
 import { DeviceProvider } from '../../../../providers/device';
 
 declare var window: any;
@@ -272,11 +273,11 @@ export class VoltChartComponent implements OnInit, OnDestroy {
       this.rezoom(start.valueOf(), endDate.valueOf());
     });
 
-    this.subscriptionZoomType$ = this.deviceProvider.$zoomChangeVolt.subscribe(val => {
-      if(val) {
-        this.customeZoom(val);
-      }
-    });
+    // this.subscriptionZoomType$ = this.deviceProvider.$zoomChangeVolt.subscribe(val => {
+    //   if(val) {
+    //     this.customeZoom(val);
+    //   }
+    // });
   }
 
   resetZoom() {
@@ -385,7 +386,7 @@ export class VoltChartComponent implements OnInit, OnDestroy {
     this.chartBody.selectAll('path').attr('d', newLine);
     this.voronoiGroup.attr('transform', d3.event.transform);
     this.setYdomain();
-    this.deviceProvider.zoomedTemp(event);
+    // this.deviceProvider.zoomedTemp(event);
   }
 
   private customeZoom(event) {
