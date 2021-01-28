@@ -427,7 +427,7 @@ export class TemperatureChartComponent implements OnInit, OnDestroy {
 
   private filterDate(data: any[]) {
     let res = data.map((item, index) => {
-        return (index % 2 !== 1) ? {
+        return (index % 5 !== 4) ? {
             sortTime: item.sortTime,
             temperature: item.temperature
         } : null;

@@ -419,7 +419,7 @@ export class VoltChartComponent implements OnInit, OnDestroy {
 
   private filterDate(data: any[]) {
     let res = data.map((item, index) => {
-        return (index % 2 !== 1) ? {
+        return (index % 4 !== 3) ? {
             sortTime: item.sortTime,
             batteryOrVolts: item.batteryOrVolts
         } : null;
