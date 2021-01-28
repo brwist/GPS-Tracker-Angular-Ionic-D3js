@@ -94,15 +94,15 @@ export class BatteryChartComponent implements OnInit, OnDestroy {
   }
 
   loadSvg() {
-    if(this.data.length > 80000) {
-      this.data = this.filterDate(this.data);
-    }
-    if(this.data.length > 50000) {
-      this.data = this.filterDate(this.data);
-    }
-    if(this.data.length > 20000) {
-      this.data = this.filterDate(this.data);
-    }
+    // if(this.data.length > 80000) {
+    //   this.data = this.filterDate(this.data);
+    // }
+    // if(this.data.length > 50000) {
+    //   this.data = this.filterDate(this.data);
+    // }
+    // if(this.data.length > 20000) {
+    //   this.data = this.filterDate(this.data);
+    // }
     // if(this.data.length > 10000) {
     //   this.data = this.filterDate(this.data);
     // }
@@ -389,7 +389,7 @@ export class BatteryChartComponent implements OnInit, OnDestroy {
     
     this.chartBody.selectAll('path').attr('d', newLine);
     this.voronoiGroup.attr('transform', d3.event.transform);
-    this.setYdomain();
+    // this.setYdomain();
     this.deviceProvider.zoomedTemp(event);
   }
 

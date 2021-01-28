@@ -93,12 +93,12 @@ export class VoltChartComponent implements OnInit, OnDestroy {
     if(this.data.length > 80000) {
       this.data = this.filterDate(this.data);
     }
-    if(this.data.length > 50000) {
-      this.data = this.filterDate(this.data);
-    }
-    if(this.data.length > 20000) {
-      this.data = this.filterDate(this.data);
-    }
+    // if(this.data.length > 50000) {
+    //   this.data = this.filterDate(this.data);
+    // }
+    // if(this.data.length > 20000) {
+    //   this.data = this.filterDate(this.data);
+    // }
     // if(this.data.length > 10000) {
     //   this.data = this.filterDate(this.data);
     // }
