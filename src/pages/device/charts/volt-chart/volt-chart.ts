@@ -275,7 +275,7 @@ export class VoltChartComponent implements OnInit, OnDestroy {
 
     this.subscriptionZoomType$ = this.deviceProvider.$zoomChangeVolt.subscribe(val => {
       if(val) {
-        // this.customeZoom(val);
+        this.customeZoom(val);
       }
     });
   }
@@ -419,7 +419,7 @@ export class VoltChartComponent implements OnInit, OnDestroy {
 
   private filterDate(data: any[]) {
     let res = data.map((item, index) => {
-        return (index % 4 !== 3) ? {
+        return (index % 2 !== 1) ? {
             sortTime: item.sortTime,
             batteryOrVolts: item.batteryOrVolts
         } : null;

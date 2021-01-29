@@ -275,7 +275,7 @@ export class TemperatureChartComponent implements OnInit, OnDestroy {
 
     this.subscriptionZoomType$ = this.deviceProvider.$zoomChangeTemp.subscribe(val => {
       if(val) {
-        // this.customeZoom(val); //Not sure why customeZoom is added, D3 already handles zooming in zoomed function
+        this.customeZoom(val); //Not sure why customeZoom is added, D3 already handles zooming in zoomed function
       }
     });
   }
@@ -427,7 +427,7 @@ export class TemperatureChartComponent implements OnInit, OnDestroy {
 
   private filterDate(data: any[]) {
     let res = data.map((item, index) => {
-        return (index % 5 !== 4) ? {
+        return (index % 2 !== 1) ? {
             sortTime: item.sortTime,
             temperature: item.temperature
         } : null;

@@ -279,7 +279,7 @@ export class HumidityChartComponent implements OnInit, OnDestroy {
 
     this.subscriptionZoomType$ = this.deviceProvider.$zoomChangeVolt.subscribe(val => {
       if(val) {
-        // this.customeZoom(val);
+        this.customeZoom(val);
       }
     });
   }
