@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, OnDestroy } from '@angular/core';
 import * as d3 from 'd3';
 
 import * as moment from 'moment';
+import { Subscription } from 'rxjs';
 import { DeviceProvider } from '../../../../providers/device';
 
 declare var window: any;
@@ -15,7 +16,7 @@ interface rangeModelArgs{
   selector: 'page-volt-chart',
   templateUrl: 'volt-chart.html'
 })
-export class VoltChartComponent implements OnInit {
+export class VoltChartComponent implements OnInit, OnDestroy {
   @Input() data = [];
   @Input() tempType;
   @Output() public rangeTabChange = new EventEmitter<number>();
@@ -67,11 +68,14 @@ export class VoltChartComponent implements OnInit {
   noData = false;
   dataYrange: any[];
 
+  subscriptionZoomDate$: Subscription;
+  subscriptionZoomType$: Subscription;
+
   constructor(private deviceProvider: DeviceProvider) {}
 
   ngOnInit() {
     this.width = window.innerWidth - this.margin.left - this.margin.right - 20;
-    this.height = 500 - this.margin.top - this.margin.bottom;
+    this.height = 400 - this.margin.top - this.margin.bottom;
     if(this.data.length <= 0) {
       this.noData = true;
     } else {
@@ -80,16 +84,21 @@ export class VoltChartComponent implements OnInit {
     }
   }
 
+  ngOnDestroy() {
+    this.subscriptionZoomDate$.unsubscribe();
+    this.subscriptionZoomType$.unsubscribe();
+  }
+
   loadSvg() {
     if(this.data.length > 80000) {
       this.data = this.filterDate(this.data);
     }
-    if(this.data.length > 50000) {
-      this.data = this.filterDate(this.data);
-    }
-    if(this.data.length > 20000) {
-      this.data = this.filterDate(this.data);
-    }
+    // if(this.data.length > 50000) {
+    //   this.data = this.filterDate(this.data);
+    // }
+    // if(this.data.length > 20000) {
+    //   this.data = this.filterDate(this.data);
+    // }
     // if(this.data.length > 10000) {
     //   this.data = this.filterDate(this.data);
     // }
@@ -127,7 +136,7 @@ export class VoltChartComponent implements OnInit {
       .axisRight(this.y)
       .ticks(5)
       .tickSize(this.width)
-      .tickPadding(-35 - this.width);
+      .tickPadding(-25 - this.width);
     this.line = d3
       .line()
       .x((d: any) => this.x(d.sortTime))
@@ -157,7 +166,7 @@ export class VoltChartComponent implements OnInit {
       .axisRight(this.y)
       .ticks(10)
       .tickSize(this.width)
-      .tickPadding(-35 - this.width);
+      .tickPadding(-25 - this.width);
     this.x.domain(d3.extent(this.data, (d) => d.sortTime));
     this.y.domain(this.dataYrange);
     this.xAxis = d3
@@ -174,7 +183,7 @@ export class VoltChartComponent implements OnInit {
       .append('svg')
       .attr('width', '90%')
       .attr('height', '100%')
-      .attr('viewBox', [-15, 0, width, height + 20])
+      .attr('viewBox', [-8, 0, width, height + 20])
       .call(this.zoom);
     // this.svg.select('*').remove();
     const g = this.svg.append('g').attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');
@@ -214,7 +223,7 @@ export class VoltChartComponent implements OnInit {
         var d = this.data[idx];
         this.chartValueAround = this.formatDate(x0) + ' ' + d.batteryOrVolts;
 
-        const xCor = d3.event.x - 44;
+        const xCor = d3.event.x - 50;
         this.selectedDetailLeft = xCor;
       }));
 
@@ -237,7 +246,7 @@ export class VoltChartComponent implements OnInit {
     this.verticalLineH = d3.select('rect').node().getBoundingClientRect().height + 8;
 
     // this.resetZoom();
-    this.deviceProvider.$zoomDateRange.subscribe((res) => {
+    this.subscriptionZoomDate$ = this.deviceProvider.$zoomDateRange.subscribe((res) => {
       const lastEl = this.data[0];
       const endDate = moment(lastEl.sortTime);
       let start;
@@ -264,7 +273,7 @@ export class VoltChartComponent implements OnInit {
       this.rezoom(start.valueOf(), endDate.valueOf());
     });
 
-    this.deviceProvider.$zoomChangeVolt.subscribe(val => {
+    this.subscriptionZoomType$ = this.deviceProvider.$zoomChangeVolt.subscribe(val => {
       if(val) {
         this.customeZoom(val);
       }
@@ -278,7 +287,7 @@ export class VoltChartComponent implements OnInit {
   }
 
   rezoom(dateS, dateE) {
-    const width = this.width + this.margin.left + this.margin.right;
+    const width = this.width //+ this.margin.left + this.margin.right;
 
     this.svg.call(this.zoom)
       .transition()
@@ -311,55 +320,22 @@ export class VoltChartComponent implements OnInit {
     let xleft = moment(domain[0]).valueOf(); // this.rangeDateStart.valueOf();
     let xright = moment(domain[1]).valueOf(); // this.rangeDateEnd.valueOf();
 
-    // const selectedTime: any = new Date(x0).getTime();
     let temp1 = this.data.map(d => Math.abs(xleft - new Date(d.sortTime).getTime()));
     let iL = temp1.indexOf(Math.min(...temp1));
-    // var d = this.data[idx];
 
-    // var iL = bisectDate(this.data, xleft);
-
-    let left_dateBefore;
-    let left_dateAfter;
-    
     let yleft;
     if (this.data[iL] !== undefined && this.data[iL - 1] !== undefined) {
-      left_dateBefore = this.data[iL - 1].sortTime;
-      left_dateAfter = this.data[iL].sortTime;
-
-      let intfun = d3.interpolateNumber(
-        this.data[iL - 1].batteryOrVolts,
-        this.data[iL].batteryOrVolts
-      );
-      yleft = intfun(
-        (xleft - left_dateBefore) / (left_dateAfter - left_dateBefore)
-      );
+      yleft = this.data[iL].batteryOrVolts;
     } else {
       yleft = 0;
     }
 
     let temp2 = this.data.map(d => Math.abs(xright - new Date(d.sortTime).getTime()));
     let iR = temp2.indexOf(Math.min(...temp2));
-
-    // var iR = bisectDate(this.data, xright);
-
-    let right_dateBefore;
-    let right_dateAfter;
-
     let yright;
 
-    if (this.data[iR] !== undefined && this.data[iR - 1] !== undefined) {
-      right_dateBefore = this.data[iR - 1].sortTime;
-      right_dateAfter = this.data[iR].sortTime;
-
-      let intfun = d3.interpolateNumber(
-        this.data[iR - 1].batteryOrVolts,
-        this.data[iR].batteryOrVolts
-      );
-      yright = intfun(
-        (xright - right_dateBefore) / (right_dateAfter - right_dateBefore)
-      );
-    } else {
-      yright = 0;
+    if (this.data[iR] !== undefined) {
+      yright = this.data[iR].batteryOrVolts;
     }
 
     let dataSubset = this.data.filter(function (d) {
@@ -379,7 +355,7 @@ export class VoltChartComponent implements OnInit {
     if (ymax_new == 0) {
       ymax_new = this.dataYrange[1];
     }
-    this.y.domain([ymin_new - 5, ymax_new * 1.05]);
+    this.y.domain([ymin_new - 0.5, ymax_new * 1.05]);
     d3.selectAll('.axis-volt-y').transition().call(this.yAxis);
   }
 

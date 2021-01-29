@@ -1,369 +1,493 @@
 import { Component, OnInit } from '@angular/core';
 import { Storage } from '@ionic/storage';
-import { ModalController, NavParams } from 'ionic-angular';
+import { Loading, LoadingController, ModalController, NavController, NavParams } from 'ionic-angular';
 import * as moment from 'moment';
 import * as momentTimezone from 'moment-timezone';
 import { convertFToC, FormatTempPipe } from '../../../pipes/format-temperature/format-temp.pipe';
-import { ApiProvider } from '../../../providers/api';
-import { IDevice, IMeasurement } from '../../../providers/device';
+import { ApiProvider, IUserInfo } from '../../../providers/api';
+import { DeviceProvider, IDevice, IMeasurement } from '../../../providers/device';
 import { Logger } from '../../../providers/logger';
 import { MeasurementProvider } from '../../../providers/measurement';
 import { ISettings, Settings } from '../../../providers/settings';
 import { UtilsService } from '../../../services/utils.service';
 import { ChartBase } from './chart.base';
 
+const DATE_SETTINGS_STORAGE_KEY = 'device-date-settings-for-charts';
+const MAX_ITEMS_PER_DAY_STORAGE_KEY = 'max-items-per-day';
+
+import * as async from 'async';
+import { Subscription } from 'rxjs';
+import { IDateSettings } from '../device';
+import { TrackProvider } from '../../../providers/track';
+import { DateSettingsPage } from '../date-settings';
+
 @Component({
-    selector: 'page-ths-charts',
-    templateUrl: 'charts.html',
-    providers: [FormatTempPipe]
+  selector: 'page-ths-charts',
+  templateUrl: 'charts.html',
+  providers: [FormatTempPipe]
 })
-export class DeviceTHSChartsPage extends ChartBase implements OnInit {
-    public _chartData: any = {};
+export class DeviceTHSChartsPage implements OnInit {
+  public chartData: any = {};
+  public groupedBy: string;
+  public pointsTotal: number;
 
-    get chartData() {
-        return this._chartData[this.chartType];
-    }
-    public settings: ISettings;
+  public device: IDevice;
 
-    public chartTypes = [
-        {
-            value: 'temperature',
-            label: 'Temperature'
-        },
-        {
-            value: 'humidity',
-            label: 'Humidity'
-        },
-        {
-            value: 'battery',
-            label: 'Battery'
-        }
-    ];
+  public maxNumberOfPointsModel: number | string;
+  public activeTab = 2;
+  public rangeDateStart: any;
+  public rangeDateEnd: any;
+  public datePipeFormat = 'MMM d h:mm a';
+  private data: any;
 
-    public groupedBy: string;
-    public pointsTotal: number;
+  public dataYear: any[] = [];
 
-    public device: IDevice;
+  private userSubscription: Subscription;
 
-    public chartDataColors = {
+  private timeZone: string = momentTimezone.tz.guess();
 
-        // https://stackoverflow.com/questions/39832874/how-do-i-change-the-color-for-ng2-charts
-        temperature: [{
-            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-            borderColor: 'rgba(54, 162, 235, 1)',
-            pointBackgroundColor: 'rgba(54, 162, 235, 1)',
-            pointBorderColor: 'rgba(54, 162, 235, 1)',
-            pointHoverBackgroundColor: 'rgba(54, 162, 235, 0.5)',
-            pointHoverBorderColor: 'rgba(54, 162, 235, 1)'
-        }],
-        humidity: [{
-            backgroundColor: 'rgba(148, 159, 177, 0.2)',
-            borderColor: 'rgba(148, 159, 177,1)',
-            pointBackgroundColor: 'rgba(148, 159, 177, 1)',
-            pointBorderColor: 'rgba(148, 159, 177, 1)',
-            pointHoverBackgroundColor: 'rgba(148, 159, 177, 0.5)',
-            pointHoverBorderColor: 'rgba(148, 159, 177, 0.8)'
-        }],
-        battery: [{
-            backgroundColor: 'rgba(148, 159, 177, 0.2)',
-            borderColor: 'rgba(148, 159, 177,1)',
-            pointBackgroundColor: 'rgba(148, 159, 177, 1)',
-            pointBorderColor: 'rgba(148, 159, 177, 1)',
-            pointHoverBackgroundColor: 'rgba(148, 159, 177, 0.5)',
-            pointHoverBorderColor: 'rgba(148, 159, 177, 0.8)'
-        }]
-    };
+  private dateSettings: IDateSettings = {
+    type: 'day',
+    value: 'today',
+    startDate: moment(),
+    endDate: moment()
+  };
 
-    private chartType: string = 'temperature';
+  private startDate: any;
+  private endDate: any;
+  private yearSelected = false;
+  private loader: Loading;
+  yearPoints: any;
+  tempUnit = 'fTemp';
+  thsType = 'humidity';
+  dataLoading: boolean = true;
+  isGps: boolean;
+  maxPeriodAvailable: number;
+  loadingMessage: string = 'Sending request';
 
-    private dataItems;
+  constructor(
+    private logger: Logger,
+    private params: NavParams,
+    private loadingCtrl: LoadingController,
+    private navCtrl: NavController,
+    private storage: Storage,
+    private modalCtrl: ModalController,
+    private trackProvider: TrackProvider,
+    private apiProvider: ApiProvider,
+    private deviceProvider: DeviceProvider,
+    private measProvider: MeasurementProvider
+  ) {
+    this.isGps = false;
+    this.deviceProvider.setChartType('gps');
+    this.device = this.params.get('device');
+  }
 
-    constructor(
-        protected logger: Logger,
-        private params: NavParams,
-        protected storage: Storage,
-        protected modalCtrl: ModalController,
-        private measProvider: MeasurementProvider,
-        protected apiProvider: ApiProvider,
-        private formatTempPipe: FormatTempPipe,
-        private settingsProvider: Settings
-    ) {
-        super(logger, storage, modalCtrl, apiProvider);
+  public ngOnInit() {
+    this.storage
+      .set(MAX_ITEMS_PER_DAY_STORAGE_KEY, 'All')
+      .then(() => {
+        this.maxNumberOfPointsModel = 'All';
 
-        this.device = this.params.get('device');
+        this.renderCharts();
+      })
+      .catch((err) => {
+        this.logger.error(err);
+      });
+    async.series(
+      [
+        (callback) => {
+          this.storage
+            .get(DATE_SETTINGS_STORAGE_KEY)
+            .then((dateSettings?: IDateSettings) => {
+              if (dateSettings) {
+                this.dateSettings = dateSettings;
 
-        this.sub = this.settingsProvider.settings.subscribe((settings: ISettings) => {
-            this.settings = settings;
-        });
-    }
+                if (this.dateSettings.type !== 'custom') {
+                  const updatedDateRange = DateSettingsPage.getDateRange(this.dateSettings.value);
 
-    protected loadChartData() {
-        this.measProvider.getListForChart(this.device.id, {
-            filter: {
-                startDate:
-                    encodeURIComponent(momentTimezone(this.startDate).tz(this.timeZone).startOf('day').format()),
-                endDate:
-                    encodeURIComponent(momentTimezone(this.endDate).tz(this.timeZone).endOf('day').format())
-            },
-            select: ['temperature', 'battery', 'humidity', 'createdAt'],
-            lean: true
-        }).then((data: any) => {
+                  if (updatedDateRange) {
+                    this.dateSettings.startDate = updatedDateRange.startDate;
+                    this.dateSettings.endDate = moment(updatedDateRange.endDate).add(1, 'hours');
+                  }
+                }
+              }
 
-            this.dataItems = data.items;
-
-            this.renderCharts();
-
-        }).catch((err) => {
-            this.logger.error(err);
-        });
-    }
-
-    protected renderCharts() {
-
-        let points;
-
-        this.groupedBy = null;
-        console.log(this.maxNumberOfPointsNumber);
-
-        if (this.dataItems.length > this.maxNumberOfPointsNumber) {
-
-            if (moment(this.endDate).diff(this.startDate, 'days') === 0) {
-
-                points = this.groupBy('hour');
-
-            } else {
-
-                points = this.groupBy('day');
-            }
-
-        } else {
-
-            points = this.dataItems.map((item: IMeasurement) => {
-                return {
-                    label: this.formatTimeLabel(item.createdAt, `HH:mm`),
-                    fullDate: this.formatTimeLabel(item.createdAt, `M/DD/YYYY, h:mm:ss a`),
-                    temperature: item.temperature,
-                    battery: item.battery,
-                    humidity: item.humidity
-                };
+              callback();
+            })
+            .catch((err) => {
+              callback(err);
             });
+        },
+        (callback) => {
+          this.storage
+            .get(MAX_ITEMS_PER_DAY_STORAGE_KEY)
+            .then((maxNumberOfPoints?: number) => {
+              if (maxNumberOfPoints) {
+                this.maxNumberOfPointsModel = maxNumberOfPoints;
+              } else {
+                this.maxNumberOfPointsModel = 50;
+              }
 
-            // console.log(points);
+              callback();
+            })
+            .catch((err) => {
+              callback(err);
+            });
         }
+      ],
+      (err) => {
+        if (err) this.logger.error(err);
 
-        this._chartData = {};
+        this.loadChartData();
+      }
+    );
 
-        setTimeout(() => {
+    this.userSubscription = this.apiProvider.user.subscribe((user: IUserInfo) => {
+      if (user && user.timeZone) {
+        this.timeZone = user.timeZone;
+      }
+    });
+  }
 
-            this._chartData.battery = {
-                title: 'Battery, %',
-                dataSets: [{
-                    data: points.map((item: any) => UtilsService.toFixed(item.battery)),
-                    label: 'Battery',
-                    borderWidth: 1,
-                    pointBorderWidth: 1,
-                    pointRadius: 1,
-                    pointHoverRadius: 2,
-                    pointHitRadius: 25
-                }],
-                labels: points.map((item: any) => item.label),
-                options: {
-                    responsive: true,
-                    scales: {
-                        yAxes: [{
-                            ticks: { min: 0, max: 100 }
-                        }]
-                    },
-                    layout: {
-                        padding: {
-                            top: 20,
-                            left: 10,
-                            right: 10
-                        }
-                    },
-                    animation: {
-                        duration: 0
-                    },
-                    tooltips: {
-                        callbacks: {
-                            title: (tooltipItem) => {
-                                if (points[tooltipItem[0].index].fullDate) {
-                                    return points[tooltipItem[0].index].fullDate;
-                                } else {
-                                    return points[tooltipItem[0].index].label;
-                                }
-                            }
-                        }
-                    }
-                },
-                legend: false,
-                colors: this.chartDataColors.battery,
-                chartType: 'line'
-            };
+  public ngOnDestroy() {
+    this.userSubscription.unsubscribe();
+  }
 
-            this._chartData.humidity = {
-                title: 'Humidity, %',
-                dataSets: [{
-                    data: points.map((item: any) => UtilsService.toFixed(item.humidity)),
-                    label: 'Humidity',
-                    borderWidth: 1,
-                    pointBorderWidth: 1,
-                    pointRadius: 1,
-                    pointHoverRadius: 2,
-                    pointHitRadius: 25
-                }],
-                labels: points.map((item: any) => item.label),
-                options: {
-                    responsive: true,
-                    scales: {
-                        yAxes: [{
-                            ticks: { min: 0, max: 100 }
-                        }]
-                    },
-                    layout: {
-                        padding: {
-                            top: 20,
-                            left: 10,
-                            right: 10
-                        }
-                    },
-                    animation: {
-                        duration: 0
-                    },
-                    tooltips: {
-                        callbacks: {
-                            title: (tooltipItem) => {
-                                if (points[tooltipItem[0].index].fullDate) {
-                                    return points[tooltipItem[0].index].fullDate;
-                                } else {
-                                    return points[tooltipItem[0].index].label;
-                                }
-                            }
-                        }
-                    }
-                },
-                legend: false,
-                colors: this.chartDataColors.humidity,
-                chartType: 'line'
-            };
-
-            this._chartData.temperature = {
-                title: `Temperature, °${this.settings.temperatureFormat}`,
-                dataSets: [{
-                    data: points.map((item: any) => {
-                        const value = item.temperature;
-
-                        return this.settings.temperatureFormat === 'C' ? convertFToC(value) : value;
-                    }),
-                    label: `Temperature`,
-                    borderWidth: 1,
-                    pointBorderWidth: 1,
-                    pointRadius: 1,
-                    pointHoverRadius: 2,
-                    pointHitRadius: 25
-                }],
-                labels: points.map((item: any) => item.label),
-                options: {
-                    responsive: true,
-                    layout: {
-                        padding: {
-                            top: 20,
-                            left: 10,
-                            right: 10
-                        }
-                    },
-                    animation: {
-                        duration: 0
-                    },
-                    tooltips: {
-                        callbacks: {
-                            title: (tooltipItem) => {
-
-                                // console.log(points[tooltipItem[0].index]);
-
-                                if (points[tooltipItem[0].index].fullDate) {
-                                    return points[tooltipItem[0].index].fullDate;
-                                } else {
-                                    return points[tooltipItem[0].index].label;
-                                }
-                            }
-                        }
-                    }
-                },
-                legend: false,
-                colors: this.chartDataColors.temperature,
-                chartType: 'line'
-            };
-
-        }, 100);
+  private loadChartData() {
+    this.showLoader();
+    if (moment(this.dateSettings.startDate).isSame(this.dateSettings.endDate)) {
+      this.dateSettings.startDate = moment(this.dateSettings.startDate).add(-1, 'hours');
     }
 
-    protected groupBy(kind: string) {
-        console.log(kind);
+    if (this.dateSettings.startDate && moment(this.dateSettings.startDate).isValid()) {
+      this.startDate = this.dateSettings.startDate;
+    } else {
+      this.startDate = moment().subtract(1, 'day');
+    }
 
-        const by = [];
-        const raw = {};
+    if (this.dateSettings.endDate && moment(this.dateSettings.endDate).isValid()) {
+      this.endDate = this.dateSettings.endDate;
+    } else {
+      this.endDate = moment();
+    }
 
-        this.groupedBy = kind;
-        this.pointsTotal = this.dataItems.length;
+    const select = ['temperature', 'battery', 'humidity', 'createdAt'];
 
-        this.dataItems.forEach((item: IMeasurement) => {
+    var duration = moment.duration(this.endDate.diff(this.startDate));
+    var hours = duration.asHours();
+    if (hours === 1) {
+      this.yearSelected = true;
+      this.loadChartYear();
+    }
+  }
 
-            let token = momentTimezone.tz(item.createdAt, this.timeZone).format('h a');
+  private showLoader() {
+    this.loader = this.loadingCtrl.create({ content: this.loadingMessage });
 
-            if (kind === 'day') {
-                token = momentTimezone.tz(item.createdAt, this.timeZone).format('MMM, DD');
-            }
+    this.loader.present();
+  }
 
-            if (!raw[token]) raw[token] = [];
+  private hideLoader() {
+    this.loader.dismiss();
+  }
 
-            raw[token].push({
-                humidity: item.humidity,
-                battery: item.battery,
-                temperature: item.temperature
-            });
+  private loadChartYear() {
+    if (this.dataYear.length > 0) {
+      return;
+    }
+    const currentTime = moment().format();
+    const start = moment(currentTime).add(-1, 'year');
+    const end = moment(currentTime);
+    const select = ['temperature', 'battery', 'humidity', 'createdAt'];
+
+    this.loadingMessage = 'Waiting callback';
+    this.loader.setContent(this.loadingMessage);
+
+    this.measProvider
+      .getListForChart(this.device.id, {
+        filter: {
+          startDate: encodeURIComponent(momentTimezone(start).tz(this.timeZone).format()),
+          endDate: encodeURIComponent(momentTimezone(end).tz(this.timeZone).format())
+        },
+        select,
+        lean: true
+      })
+      .then((data: any) => {
+        this.loadingMessage = 'Data recieved';
+        this.loader.setContent(this.loadingMessage);
+        this.dataYear = data.items.map((item: IMeasurement) => {
+          return {
+            timestamp: item.createdAt,
+            temperature: item.temperature,
+            battery: item.battery,
+            humidity: item.humidity
+          };
         });
 
-        for (const token in raw) {
+        const minDate = this.dataYear[0] ? this.dataYear[0].timestamp : undefined;
+        const maxDate = this.dataYear[this.dataYear.length - 1]
+          ? this.dataYear[this.dataYear.length - 1].timestamp
+          : undefined;
 
-            if (raw.hasOwnProperty(token)) {
-
-                let batteryTotal = 0;
-                let batterySum = 0;
-
-                let humidityTotal = 0;
-                let humiditySum = 0;
-
-                let temperatureTotal = 0;
-                let temperatureSum = 0;
-
-                raw[token].forEach((item: IMeasurement) => {
-
-                    if (typeof item.battery !== 'undefined') {
-                        batterySum += 100;
-                        batteryTotal++;
-                    }
-
-                    if (typeof item.humidity !== 'undefined') {
-                        humiditySum += 100;
-                        humidityTotal++;
-                    }
-
-                    if (typeof item.temperature !== 'undefined') {
-                        temperatureSum += item.temperature;
-                        temperatureTotal++;
-                    }
-                });
-
-                by.push({
-                    label: token,
-                    temperature: temperatureTotal > 0 ? Math.floor(temperatureSum / temperatureTotal) : null,
-                    humidity: humidityTotal > 0 ? Math.floor(humiditySum / humidityTotal) : null,
-                    battery: batteryTotal > 0 ? Math.floor(batteryTotal / batterySum) : null
-                });
-            }
+        if (minDate && maxDate) {
+          const min = moment(minDate);
+          const max = moment(maxDate);
+          this.maxPeriodAvailable = max.diff(min, 'day');
         }
 
-        return by;
+        this.renderCharts();
+      })
+      .catch((err) => {
+        this.logger.error(err);
+      });
+  }
+
+  private renderCharts() {
+    this.loadingMessage = 'Processing data';
+    this.loader.setContent(this.loadingMessage);
+    if (this.yearSelected) {
+      this.data = undefined;
+      this.loadData(this.dataYear);
+    } else {
+      this.loadData(this.data);
     }
+  }
+
+  loadData(data) {
+    let points;
+    if (!data) {
+      return;
+    }
+
+    this.groupedBy = null;
+    if (!this.yearSelected) {
+      points = data.items.map((item: IMeasurement) => {
+        return {
+          timestamp: item.createdAt,
+          temperature: item.temperature,
+          battery: item.battery,
+          humidity: item.humidity
+        };
+      });
+    } else {
+      points = data;
+    }
+
+    this.chartData = {};
+    setTimeout(() => {
+      let humidity = [];
+      let temperature = [];
+      let battery = [];
+      if (points) {
+        humidity = points
+          .filter((item) => {
+            if (!item.humidity) {
+              return false;
+            }
+            return true;
+          })
+          .map((item) => {
+            return {
+              sortTime: new Date(item.timestamp).getTime(),
+              humidity: item.humidity
+            };
+          })
+          .sort((a, b) => (a.sortTime > b.sortTime ? -1 : b.sortTime > a.sortTime ? 1 : 0));
+
+        temperature = points
+          .filter((item) => {
+            if (!item.temperature) {
+              return false;
+            }
+            return true;
+          })
+          .map((item) => {
+            if (!item.temperature) {
+              console.log(item.temperature);
+              return;
+            }
+            return {
+              sortTime: new Date(item.timestamp).getTime(),
+              temperature: this.tempUnit === 'cTemp' ? ((item.temperature - 32) * 5) / 9 : item.temperature
+            };
+          })
+          .sort((a, b) => (a.sortTime > b.sortTime ? -1 : b.sortTime > a.sortTime ? 1 : 0));
+
+          battery = points
+          .filter((item) => {
+            if (!item.battery) {
+              return false;
+            }
+            return true;
+          })
+          .map((item) => {
+            if (!item.battery) {
+              console.log(item.battery);
+              return;
+            }
+            return {
+              sortTime: new Date(item.timestamp).getTime(),
+              battery: item.battery
+            };
+          })
+          .sort((a, b) => (a.sortTime > b.sortTime ? -1 : b.sortTime > a.sortTime ? 1 : 0));
+      }
+
+      this.chartData.humidity = humidity;
+      this.chartData.temperature = temperature;
+      this.chartData.battery = battery;
+      this.loadingMessage = 'Creating chart';
+      this.loader.setContent(this.loadingMessage);
+      this.selectTimeDurationDay(2);
+      this.dataLoading = false;
+      this.hideLoader();
+    }, 100);
+  }
+
+  rangeTimeChange(event) {
+    this.rangeDateStart = moment(event.start).isValid() ? moment(event.start) : undefined;
+    this.rangeDateEnd = moment(event.end).isValid() ? moment(event.end) : undefined;
+  }
+
+  public selectTimeDurationHour(tab) {
+    this.datePipeFormat = 'MMM d h:mm a';
+    this.yearSelected = false;
+    this.activeTab = tab;
+    const currentTime = moment().format();
+    const start = moment(currentTime).add(-1, 'hours');
+    const end = moment(currentTime);
+    this.dateSettings.startDate = start;
+    this.dateSettings.endDate = end;
+    this.storage.set(DATE_SETTINGS_STORAGE_KEY, this.dateSettings).catch((err) => {
+      this.logger.error(err);
+    });
+    this.rangeDateStart = start;
+    this.rangeDateEnd = end;
+
+    this.deviceProvider.setSelectedRange('hour');
+    // this.loadChartData();
+  }
+
+  public selectTimeDurationDay(tab) {
+    this.datePipeFormat = 'MMM d h:mm a';
+    this.yearSelected = false;
+    this.activeTab = tab;
+    const currentTime = moment().format();
+    const start = moment(currentTime).add(-1, 'day');
+    const end = moment(currentTime);
+    this.dateSettings.startDate = start;
+    this.dateSettings.endDate = end;
+    this.storage.set(DATE_SETTINGS_STORAGE_KEY, this.dateSettings).catch((err) => {
+      this.logger.error(err);
+    });
+    this.rangeDateStart = start;
+    this.rangeDateEnd = end;
+
+    this.deviceProvider.setSelectedRange('day');
+    // this.loadChartData();
+  }
+
+  public selectTimeDurationWeek(tab) {
+    this.datePipeFormat = 'MMM d h:mm a';
+    this.yearSelected = false;
+    this.activeTab = tab;
+    const currentTime = moment().format();
+    const start = moment(currentTime).add(-1, 'week');
+    const end = moment(currentTime);
+
+    this.dateSettings.startDate = start;
+    this.dateSettings.endDate = end;
+    this.storage.set(DATE_SETTINGS_STORAGE_KEY, this.dateSettings).catch((err) => {
+      this.logger.error(err);
+    });
+    this.rangeDateStart = start;
+    this.rangeDateEnd = end;
+
+    this.deviceProvider.setSelectedRange('week');
+    // this.loadChartData();
+  }
+
+  public selectTimeDurationMonth(tab) {
+    this.datePipeFormat = 'MMM d h:mm a';
+    this.yearSelected = false;
+    this.activeTab = tab;
+    const currentTime = moment().format();
+    const start = moment(currentTime).add(-1, 'month');
+    const end = moment(currentTime);
+    this.dateSettings.startDate = start;
+    this.dateSettings.endDate = end;
+    this.storage.set(DATE_SETTINGS_STORAGE_KEY, this.dateSettings).catch((err) => {
+      this.logger.error(err);
+    });
+    this.rangeDateStart = start;
+    this.rangeDateEnd = end;
+
+    this.deviceProvider.setSelectedRange('month');
+    // this.loadChartData();
+  }
+
+  public selectTimeDurationYear(tab) {
+    if (this.dataYear.length <= 0) {
+      return;
+    }
+    this.datePipeFormat = 'MMM d, y, h:mm a';
+    this.yearSelected = true;
+    this.activeTab = tab;
+    const currentTime = moment().format();
+    const start = moment(currentTime).add(-1, 'year');
+    const end = moment(currentTime);
+    this.dateSettings.startDate = start;
+    this.dateSettings.endDate = end;
+    this.storage.set(DATE_SETTINGS_STORAGE_KEY, this.dateSettings).catch((err) => {
+      this.logger.error(err);
+    });
+    this.rangeDateStart = start;
+    this.rangeDateEnd = end;
+
+    this.deviceProvider.setSelectedRange('year');
+
+    // this.loadChartData();
+  }
+
+  fToC(type) {
+    if (this.tempUnit === type) {
+      return;
+    }
+    this.tempUnit = type;
+    const tempdata = JSON.stringify(this.chartData.temperature);
+    const data = JSON.parse(tempdata);
+
+    this.chartData.temperature = undefined;
+
+    data.forEach((item) => {
+      item.temperature = ((item.temperature - 32) * 5) / 9;
+    });
+
+    setTimeout(() => {
+      this.chartData.temperature = data;
+    }, 100);
+  }
+
+  cToF(type) {
+    if (this.tempUnit === type) {
+      return;
+    }
+    this.tempUnit = type;
+    const tempdata = JSON.stringify(this.chartData.temperature);
+    const data = JSON.parse(tempdata);
+
+    this.chartData.temperature = undefined;
+
+    data.forEach((item) => {
+      item.temperature = (item.temperature * 9) / 5 + 32;
+    });
+
+    setTimeout(() => {
+      this.chartData.temperature = data;
+    }, 100);
+  }
+
+  chageTHSType(type) {
+      this.thsType = type;
+  }
 }

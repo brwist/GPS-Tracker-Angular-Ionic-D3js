@@ -7,13 +7,13 @@
   color: #ababab;
 }
 
-.temperature-details-con {
+.humidity-details-con {
   padding-left: 50px;
   padding-right: 50px;
   padding-bottom: 18px;
 }
 
-.temperature-detail {
+.humidity-detail {
   padding: 3px;
   border-radius: 5px;
   background-color: #387ef5;
@@ -22,12 +22,12 @@
   position: absolute;
 }
 
-.temperature-detail .temperature-text {
+.humidity-detail .humidity-text {
   font-size: 9px;
   color: white;
 }
 
-.temperature-detail .triangle_down {
+.humidity-detail .triangle_down {
   position: absolute;
   width: 0;
   height: 0;
@@ -37,15 +37,15 @@
   font-size: 0;
   line-height: 0;
   float: left;
-  left: 45px;
+  left: 48px;
   margin-top: 2px;
 }
 
-.temperature-detail .vl {
+.humidity-detail .vl {
   position: absolute;
   border-left: 1px solid #387ef5;
   float: left;
-  left: 49px;
+  left: 53px;
   margin-top: 2px;
 }
 
@@ -67,6 +67,6 @@ ion-list {
   padding: 0px;
 }
 
-#stacked-area-temp {
-  margin-left: 35px !important;
+#stacked-area-volt {
+  margin-left: 35px;
 }

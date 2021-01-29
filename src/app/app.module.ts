@@ -110,6 +110,8 @@ import { HumidityConditionPage } from '../pages/rules/common/conditions/humidity
 import { TemperatureChartComponent } from '../pages/device/charts/temperature-chart/temperature-chart';
 import { VoltChartComponent } from '../pages/device/charts/volt-chart/volt-chart';
 import { DecimalPipe } from '@angular/common';
+import { HumidityChartComponent } from '../pages/device/charts/humidity/humidity-chart';
+import { BatteryChartComponent } from '../pages/device/charts/battery/battery-chart';
 
 // @mergeTHS
 Sentry.init({
@@ -161,6 +163,8 @@ Sentry.init({
         LatestVersionPage,
         TemperatureChartComponent,
         VoltChartComponent,
+        HumidityChartComponent,
+        BatteryChartComponent,
 
         TemperatureConditionPage,
         HumidityConditionPage,

@@ -120,6 +120,9 @@ export class DeviceProvider extends BaseProvider {
     private zoomDateRange = new BehaviorSubject<string>(undefined);
     $zoomDateRange = this.zoomDateRange.asObservable();
 
+    private chartType = new BehaviorSubject<string>(undefined);
+    $chartTypeRange = this.chartType.asObservable();
+
     public static codeToString(code: number) {
 
         switch (code) {
@@ -178,6 +181,10 @@ export class DeviceProvider extends BaseProvider {
 
     public setSelectedRange(type: string) {
         this.zoomDateRange.next(type);
+    }
+
+    public setChartType(type: string) {
+        this.chartType.next(type);
     }
 
     /**
