@@ -275,7 +275,7 @@ export class VoltChartComponent implements OnInit, OnDestroy {
 
     this.subscriptionZoomType$ = this.deviceProvider.$zoomChangeVolt.subscribe(val => {
       if(val) {
-        this.customeZoom(val);
+        // this.customeZoom(val);
       }
     });
   }
@@ -287,7 +287,7 @@ export class VoltChartComponent implements OnInit, OnDestroy {
   }
 
   rezoom(dateS, dateE) {
-    const width = this.width + this.margin.left + this.margin.right;
+    const width = this.width //+ this.margin.left + this.margin.right;
 
     this.svg.call(this.zoom)
       .transition()

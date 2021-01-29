@@ -275,7 +275,7 @@ export class TemperatureChartComponent implements OnInit, OnDestroy {
 
     this.subscriptionZoomType$ = this.deviceProvider.$zoomChangeTemp.subscribe(val => {
       if(val) {
-        this.customeZoom(val);
+        // this.customeZoom(val); //Not sure why customeZoom is added, D3 already handles zooming in zoomed function
       }
     });
   }
@@ -287,7 +287,7 @@ export class TemperatureChartComponent implements OnInit, OnDestroy {
   }
 
   rezoom(dateS, dateE) {
-    const width = this.width + this.margin.left + this.margin.right;
+    const width = this.width; //I removed "this.margin.left + this.margin.right" because x scale uses "this.width" as a length measurement
 
     this.svg.call(this.zoom)
       .transition()
