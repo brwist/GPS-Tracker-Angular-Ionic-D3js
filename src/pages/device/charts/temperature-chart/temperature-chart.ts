@@ -124,7 +124,7 @@ export class TemperatureChartComponent implements OnInit, OnDestroy {
       this.formatWeek = d3.timeFormat('%b-%d');
     }
     this.x = d3.scaleTime().range([0, this.width]);
-    this.y = d3.scaleLinear().rangeRound([this.height, 0]);
+    this.y = d3.scaleLinear().rangeRound([this.height, 0]); 
     this.xAxis = d3
       .axisBottom(this.x)
       .ticks((this.width / this.height) * 5)
