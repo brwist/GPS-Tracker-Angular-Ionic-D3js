@@ -76,7 +76,7 @@ export class TemperatureChartComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.width = window.innerWidth - this.margin.left - this.margin.right - 20;
-    this.height = 500 - this.margin.top - this.margin.bottom;
+    this.height = 400 - this.margin.top - this.margin.bottom;
     if(this.data.length <= 0) {
       this.noData = true;
     } else {
