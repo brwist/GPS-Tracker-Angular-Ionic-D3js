@@ -36,10 +36,10 @@
     <!--<ion-toggle color="secondary" [(ngModel)]="bucketPointLoading"></ion-toggle>-->
     <!--</ion-item>-->
     <!--<ion-item *ngIf="bucketPointLoading === false">-->
-    <ion-item>
+    <!-- <ion-item>
       <ion-label>Clusterize data points</ion-label>
       <ion-toggle color="secondary" [(ngModel)]="clusterizeDeviceMap"></ion-toggle>
-    </ion-item>
+    </ion-item> -->
     <ion-item>
       <ion-label>Night map</ion-label>
       <ion-toggle color="secondary" [(ngModel)]="nightModeEnabled"></ion-toggle>
@@ -55,11 +55,11 @@
   </ion-list>
 
   <ion-list>
-    <ion-list-header>Temperature</ion-list-header>
+    <ion-list-header>Temperature Unit</ion-list-header>
     <ion-item>
       <ion-select [(ngModel)]="temperatureFormat">
-        <ion-option value="F">°F</ion-option>
-        <ion-option value="C">°C</ion-option>
+        <ion-option value="F">Fahrenheit °F</ion-option>
+        <ion-option value="C">Celsius °C</ion-option>
       </ion-select>
     </ion-item>
   </ion-list>
