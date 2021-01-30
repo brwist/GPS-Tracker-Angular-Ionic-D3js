@@ -20,7 +20,7 @@
     color: black;
     cursor: pointer;
     &.active-tab {
-      background: #387ef5;
+      background-color: #387ef5 !important;
       color: white;
     }
   }
@@ -102,4 +102,16 @@ div.disabled {
 
 .chart-title {
   padding-left: 16px;
+}
+
+.night-them-tab ion-card {
+  background-color: #242424;
+}
+
+.night-them-tab ion-card-title {
+  color: #ffffff;
+}
+
+.night-them-tab .tabs-container_name {
+  background-color: #ffffff;
 }
