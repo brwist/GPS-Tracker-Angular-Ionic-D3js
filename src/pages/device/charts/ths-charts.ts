@@ -459,6 +459,7 @@ export class DeviceTHSChartsPage implements OnInit {
     if (this.tempUnit === type) {
       return;
     }
+    this.deviceProvider.setTempType(type);
     this.tempUnit = type;
     const tempdata = JSON.stringify(this.chartData.temperature);
     const data = JSON.parse(tempdata);
@@ -478,6 +479,7 @@ export class DeviceTHSChartsPage implements OnInit {
     if (this.tempUnit === type) {
       return;
     }
+    this.deviceProvider.setTempType(type);
     this.tempUnit = type;
     const tempdata = JSON.stringify(this.chartData.temperature);
     const data = JSON.parse(tempdata);

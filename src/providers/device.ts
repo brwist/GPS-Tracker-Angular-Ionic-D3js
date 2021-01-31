@@ -123,6 +123,9 @@ export class DeviceProvider extends BaseProvider {
     private chartType = new BehaviorSubject<string>(undefined);
     $chartTypeRange = this.chartType.asObservable();
 
+    private tempType = new BehaviorSubject<string>('fTemp');
+    $tempType = this.tempType.asObservable();
+
     public static codeToString(code: number) {
 
         switch (code) {
@@ -185,6 +188,10 @@ export class DeviceProvider extends BaseProvider {
 
     public setChartType(type: string) {
         this.chartType.next(type);
+    }
+
+    public setTempType(type: string) {
+        this.tempType.next(type);
     }
 
     /**

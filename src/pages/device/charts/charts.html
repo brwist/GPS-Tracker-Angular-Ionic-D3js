@@ -80,8 +80,8 @@
         <button ion-button item-right color="light" [ngClass]="{'active': thsType === 'humidity'}" (click)="chageTHSType('humidity')">Humidity</button>
         <button ion-button item-right color="light" [ngClass]="{'active': thsType === 'battery'}" (click)="chageTHSType('battery')">Battery</button>
       </ion-item>
-      <page-humidity-chart [data]="chartData?.humidity" *ngIf="chartData.humidity && thsType === 'humidity'"></page-humidity-chart>
-      <page-battery-chart [data]="chartData?.battery" *ngIf="chartData.battery && thsType === 'battery'"></page-battery-chart>
+      <page-humidity-chart [data]="chartData?.humidity" *ngIf="chartData.humidity && thsType === 'humidity'" [tempType]="tempUnit"></page-humidity-chart>
+      <page-battery-chart [data]="chartData?.battery" *ngIf="chartData.battery && thsType === 'battery'" [tempType]="tempUnit"></page-battery-chart>
     </ion-card-content>
   </ion-card>
 </ion-content>
