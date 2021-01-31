@@ -244,7 +244,7 @@ export class DevicesPage extends BaseComponent {
         const value = event.target.value;
 
         if (value && value.trim() !== '') {
-            this.searchString = value.toLowerCase();
+            this.searchString = value;
         } else {
             this.searchString = '';
         }
@@ -301,7 +301,7 @@ export class DevicesPage extends BaseComponent {
 
             if (this.searchString) {
 
-                filter.search = this.searchString;
+                filter.search = this.searchString.toLowerCase();;
             }
 
             if (this.sorting) {
@@ -420,7 +420,7 @@ export class DevicesPage extends BaseComponent {
 
         if (this.searchString) {
 
-            filter.search = this.searchString;
+            filter.search = this.searchString.toLowerCase();;
         }
 
         if (this.sorting) {
