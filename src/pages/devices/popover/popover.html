@@ -21,6 +21,16 @@
     Last seen
   </button>
 
+  <button ion-item detail-none (click)="sort('name', 'asc')" [class.active]="isActive('name', 'asc')">
+    <ion-icon item-start name="arrow-round-down"></ion-icon>
+    Name
+  </button>
+
+  <button ion-item detail-none (click)="sort('name', 'desc')" [class.active]="isActive('name', 'desc')">
+    <ion-icon item-start name="arrow-round-up"></ion-icon>
+    Name
+  </button>
+
   <button ion-item detail-none (click)="sort('firmware', 'asc')" [class.active]="isActive('firmware', 'asc')">
     <ion-icon item-start name="arrow-round-down"></ion-icon>
     Firmware

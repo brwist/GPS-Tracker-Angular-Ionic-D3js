@@ -2,7 +2,7 @@
   <ion-navbar>
 
     <ion-title>
-      <ng-container *ngIf="feature === 'tracking-modes'">Trakkit Modes</ng-container>
+      <ng-container *ngIf="feature === 'tracking-modes'">Trakkit GPS Modes</ng-container>
       <ng-container *ngIf="feature === 'rules'">Rules</ng-container>
       <ng-container *ngIf="feature === 'measurements'">Measurements</ng-container>
       <ng-container *ngIf="feature === 'tracks'">Tracks</ng-container>
@@ -28,9 +28,9 @@
     <p>
       While motion is detected, Trakkit checks for WiFi every 2 minutes.
       <br>
-      If an open WiFi is found, Trakkit records and shows its WiFi position (<span class="blue">blue</span> dots).
+      If an open WiFi is found, Trakkit sends its WiFi location (<span class="blue">blue</span> dots).
       <br>
-      This is the estimated position based on the location of the WiFi source. GPS is not used.
+      This is an estimated location based on the location of the WiFi router. GPS is not used.
       <br>
       Typical battery life is 2 months.
     </p>
@@ -38,7 +38,7 @@
     <h5>GPS Tracking</h5>
 
     <p>
-      Trakkit checks for WiFi every 2 minutes.
+      Same as WiFi Tracking mode, except the GPS is used for precise location.
       <br>
       If an open WiFi is found, Trakkit records and shows its GPS position (<span class="red">red</span> dots).
       <br>
@@ -51,13 +51,13 @@
     <h5>GPS Logging</h5>
 
     <p>
-      Logs Trakkit’s GPS position every minute, while moving.
+      Logs Trakkit’s GPS position every minute, while motion is detected.
       <br>
       When Trakkit senses no motion, it checks for WiFi and if it finds one it will try to check in
       (you'll see a <span class="red">red</span> dot if position is GPS based or <span class="blue">blue</span>
       dot if position is WiFi based).
       <br>
-      When you reach a Home WiFi, previously configured, Trakkit uploads all its GPS Logging data
+      If you are near a Home WiFi, previously configured, Trakkit uploads all its GPS Logging data
       (<span class="black">black</span> dots).
       <br>
       Logging Data includes: Time, Location, Speed, Heading, Motion Level, and Temperature
@@ -71,7 +71,7 @@
 
     <h5>Rule Configuration</h5>
     <p>
-      Add Rules that will trigger Alerts.
+      Create and Manage Rules that will trigger Alerts.
       <br>
       For example, you can set Motion Alerts, Geo-Fence (Inside or Outside), Speed, or Temperature Alerts
     </p>
@@ -92,7 +92,7 @@
 
     <h5>Tracks Data</h5>
     <p>
-      This shows your raw tracks data.
+      This shows your raw tracks location data.
       <br>
     </p>
 
@@ -102,7 +102,7 @@
 
     <h5>View Charts</h5>
     <p>
-      View Charts of your Battery level or Temperature.
+      View Charts of your Temperatures and other data.
       <br>
     </p>
 
@@ -122,7 +122,7 @@
 
     <h5>Sharing</h5>
     <p>
-      This feature allows you to Share your Trakkit information with a friend who also has the Trakkit App installed.
+      This feature allows you to Share your Trakkit information with a friend if they have the Trakkit App installed.
       <br>
       Once you share your Trakkit with them, they will be able to set Rules and Trigger Alerts, but will not be able
       to change or Edit any of your settings.
