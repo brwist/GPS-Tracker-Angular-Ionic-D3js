@@ -64,6 +64,7 @@ export class DeviceTHSChartsPage implements OnInit {
   isGps: boolean;
   maxPeriodAvailable: number;
   loadingMessage: string = 'Sending request';
+  isNightTheme: boolean;
 
   constructor(
     private logger: Logger,
@@ -75,7 +76,8 @@ export class DeviceTHSChartsPage implements OnInit {
     private trackProvider: TrackProvider,
     private apiProvider: ApiProvider,
     private deviceProvider: DeviceProvider,
-    private measProvider: MeasurementProvider
+    private measProvider: MeasurementProvider,
+    private settingsProvider: Settings
   ) {
     this.isGps = false;
     this.deviceProvider.setChartType('gps');
@@ -83,6 +85,10 @@ export class DeviceTHSChartsPage implements OnInit {
   }
 
   public ngOnInit() {
+    this.settingsProvider.getActiveTheme().take(1).subscribe((theme: string) => {
+      this.isNightTheme = theme === 'night-theme' ? true : false;
+      console.log(theme);
+    });
     this.storage
       .set(MAX_ITEMS_PER_DAY_STORAGE_KEY, 'All')
       .then(() => {
@@ -453,6 +459,7 @@ export class DeviceTHSChartsPage implements OnInit {
     if (this.tempUnit === type) {
       return;
     }
+    this.deviceProvider.setTempType(type);
     this.tempUnit = type;
     const tempdata = JSON.stringify(this.chartData.temperature);
     const data = JSON.parse(tempdata);
@@ -472,6 +479,7 @@ export class DeviceTHSChartsPage implements OnInit {
     if (this.tempUnit === type) {
       return;
     }
+    this.deviceProvider.setTempType(type);
     this.tempUnit = type;
     const tempdata = JSON.stringify(this.chartData.temperature);
     const data = JSON.parse(tempdata);

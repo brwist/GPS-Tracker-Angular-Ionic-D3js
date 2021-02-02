@@ -94,22 +94,22 @@ export class MyApp {
       }
     });
 
-    this.network.onchange().subscribe({
-      next: (async ({ type }) => {
-        logger.info(`TrakkitConfigPage:network.onchange: Connection type = ${type}`);
-
-        const isAvailable = await this.trakkitProvider.isAvailable();
-        logger.info(`TrakkitConfigPage: is available device? ${isAvailable}`);
-
-        if (isAvailable) {
-          setTimeout((x) => {
-            this.openTrakkitConfigPage();
-          }, 200);
-        }
-      })
-    });
-
     platform.ready().then(() => {
+      this.network.onchange().subscribe({
+        next: (async ({ type }) => {
+          logger.info(`TrakkitConfigPage:network.onchange: Connection type = ${type}`);
+
+          const isAvailable = await this.trakkitProvider.isAvailable();
+          logger.info(`TrakkitConfigPage: is available device? ${isAvailable}`);
+
+          if (isAvailable) {
+            setTimeout((x) => {
+              this.openTrakkitConfigPage();
+            }, 200);
+          }
+        })
+      });
+
       // Okay, so the platform is ready and our plugins are available.
       // Here you can do any higher level native things you might need.
 

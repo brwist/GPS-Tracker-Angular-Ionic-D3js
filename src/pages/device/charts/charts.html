@@ -2,32 +2,10 @@
   <ion-navbar>
     <ion-title>{{ device?.name }} Charts</ion-title>
   </ion-navbar>
-  <!-- <ion-toolbar>
-    <ion-segment [(ngModel)]="chartType">
-
-      <ion-segment-button
-        *ngFor="let type of chartTypes"
-        value="{{type.value}}"
-      >
-        {{type.label}}
-      </ion-segment-button>
-    </ion-segment>
-  </ion-toolbar> -->
 </ion-header>
 
 
-<ion-content>
-  <!-- <div *ngIf="dataLoading" class="applying-search">
-    <ion-spinner></ion-spinner>
-  </div> -->
-
-  <!-- <div
-    *ngIf="!chartData"
-    class="loading"
-  >
-    <ion-spinner></ion-spinner>
-  </div> -->
-
+<ion-content [ngClass]="{'night-them-tab':isNightTheme}">
   <ion-card class="tabs-container-card">
     <ion-card-content>
       <div class="tabs-container">
@@ -102,8 +80,8 @@
         <button ion-button item-right color="light" [ngClass]="{'active': thsType === 'humidity'}" (click)="chageTHSType('humidity')">Humidity</button>
         <button ion-button item-right color="light" [ngClass]="{'active': thsType === 'battery'}" (click)="chageTHSType('battery')">Battery</button>
       </ion-item>
-      <page-humidity-chart [data]="chartData?.humidity" *ngIf="chartData.humidity && thsType === 'humidity'"></page-humidity-chart>
-      <page-battery-chart [data]="chartData?.battery" *ngIf="chartData.battery && thsType === 'battery'"></page-battery-chart>
+      <page-humidity-chart [data]="chartData?.humidity" *ngIf="chartData.humidity && thsType === 'humidity'" [tempType]="tempUnit"></page-humidity-chart>
+      <page-battery-chart [data]="chartData?.battery" *ngIf="chartData.battery && thsType === 'battery'" [tempType]="tempUnit"></page-battery-chart>
     </ion-card-content>
   </ion-card>
 </ion-content>

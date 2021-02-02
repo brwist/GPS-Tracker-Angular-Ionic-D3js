@@ -82,6 +82,12 @@
         class="dates"
       >
         <div (click)="presentDateSettings()">
+          <ion-icon
+          color="primary"
+          item-left
+          name="calendar"
+          class="icon item-icon"
+        ></ion-icon>
           {{ dateRangeString }}
         </div>
         <ion-note
@@ -152,7 +158,7 @@
         <h2>Time</h2>
 
         <ion-note item-right>
-          {{ shownTrack.timestamp | amDateFormat: 'dddd, MMMM Do, h:mm:ss a' }}
+          {{ shownTrack.timestamp | amDateFormat: 'MMMM Do, h:mm:ss a' }}
         </ion-note>
       </ion-item>
 
@@ -176,7 +182,7 @@
         <h2>GPS Time</h2>
 
         <ion-note item-right>
-          {{ shownTrack.gpsTime | amDateFormat: 'dddd, MMMM Do, h:mm:ss a' }}
+          {{ shownTrack.gpsTime | amDateFormat: 'MMMM Do, h:mm:ss a' }}
         </ion-note>
       </ion-item>
 
@@ -291,60 +297,6 @@
 
     </ion-list>
 
-    <ion-list class="feature-list">
-      <ion-item
-        detail-none
-        class="tracks"
-      >
-        <div (click)="goDeviceTracksPage()">
-          <ion-icon
-            color="primary"
-            item-left
-            name="pin"
-            class="icon item-icon"
-          ></ion-icon>
-          Tracks
-        </div>
-        <ion-note
-          item-right
-          (click)="showItemHelp('tracks')"
-        >
-          <ion-icon
-            color="primary"
-            name="ios-help-circle-outline"
-            class="icon"
-          ></ion-icon>
-        </ion-note>
-      </ion-item>
-    </ion-list>
-
-    <ion-list
-      *ngIf="device"
-      class="tracking-options feature-list"
-    >
-      <ion-item detail-none>
-        <div (click)="openDeviceTrackingOptionsModal()">
-          <ion-icon
-            color="primary"
-            item-left
-            name="eye"
-            class="icon item-icon"
-          ></ion-icon>
-          Tracking options
-        </div>
-        <ion-note
-          item-right
-          (click)="showItemHelp('tracking-options', device.sharedAccess)"
-        >
-          <ion-icon
-            color="primary"
-            name="ios-help-circle-outline"
-            class="icon"
-          ></ion-icon>
-        </ion-note>
-      </ion-item>
-    </ion-list>
-
   </ng-container>
 
   <ion-list *ngIf="device && !isGps && showDetails && device.lastMeasurement as lastMeasurement">
@@ -382,13 +334,40 @@
     </ion-item>
 
     <ion-item *ngIf="lastMeasurement.createdAt">
-      <h2>Created Time</h2>
+      <h2>Last Event</h2>
 
       <ion-note item-right>
-        {{ lastMeasurement.createdAt | amDateFormat: 'dddd, MMMM Do, HH:mm:ss'}}
+        {{ lastMeasurement.createdAt | amDateFormat: 'MMMM Do, HH:mm:ss'}}
       </ion-note>
     </ion-item>
 
+  </ion-list>
+
+  <ion-list class="feature-list">
+    <ion-item
+      detail-none
+      class="charts"
+    >
+      <div (click)="goDeviceChartsPage()">
+        <ion-icon
+          color="primary"
+          item-left
+          name="stats"
+          class="icon item-icon"
+        ></ion-icon>
+        Charts
+      </div>
+      <ion-note
+        item-right
+        (click)="showItemHelp('charts')"
+      >
+        <ion-icon
+          color="primary"
+          name="ios-help-circle-outline"
+          class="icon"
+        ></ion-icon>
+      </ion-note>
+    </ion-item>
   </ion-list>
 
   <ion-list class="feature-list">
@@ -417,6 +396,64 @@
       </ion-note>
     </ion-item>
   </ion-list>
+
+<ng-container *ngIf="isGps">
+
+  <ion-list class="feature-list">
+    <ion-item
+      detail-none
+      class="tracks"
+    >
+      <div (click)="goDeviceTracksPage()">
+        <ion-icon
+          color="primary"
+          item-left
+          name="pin"
+          class="icon item-icon"
+        ></ion-icon>
+        Tracks
+      </div>
+      <ion-note
+        item-right
+        (click)="showItemHelp('tracks')"
+      >
+        <ion-icon
+          color="primary"
+          name="ios-help-circle-outline"
+          class="icon"
+        ></ion-icon>
+      </ion-note>
+    </ion-item>
+  </ion-list>
+
+  <ion-list
+    *ngIf="device"
+    class="tracking-options feature-list"
+  >
+    <ion-item detail-none>
+      <div (click)="openDeviceTrackingOptionsModal()">
+        <ion-icon
+          color="primary"
+          item-left
+          name="eye"
+          class="icon item-icon"
+        ></ion-icon>
+        Tracking options
+      </div>
+      <ion-note
+        item-right
+        (click)="showItemHelp('tracking-options', device.sharedAccess)"
+      >
+        <ion-icon
+          color="primary"
+          name="ios-help-circle-outline"
+          class="icon"
+        ></ion-icon>
+      </ion-note>
+    </ion-item>
+  </ion-list>
+
+</ng-container>
 
   <ion-list
     *ngIf="!isGps"
@@ -448,32 +485,6 @@
     </ion-item>
   </ion-list>
 
-  <ion-list class="feature-list">
-    <ion-item
-      detail-none
-      class="charts"
-    >
-      <div (click)="goDeviceChartsPage()">
-        <ion-icon
-          color="primary"
-          item-left
-          name="stats"
-          class="icon item-icon"
-        ></ion-icon>
-        Charts
-      </div>
-      <ion-note
-        item-right
-        (click)="showItemHelp('charts')"
-      >
-        <ion-icon
-          color="primary"
-          name="ios-help-circle-outline"
-          class="icon"
-        ></ion-icon>
-      </ion-note>
-    </ion-item>
-  </ion-list>
 
   <ion-list
     padding-bottom

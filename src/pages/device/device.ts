@@ -216,7 +216,7 @@ export class DevicePage implements OnInit {
     get showDetails() {
         const storedValue = localStorage.getItem(SHOW_DETAILS_KEY + `-${this.id}`);
 
-        return storedValue ? storedValue === 'true' : true;
+        return storedValue ? storedValue === 'true' : false;
     }
 
     set showDetails(value) {

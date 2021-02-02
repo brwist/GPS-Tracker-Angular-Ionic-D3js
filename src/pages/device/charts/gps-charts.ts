@@ -3,6 +3,7 @@ import { AlertPage } from '../alert/alert';
 import { LoadingController, NavParams, NavController, ModalController, Loading } from 'ionic-angular';
 import { AlertsPopoverPage } from './popover';
 import { Logger } from '../../../providers/logger';
+import { ISettings, Settings } from '../../../providers/settings';
 import { DeviceProvider, IDevice, ITrack } from '../../../providers/device';
 import { TrackProvider } from '../../../providers/track';
 import { TrackPage } from './track';
@@ -78,6 +79,7 @@ export class DeviceGPSChartsPage implements OnInit {
     isGps: boolean;
     maxPeriodAvailable: number;
     loadingMessage: string = 'Sending request';
+    isNightTheme: boolean;
 
     constructor(private logger: Logger,
                 private params: NavParams,
@@ -87,7 +89,8 @@ export class DeviceGPSChartsPage implements OnInit {
                 private modalCtrl: ModalController,
                 private trackProvider: TrackProvider,
                 private apiProvider: ApiProvider,
-                private deviceProvider: DeviceProvider) {
+                private deviceProvider: DeviceProvider,
+                private settingsProvider: Settings) {
 
         this.isGps = true;
         this.deviceProvider.setChartType('gps');
@@ -95,6 +98,10 @@ export class DeviceGPSChartsPage implements OnInit {
     }
 
     public ngOnInit() {
+        this.settingsProvider.getActiveTheme().take(1).subscribe((theme: string) => {
+            this.isNightTheme = theme === 'night-theme' ? true : false;
+        });
+
         this.storage.set(MAX_ITEMS_PER_DAY_STORAGE_KEY, "All").then(() => {
 
             this.maxNumberOfPointsModel = "All";
@@ -508,6 +515,7 @@ export class DeviceGPSChartsPage implements OnInit {
         if(this.tempUnit === type) {
             return;
         }
+        this.deviceProvider.setTempType(type);
         this.tempUnit = type;
         const tempdata = JSON.stringify(this.chartData.temperature);
         const data = JSON.parse(tempdata);
@@ -528,6 +536,7 @@ export class DeviceGPSChartsPage implements OnInit {
         if(this.tempUnit === type) {
             return;
         }
+        this.deviceProvider.setTempType(type);
         this.tempUnit = type;
         const tempdata = JSON.stringify(this.chartData.temperature);
         const data = JSON.parse(tempdata);
