@@ -301,7 +301,7 @@ export class DevicesPage extends BaseComponent {
 
             if (this.searchString) {
 
-                filter.search = this.searchString.toLowerCase();;
+                filter.search = this.searchString.toLowerCase();
             }
 
             if (this.sorting) {
@@ -420,7 +420,7 @@ export class DevicesPage extends BaseComponent {
 
         if (this.searchString) {
 
-            filter.search = this.searchString.toLowerCase();;
+            filter.search = this.searchString.toLowerCase();
         }
 
         if (this.sorting) {

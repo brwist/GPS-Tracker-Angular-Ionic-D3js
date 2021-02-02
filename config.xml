@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="com.zedly.trakkit" version="1.23.0" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Trakkit</name>
-    <description>GPS Tracker App</description>
+    <description>GPS and Sensor Products</description>
     <author email="bushevuv@gmail.com" href="https://github.com/bushev">Zedly, Inc</author>
     <content src="index.html" />
     <access origin="*" />
@@ -38,7 +38,7 @@
         <splash density="port-xhdpi" src="resources/android/splash/drawable-port-xhdpi-screen.png" />
         <splash density="port-xxhdpi" src="resources/android/splash/drawable-port-xxhdpi-screen.png" />
         <splash density="port-xxxhdpi" src="resources/android/splash/drawable-port-xxxhdpi-screen.png" />
-        <resource-file src="google-services.json" target="google-services.json" />
+        <resource-file src="google-services.json" target="app/google-services.json" />
     </platform>
     <platform name="ios">
         <allow-intent href="itms:*" />
@@ -110,7 +110,7 @@
     <preference name="UIWebViewBounce" value="false" />
     <preference name="DisallowOverscroll" value="true" />
     <preference name="android-minSdkVersion" value="22" />
-    <preference name="android-targetSdkVersion" value="24" />
+    <preference name="android-targetSdkVersion" value="29" />
     <preference name="BackupWebStorage" value="none" />
     <preference name="SplashMaintainAspectRatio" value="true" />
     <preference name="FadeSplashScreenDuration" value="0" />
@@ -147,8 +147,9 @@
     <plugin name="cordova-plugin-uniquedeviceid" spec="https://github.com/massaroni/uniquedeviceid" />
     <plugin name="cordova-plugin-add-swift-support" spec="2.0.2" />
     <plugin name="cordova-open-native-settings" spec="1.5.2" />
-    <engine name="android" spec="7.1.4" />
     <plugin name="cordova-plugin-networkinterface" spec="2.0.0" />
     <plugin name="cordova-plugin-network-information" spec="2.0.2" />
+    <allow-navigation href="http://localhost:8100" sessionid="0d099a62" />
+    <engine name="android" spec="8.1.0" />
     <engine name="ios" spec="5.1.1" />
 </widget>
