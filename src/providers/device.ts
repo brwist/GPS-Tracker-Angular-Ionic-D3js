@@ -102,8 +102,6 @@ export const statusCodes = [{
     name: 'Locate'
 }];
 
-export const TYPES = ['GPS', 'THS'];
-
 export interface SelectedRange {
     start: number;
     end: number;

@@ -22,25 +22,25 @@ export class RulesPage {
     private pagination: IPagination;
 
     constructor(private navCtrl: NavController,
-                private ruleProvider: RuleProvider,
-                private loadingCtrl: LoadingController,
-                private popoverCtrl: PopoverController,
-                private alertCtrl: AlertController,
-                private params: NavParams) {
+        private ruleProvider: RuleProvider,
+        private loadingCtrl: LoadingController,
+        private popoverCtrl: PopoverController,
+        private alertCtrl: AlertController,
+        private params: NavParams) {
 
         this.device = this.params.get('device');
     }
 
     public doRefresh(refresher: Refresher) {
 
-        this.loadRules({pagination: {page: 1}}, refresher);
+        this.loadRules({ pagination: { page: 1 } }, refresher);
     }
 
     public doInfinite(infiniteScroll) {
 
         if (this.pagination.nextPage) {
 
-            this.ruleProvider.getList({pagination: {page: this.pagination.nextPage}}).then((data: any) => {
+            this.ruleProvider.getList({ pagination: { page: this.pagination.nextPage } }).then((data: any) => {
 
                 data.items = this.prepareRules(data.items);
 
@@ -107,15 +107,14 @@ export class RulesPage {
 
         this.popoverCtrl.create(RulesPopoverPage, {
             newRuleCallback: () => {
-
-                this.navCtrl.push(RulesEditorPage, {deviceId: this.device ? this.device.id : undefined});
+                this.navCtrl.push(RulesEditorPage, { device: this.device });
             }
-        }).present({ev});
+        }).present({ ev });
     }
 
     public goEditRulePage(id) {
 
-        this.navCtrl.push(RulesEditorPage, {id});
+        this.navCtrl.push(RulesEditorPage, { id });
     }
 
     public removeRule(rule: IRule, slidingItem: ItemSliding) {
@@ -143,12 +142,12 @@ export class RulesPage {
 
     public ionViewDidEnter() {
 
-        this.loadRules({pagination: {page: 1}});
+        this.loadRules({ pagination: { page: 1 } });
     }
 
     private loadRules(options, refresher?: Refresher) {
 
-        const loader = this.loadingCtrl.create({content: `Loading rules`});
+        const loader = this.loadingCtrl.create({ content: `Loading rules` });
 
         // noinspection JSIgnoredPromiseFromCall
         loader.present();
@@ -171,7 +170,7 @@ export class RulesPage {
 
             if (refresher) refresher.complete();
 
-            this.rules      = this.prepareRules(data.items);
+            this.rules = this.prepareRules(data.items);
             this.pagination = data.pagination;
 
         }).catch(() => {
@@ -192,10 +191,10 @@ export class RulesPage {
             let separator;
 
             if (rule.conditions.all) {
-                separator  = 'AND';
+                separator = 'AND';
                 conditions = rule.conditions.all;
             } else {
-                separator  = 'OR';
+                separator = 'OR';
                 conditions = rule.conditions.any;
             }
 
