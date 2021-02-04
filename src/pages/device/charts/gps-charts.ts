@@ -311,7 +311,9 @@ export class DeviceGPSChartsPage implements OnInit {
 
     private renderCharts() {
         this.loadingMessage = 'Processing data';
-        this.loader.setContent(this.loadingMessage);
+        if(this.loader) {
+            this.loader.setContent(this.loadingMessage);
+        }
         if(this.yearSelected) {
             this.data = undefined;
             this.loadData(this.dataYear);
