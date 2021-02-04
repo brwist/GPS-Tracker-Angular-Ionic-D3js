@@ -1,3 +1,11 @@
 .track-dialogue-button {
   color: color($colors, danger);
 }
+
+ion-alert {
+  .alert-button.disabled {
+    cursor: none;
+    color: #666 !important;
+    background-color: unset !important;
+  }
+}

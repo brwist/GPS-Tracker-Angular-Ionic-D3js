@@ -13,7 +13,7 @@ declare const cordova;
 })
 export class TrakkitConfigPage {
 
-    public title: string = 'Trakkit Configuration';
+    public title: string = 'Trakkit Setup';
 
     public error: boolean;
 
