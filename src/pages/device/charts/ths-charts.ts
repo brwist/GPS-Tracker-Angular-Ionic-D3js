@@ -55,7 +55,7 @@ export class DeviceTHSChartsPage implements OnInit {
 
   private startDate: any;
   private endDate: any;
-  private yearSelected = false;
+  // private yearSelected = false;
   private loader: Loading;
   yearPoints: any;
   tempUnit = 'fTemp';
@@ -70,10 +70,7 @@ export class DeviceTHSChartsPage implements OnInit {
     private logger: Logger,
     private params: NavParams,
     private loadingCtrl: LoadingController,
-    private navCtrl: NavController,
     private storage: Storage,
-    private modalCtrl: ModalController,
-    private trackProvider: TrackProvider,
     private apiProvider: ApiProvider,
     private deviceProvider: DeviceProvider,
     private measProvider: MeasurementProvider,
@@ -160,30 +157,7 @@ export class DeviceTHSChartsPage implements OnInit {
 
   private loadChartData() {
     this.showLoader();
-    if (moment(this.dateSettings.startDate).isSame(this.dateSettings.endDate)) {
-      this.dateSettings.startDate = moment(this.dateSettings.startDate).add(-1, 'hours');
-    }
-
-    if (this.dateSettings.startDate && moment(this.dateSettings.startDate).isValid()) {
-      this.startDate = this.dateSettings.startDate;
-    } else {
-      this.startDate = moment().subtract(1, 'day');
-    }
-
-    if (this.dateSettings.endDate && moment(this.dateSettings.endDate).isValid()) {
-      this.endDate = this.dateSettings.endDate;
-    } else {
-      this.endDate = moment();
-    }
-
-    const select = ['temperature', 'battery', 'humidity', 'createdAt'];
-
-    var duration = moment.duration(this.endDate.diff(this.startDate));
-    var hours = duration.asHours();
-    if (hours === 1) {
-      this.yearSelected = true;
-      this.loadChartYear();
-    }
+    this.loadChartYear();
   }
 
   private showLoader() {
@@ -252,33 +226,20 @@ export class DeviceTHSChartsPage implements OnInit {
     if(this.loader) {
       this.loader.setContent(this.loadingMessage);
     }
-    if (this.yearSelected) {
-      this.data = undefined;
+    setTimeout(() => {
       this.loadData(this.dataYear);
-    } else {
-      this.loadData(this.data);
-    }
+    },);
   }
 
   loadData(data) {
     let points;
-    if (!data) {
+    if (!data || data.length <= 0) {
+      console.log('no data');
       return;
     }
 
     this.groupedBy = null;
-    if (!this.yearSelected) {
-      points = data.items.map((item: IMeasurement) => {
-        return {
-          timestamp: item.createdAt,
-          temperature: item.temperature,
-          battery: item.battery,
-          humidity: item.humidity
-        };
-      });
-    } else {
-      points = data;
-    }
+    points = data;
 
     this.chartData = {};
     setTimeout(() => {
@@ -358,7 +319,6 @@ export class DeviceTHSChartsPage implements OnInit {
 
   public selectTimeDurationHour(tab) {
     this.datePipeFormat = 'MMM d h:mm a';
-    this.yearSelected = false;
     this.activeTab = tab;
     const currentTime = moment().format();
     const start = moment(currentTime).add(-1, 'hours');
@@ -377,7 +337,6 @@ export class DeviceTHSChartsPage implements OnInit {
 
   public selectTimeDurationDay(tab) {
     this.datePipeFormat = 'MMM d h:mm a';
-    this.yearSelected = false;
     this.activeTab = tab;
     const currentTime = moment().format();
     const start = moment(currentTime).add(-1, 'day');
@@ -396,7 +355,6 @@ export class DeviceTHSChartsPage implements OnInit {
 
   public selectTimeDurationWeek(tab) {
     this.datePipeFormat = 'MMM d h:mm a';
-    this.yearSelected = false;
     this.activeTab = tab;
     const currentTime = moment().format();
     const start = moment(currentTime).add(-1, 'week');
@@ -416,7 +374,6 @@ export class DeviceTHSChartsPage implements OnInit {
 
   public selectTimeDurationMonth(tab) {
     this.datePipeFormat = 'MMM d h:mm a';
-    this.yearSelected = false;
     this.activeTab = tab;
     const currentTime = moment().format();
     const start = moment(currentTime).add(-1, 'month');
@@ -438,7 +395,6 @@ export class DeviceTHSChartsPage implements OnInit {
       return;
     }
     this.datePipeFormat = 'MMM d, y, h:mm a';
-    this.yearSelected = true;
     this.activeTab = tab;
     const currentTime = moment().format();
     const start = moment(currentTime).add(-1, 'year');
