@@ -87,7 +87,6 @@ export class DeviceTHSChartsPage implements OnInit {
   public ngOnInit() {
     this.settingsProvider.getActiveTheme().take(1).subscribe((theme: string) => {
       this.isNightTheme = theme === 'night-theme' ? true : false;
-      console.log(theme);
     });
     this.storage
       .set(MAX_ITEMS_PER_DAY_STORAGE_KEY, 'All')
