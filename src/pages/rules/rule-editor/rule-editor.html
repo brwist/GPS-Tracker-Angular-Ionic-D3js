@@ -14,9 +14,9 @@
 
 <ion-content class="outer-content">
 
-  <div *ngIf="rule">
+  <div *ngIf="rule" padding-top>
 
-    <ion-list padding-top>
+    <ion-list padding-top *ngIf="!device && deviceTypes.length > 1">
       <ion-item>
         <ion-label>Device Type</ion-label>
         <ion-select
@@ -35,8 +35,6 @@
     </ion-list>
 
     <ion-list>
-      <ion-list-header>General</ion-list-header>
-
       <ion-item>
         <ion-label>Name</ion-label>
         <ion-input type="text" [(ngModel)]="rule.name"></ion-input>

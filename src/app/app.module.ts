@@ -40,7 +40,7 @@ import { DevicesPopoverPage } from '../pages/devices/popover';
 import { DevicePage } from '../pages/device/device';
 import { DateSettingsPage } from '../pages/device/date-settings';
 import { DeviceTracksPage } from '../pages/device/tracks';
-import { DeviceGPSChartsPage , DeviceTHSChartsPage} from '../pages/device/charts';
+import { DeviceGPSChartsPage, DeviceTHSChartsPage } from '../pages/device/charts';
 import { HelpModal } from '../pages/device/help-modal';
 import { TrackPage } from '../pages/device/tracks/track';
 import { RulesPage } from '../pages/rules';
@@ -110,13 +110,16 @@ import { HumidityConditionPage } from '../pages/rules/common/conditions/humidity
 import { TemperatureChartComponent } from '../pages/device/charts/temperature-chart/temperature-chart';
 import { VoltChartComponent } from '../pages/device/charts/volt-chart/volt-chart';
 import { DecimalPipe } from '@angular/common';
+import { environment } from '../environments/environment';
 import { HumidityChartComponent } from '../pages/device/charts/humidity/humidity-chart';
 import { BatteryChartComponent } from '../pages/device/charts/battery/battery-chart';
 
-// @mergeTHS
-Sentry.init({
-    dsn: 'https://d8f1c773c46d4b6c91ad8604bc4f90b1@sentry.io/2299214'
-});
+if (environment.production) {
+    // @mergeTHS
+    Sentry.init({
+        dsn: 'https://d8f1c773c46d4b6c91ad8604bc4f90b1@sentry.io/2299214'
+    });
+}
 
 @NgModule({
     declarations: [

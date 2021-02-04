@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { RuleProvider, IRule } from '../../../providers/rule';
 import { NavController, NavParams, AlertController, ItemSliding, LoadingController } from 'ionic-angular';
 import { TemperatureConditionPage } from '../common/conditions/temperature/temperature';
@@ -27,7 +27,7 @@ import { ActionFactory } from '../../../app/actions/action-factory';
 import { BatteryCondition } from '../../../app/conditions/battery';
 import { StateChangeCondition } from '../../../app/conditions/change-state';
 import { ReeferHoursCondition } from '../../../app/conditions/reefer-hours';
-import { DeviceProvider, IDevice, TYPES } from '../../../providers/device';
+import { DeviceProvider, DeviceType, IDevice } from '../../../providers/device';
 import { ApiProvider, IUserInfo } from '../../../providers/api';
 import { Subscription } from 'rxjs/Subscription';
 import { Geolocation, Geoposition } from '@ionic-native/geolocation';
@@ -43,6 +43,7 @@ import { HumidityCondition } from '../../../app/conditions/humidity';
     templateUrl: 'rule-editor.html'
 })
 export class RulesEditorPage implements OnInit, OnDestroy {
+    @Input() device: IDevice = this.params.get('device');
 
     public rule: IRule;
 
@@ -60,7 +61,7 @@ export class RulesEditorPage implements OnInit, OnDestroy {
 
     public searchDevicesString: string;
 
-    public deviceTypes = TYPES;
+    public deviceTypes: DeviceType[] = [];
 
     private ruleId: string;
 
@@ -86,32 +87,31 @@ export class RulesEditorPage implements OnInit, OnDestroy {
         private alertCtrl: AlertController
     ) {
 
-        this.ruleId = this.params.get('id');
-
-        if (this.ruleId) {
-
-            this.loadRule();
-
-        } else {
-
-            this.rule = {
-                name: 'New rule',
-                enabled: true,
-                devices: [],
-                devicesType: 'GPS'
-            };
-
-            if (this.params.get('deviceId')) {
-
-                this.rule.devices = [this.params.get('deviceId')];
-            }
-        }
-
         this.deviceProvider
             .getList({ select: ['id', 'name', 'type'], pagination: { limit: 1000 } })
             .then((data: any) => {
                 this.devices = data.items;
                 this.allDevices = data.items;
+
+                this.deviceTypes = Array.from(new Set(this.allDevices.map(device => device.type)));
+
+                this.ruleId = this.params.get('id');
+
+                if (this.ruleId) {
+                    this.loadRule();
+                } else {
+                    this.rule = {
+                        name: 'New rule',
+                        enabled: true,
+                        devices: [],
+                        devicesType: this.deviceTypes[0]
+                    };
+
+                    if (this.device) {
+                        this.rule.devicesType = this.device.type;
+                        this.rule.devices = [this.device.id];
+                    }
+                }
             });
     }
 
@@ -374,25 +374,28 @@ export class RulesEditorPage implements OnInit, OnDestroy {
 
         alert.addButton({
             text: 'SMS',
+            cssClass: 'disabled',
+            // @TODO  In the Add Actions menu for the Rule, gray out the SMS option until we have Plivo text alerts working
             handler: (data) => {
+                return false;
 
-                if (this.phones.length === 0) {
+                // if (this.phones.length === 0) {
 
-                    this.alertCtrl.create({
-                        title: 'Verify Phone number',
-                        subTitle: 'At least one verified Phone number is required',
-                        buttons: ['Ok']
-                    }).present();
+                //     this.alertCtrl.create({
+                //         title: 'Verify Phone number',
+                //         subTitle: 'At least one verified Phone number is required',
+                //         buttons: ['Ok']
+                //     }).present();
 
-                    return;
-                }
+                //     return;
+                // }
 
-                this.navCtrl.push(SmsActionPage, {
-                    phones: this.phones,
-                    callback: (action: SmsAction) => {
-                        this.actions.push(action);
-                    }
-                });
+                // this.navCtrl.push(SmsActionPage, {
+                //     phones: this.phones,
+                //     callback: (action: SmsAction) => {
+                //         this.actions.push(action);
+                //     }
+                // });
             }
         });
 
@@ -687,14 +690,15 @@ export class RulesEditorPage implements OnInit, OnDestroy {
     }
 
     public save() {
+        if (this.rule.devices.length === 0) {
+            return alert('Please, add at least 1 device');
+        }
 
         if (this.conditions.length === 0) {
-
             return alert('Please, add at least 1 condition');
         }
 
         if (this.actions.length === 0) {
-
             return alert('Please, add at least 1 action');
         }
 

@@ -9,7 +9,7 @@ rm -rf platforms/android/build/outputs/apk/* && \
         -keystore /Users/rayzik/work/projects/zedly/gps-tracker-key.keystore \
         platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk alias_name && \
     ~/Library/Android/sdk/build-tools/29.0.2/zipalign -v 4 platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk \
-        platforms/android/app/build/outputs/apk/release/Trakkit-1.23.0.apk && \
+        platforms/android/app/build/outputs/apk/release/Trakkit-1.23.1.apk && \
     open platforms/android/app/build/outputs/apk/release
 
  # -keystore /Users/bushev/Dropbox/UpWork/gps-tracker/gps-tracker-key.keystore \
