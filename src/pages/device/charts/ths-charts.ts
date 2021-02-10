@@ -14,6 +14,7 @@ import { ChartBase } from './chart.base';
 
 const DATE_SETTINGS_STORAGE_KEY = 'device-date-settings-for-charts';
 const MAX_ITEMS_PER_DAY_STORAGE_KEY = 'max-items-per-day';
+const SETTINGS_STORAGE_TOKEN = 'settings';
 
 import * as async from 'async';
 import { Subscription } from 'rxjs';
@@ -65,6 +66,7 @@ export class DeviceTHSChartsPage implements OnInit {
   maxPeriodAvailable: number;
   loadingMessage: string = 'Sending request';
   isNightTheme: boolean;
+  allSettings: ISettings;
 
   constructor(
     private logger: Logger,
@@ -147,6 +149,17 @@ export class DeviceTHSChartsPage implements OnInit {
     this.userSubscription = this.apiProvider.user.subscribe((user: IUserInfo) => {
       if (user && user.timeZone) {
         this.timeZone = user.timeZone;
+      }
+    });
+
+    this.storage.get(SETTINGS_STORAGE_TOKEN).then((settings: ISettings) => {
+      console.log(settings);
+      this.allSettings = settings;
+      if (!settings.temperatureFormat) {
+        this.allSettings.temperatureFormat = 'F';
+        this.settingsProvider.saveSettings(this.allSettings);
+      } else {
+        this.tempUnit = settings.temperatureFormat === 'C' ? 'cTemp' : 'fTemp';
       }
     });
   }
@@ -416,6 +429,8 @@ export class DeviceTHSChartsPage implements OnInit {
     if (this.tempUnit === type) {
       return;
     }
+    this.allSettings.temperatureFormat = 'C';
+    this.settingsProvider.saveSettings(this.allSettings);
     this.deviceProvider.setTempType(type);
     this.tempUnit = type;
     const tempdata = JSON.stringify(this.chartData.temperature);
@@ -436,6 +451,8 @@ export class DeviceTHSChartsPage implements OnInit {
     if (this.tempUnit === type) {
       return;
     }
+    this.allSettings.temperatureFormat = 'F';
+    this.settingsProvider.saveSettings(this.allSettings);
     this.deviceProvider.setTempType(type);
     this.tempUnit = type;
     const tempdata = JSON.stringify(this.chartData.temperature);
