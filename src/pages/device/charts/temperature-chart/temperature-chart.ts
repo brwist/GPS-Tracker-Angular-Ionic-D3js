@@ -336,7 +336,7 @@ export class TemperatureChartComponent implements OnInit, OnDestroy {
 
     let yright;
 
-    if (this.data[iR] !== undefined) {
+    if (this.data[iR] !== undefined && this.data[iR - 1] !== undefined) {
       yright = this.data[iR].temperature ? this.data[iR].temperature : this.data[iR-1].temperature;
     } 
 
