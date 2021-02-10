@@ -35,7 +35,7 @@ export const API_INFO: {
 
     // Staging
     // PROTOCOL: 'https',
-    // HOST: 'trakkit-app-api.mobibean.com'
+    // HOST: 'trakkit-app-api.mobibean.com',
 
     // HOST: '192.168.2.28' // Kow
     // HOST: '192.168.1.33', // a
