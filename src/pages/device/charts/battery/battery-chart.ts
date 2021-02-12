@@ -386,7 +386,7 @@ export class BatteryChartComponent implements OnInit, OnDestroy {
     
     this.chartBody.selectAll('path').attr('d', newLine);
     this.voronoiGroup.attr('transform', d3.event.transform);
-    // this.setYdomain();
+    this.setYdomain();
     this.deviceProvider.zoomedTemp(event);
   }
 

@@ -153,7 +153,6 @@ export class DeviceTHSChartsPage implements OnInit {
     });
 
     this.storage.get(SETTINGS_STORAGE_TOKEN).then((settings: ISettings) => {
-      console.log(settings);
       this.allSettings = settings;
       if (!settings.temperatureFormat) {
         this.allSettings.temperatureFormat = 'F';
