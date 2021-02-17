@@ -476,8 +476,7 @@ export class DeviceGPSChartsPage extends BaseComponent implements OnInit {
         if(this.tempUnit === type) {
             return;
         }
-        this.allSettings.temperatureFormat = 'C';
-        this.settingsProvider.saveSettings(this.allSettings);
+        this.settingsProvider.convertTemperature();
         this.deviceProvider.setTempType(type);
         this.tempUnit = type;
         const tempdata = JSON.stringify(this.chartData.temperature);
@@ -499,8 +498,7 @@ export class DeviceGPSChartsPage extends BaseComponent implements OnInit {
         if(this.tempUnit === type) {
             return;
         }
-        this.allSettings.temperatureFormat = 'F';
-        this.settingsProvider.saveSettings(this.allSettings);
+        this.settingsProvider.convertTemperature();
         this.deviceProvider.setTempType(type);
         this.tempUnit = type;
         const tempdata = JSON.stringify(this.chartData.temperature);
