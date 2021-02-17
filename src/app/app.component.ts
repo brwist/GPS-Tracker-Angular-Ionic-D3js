@@ -332,6 +332,12 @@ export class MyApp {
       return;
     }
 
+    if (typeof err.error === 'string') {
+      try {
+        err.error = JSON.parse(err.error);
+      } catch (error) { }
+    }
+
     if (err.status === 400 && err.error && err.error.error) {
       this.alertCtrl
         .create({
@@ -375,6 +381,7 @@ export class MyApp {
 
     try {
       errorString = err.json().error;
+
     } catch (err2) {
       // ignore
       errorString = JSON.stringify(err);

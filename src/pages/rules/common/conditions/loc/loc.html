@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-navbar>
+
+    <ion-title>Loss of Communication</ion-title>
+
+    <ion-buttons end>
+      <button ion-button (click)="save()" color="primary">
+        Save
+      </button>
+    </ion-buttons>
+
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="outer-content">
+
+  <ion-list>
+    <ion-item>
+      <ion-label>Value</ion-label>
+      <ion-input [(ngModel)]="condition.value" [disabled]="!condition.enabled"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>Enabled</ion-label>
+      <ion-toggle color="secondary" [(ngModel)]="condition.enabled"></ion-toggle>
+    </ion-item>
+  </ion-list>
+
+</ion-content>

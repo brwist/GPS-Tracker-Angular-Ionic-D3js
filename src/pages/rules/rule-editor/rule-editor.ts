@@ -37,6 +37,8 @@ import { SpeedConditionPage } from '../common/conditions/speed/speed';
 import { SpeedCondition } from '../../../app/conditions/speed';
 import { HumidityConditionPage } from '../common/conditions/humidity/humidity';
 import { HumidityCondition } from '../../../app/conditions/humidity';
+import { LoCConditionPage } from '../common/conditions/loc/loc';
+import { LoCCondition } from '../../../app/conditions/loc';
 
 @Component({
     selector: 'page-rule-editor',
@@ -53,7 +55,7 @@ export class RulesEditorPage implements OnInit, OnDestroy {
 
     public _devices: IDevice[] = [];
     public get devices(): IDevice[] {
-        return this._devices.filter((device: IDevice) => device.type === this.rule.devicesType);
+        return this._devices.filter((device: IDevice) => device.type === this.rule.deviceType);
     }
     public set devices(value: IDevice[]) {
         this._devices = value;
@@ -89,7 +91,7 @@ export class RulesEditorPage implements OnInit, OnDestroy {
 
         this.deviceProvider
             .getList({ select: ['id', 'name', 'type'], pagination: { limit: 1000 } })
-            .then((data: any) => {
+            .then(async (data: any) => {
                 this.devices = data.items;
                 this.allDevices = data.items;
 
@@ -98,17 +100,19 @@ export class RulesEditorPage implements OnInit, OnDestroy {
                 this.ruleId = this.params.get('id');
 
                 if (this.ruleId) {
-                    this.loadRule();
+                    await this.loadRule();
+                    const ruleDeviceId = this.rule.devices[0];
+                    this.rule.deviceType = ruleDeviceId ? this.allDevices.find(device => device.id === ruleDeviceId).type : this.deviceTypes[0];
                 } else {
                     this.rule = {
                         name: 'New rule',
                         enabled: true,
                         devices: [],
-                        devicesType: this.deviceTypes[0]
+                        deviceType: this.deviceTypes[0]
                     };
 
                     if (this.device) {
-                        this.rule.devicesType = this.device.type;
+                        this.rule.deviceType = this.device.type;
                         this.rule.devices = [this.device.id];
                     }
                 }
@@ -201,7 +205,7 @@ export class RulesEditorPage implements OnInit, OnDestroy {
 
         alert.setTitle('Add new condition');
 
-        if (this.rule.devicesType === 'GPS') {
+        if (this.rule.deviceType === 'GPS') {
 
             alert.addButton({
                 text: 'Geo zone',
@@ -308,6 +312,17 @@ export class RulesEditorPage implements OnInit, OnDestroy {
                 handler: (data) => {
                     this.navCtrl.push(TemperatureConditionPage, {
                         callback: (condition: TemperatureCondition) => {
+                            this.conditions.push(condition);
+                        }
+                    });
+                }
+            });
+
+            alert.addButton({
+                text: 'Loss of Communication',
+                handler: (data) => {
+                    this.navCtrl.push(LoCConditionPage, {
+                        callback: (condition: LocalForageOptions) => {
                             this.conditions.push(condition);
                         }
                     });
@@ -428,7 +443,7 @@ export class RulesEditorPage implements OnInit, OnDestroy {
 
     public goEditConditionPage(condition) {
 
-        if (this.rule.devicesType === 'GPS') {
+        if (this.rule.deviceType === 'GPS') {
 
             switch (condition.conditionType) {
                 case 'geoZone':
@@ -529,6 +544,14 @@ export class RulesEditorPage implements OnInit, OnDestroy {
                     this.navCtrl.push(HumidityConditionPage, {
                         condition,
                         callback: (cond: HumidityCondition) => {
+                            this.doUpdateCondition(cond);
+                        }
+                    });
+                    break;
+                case 'lossOfCommunication':
+                    this.navCtrl.push(LoCConditionPage, {
+                        condition,
+                        callback: (cond: LoCCondition) => {
                             this.doUpdateCondition(cond);
                         }
                     });
@@ -732,51 +755,56 @@ export class RulesEditorPage implements OnInit, OnDestroy {
     }
 
     private loadRule() {
-
-        const loader = this.loadingCtrl.create({ content: `Loading rule` });
-
-        // noinspection JSIgnoredPromiseFromCall
-        loader.present();
-
-        this.ruleProvider.getItem(this.ruleId).then((rule: IRule) => {
+        return new Promise((resolve, reject) => {
+            const loader = this.loadingCtrl.create({ content: `Loading rule` });
 
             // noinspection JSIgnoredPromiseFromCall
-            loader.dismiss();
+            loader.present();
 
-            this.rule = rule;
+            this.ruleProvider.getItem(this.ruleId).then((rule: IRule) => {
 
-            if (this.rule.conditions) {
+                // noinspection JSIgnoredPromiseFromCall
+                loader.dismiss();
 
-                if (this.rule.conditions.any) {
+                this.rule = rule;
 
-                    this.match = 'any';
-                    this.conditions = this.rule.conditions.any;
+                if (this.rule.conditions) {
 
-                } else if (this.rule.conditions.all) {
+                    if (this.rule.conditions.any) {
 
-                    this.match = 'all';
-                    this.conditions = this.rule.conditions.all;
+                        this.match = 'any';
+                        this.conditions = this.rule.conditions.any;
 
-                } else {
+                    } else if (this.rule.conditions.all) {
 
-                    console.log(`Unexpected conditions group`);
+                        this.match = 'all';
+                        this.conditions = this.rule.conditions.all;
+
+                    } else {
+
+                        console.log(`Unexpected conditions group`);
+                    }
+
+                    this.conditions = this.conditions.map((conditionData) => {
+
+                        return ConditionFactory.createCondition(conditionData);
+                    });
                 }
 
-                this.conditions = this.conditions.map((conditionData) => {
+                this.actions = this.rule.actions.map((actionData) => {
 
-                    return ConditionFactory.createCondition(conditionData);
+                    return ActionFactory.createAction(actionData);
                 });
-            }
 
-            this.actions = this.rule.actions.map((actionData) => {
+                resolve(this.rule);
 
-                return ActionFactory.createAction(actionData);
+            }).catch((err) => {
+                // noinspection JSIgnoredPromiseFromCall
+                loader.dismiss();
+                console.log(err);
+                reject(err);
             });
 
-        }).catch((err) => {
-            // noinspection JSIgnoredPromiseFromCall
-            loader.dismiss();
-            console.log(err);
         });
     }
 

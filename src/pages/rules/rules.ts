@@ -171,9 +171,12 @@ export class RulesPage {
             if (refresher) refresher.complete();
 
             this.rules = this.prepareRules(data.items);
+
             this.pagination = data.pagination;
 
-        }).catch(() => {
+        }).catch((er) => {
+            console.error(er);
+            
             loader.dismiss().catch((err) => {
                 console.error(err);
             });
@@ -199,7 +202,6 @@ export class RulesPage {
             }
 
             conditions.forEach((conditionData) => {
-
                 explanationArr.push(ConditionFactory.createCondition(conditionData).getExplanation());
             });
 

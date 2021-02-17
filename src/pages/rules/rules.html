@@ -27,7 +27,7 @@
     No Rules found
   </div>
 
-  <ion-list>
+  <ion-list *ngIf="rules.length !== 0">
 
     <ion-item-sliding *ngFor="let rule of rules" #slidingItem>
 

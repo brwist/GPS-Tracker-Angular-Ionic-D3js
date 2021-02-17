@@ -52,7 +52,20 @@
       </ion-item-options>
 
       <ion-item-options side="right">
-        <button ion-button color="danger" (click)="removeItem(item)">
+        <button
+          *ngIf="!item.seen && isTHS(item.device?.type)"
+          ion-button
+          color="secondary"
+          (click)="snoozeItem(item, ItemSliding)"
+        >
+          Snooze
+        </button>
+      
+        <button
+          ion-button
+          color="danger"
+          (click)="removeItem(item)"
+        >
           <ion-icon name="close"></ion-icon>
           Delete
         </button>
