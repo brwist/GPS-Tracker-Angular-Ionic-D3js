@@ -21,13 +21,14 @@ import { Subscription } from 'rxjs';
 import { IDateSettings } from '../device';
 import { TrackProvider } from '../../../providers/track';
 import { DateSettingsPage } from '../date-settings';
+import { BaseComponent } from '../../../app/base-component';
 
 @Component({
   selector: 'page-ths-charts',
   templateUrl: 'charts.html',
   providers: [FormatTempPipe]
 })
-export class DeviceTHSChartsPage implements OnInit {
+export class DeviceTHSChartsPage extends BaseComponent implements OnInit {
   public chartData: any = {};
   public groupedBy: string;
   public pointsTotal: number;
@@ -78,6 +79,7 @@ export class DeviceTHSChartsPage implements OnInit {
     private measProvider: MeasurementProvider,
     private settingsProvider: Settings
   ) {
+    super();
     this.isGps = false;
     this.deviceProvider.setChartType('gps');
     this.device = this.params.get('device');
@@ -152,7 +154,7 @@ export class DeviceTHSChartsPage implements OnInit {
       }
     });
 
-    this.storage.get(SETTINGS_STORAGE_TOKEN).then((settings: ISettings) => {
+    this.sub = this.settingsProvider.settings.subscribe((settings: ISettings) => {
       this.allSettings = settings;
       if (!settings.temperatureFormat) {
         this.allSettings.temperatureFormat = 'F';
