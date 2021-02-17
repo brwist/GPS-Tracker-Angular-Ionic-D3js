@@ -113,6 +113,7 @@ import { DecimalPipe } from '@angular/common';
 import { environment } from '../environments/environment';
 import { HumidityChartComponent } from '../pages/device/charts/humidity/humidity-chart';
 import { BatteryChartComponent } from '../pages/device/charts/battery/battery-chart';
+import { LoCConditionPage } from '../pages/rules/common/conditions/loc/loc';
 
 if (environment.production) {
     // @mergeTHS
@@ -179,6 +180,7 @@ if (environment.production) {
         BatteryConditionPage,
         StateChangeConditionPage,
         ReeferHoursConditionPage,
+        LoCConditionPage,
 
         EmailActionPage,
         SmsActionPage,
@@ -257,6 +259,7 @@ if (environment.production) {
         BatteryConditionPage,
         StateChangeConditionPage,
         ReeferHoursConditionPage,
+        LoCConditionPage,
 
         EmailActionPage,
         SmsActionPage,

@@ -3,7 +3,8 @@ import { AlertPage } from './alert/alert';
 import { NotificationPage } from './notification';
 import {
     NavController, PopoverController, Refresher, ToastController, LoadingController,
-    ItemSliding
+    ItemSliding,
+    AlertController
 } from 'ionic-angular';
 import { IPagination } from '../../providers/base';
 import { AlertProvider, IAlert } from '../../providers/alert';
@@ -12,6 +13,7 @@ import { Logger } from '../../providers/logger';
 import { INotification, NotificationProvider } from '../../providers/notification';
 
 import * as moment from 'moment';
+import { DeviceProvider } from '../../providers/device';
 
 @Component({
     selector: 'page-alerts-and-notifications',
@@ -28,13 +30,17 @@ export class AlertsAndNotificationsPage {
     private notificationsPagination: IPagination;
     private pageLimit = 30;
 
+    public isTHS = DeviceProvider.isTHS;
+
     constructor(private navCtrl: NavController,
-                private popoverCtrl: PopoverController,
-                private toastCtrl: ToastController,
-                private logger: Logger,
-                private loadingCtrl: LoadingController,
-                private alertProvider: AlertProvider,
-                private notificationProvider: NotificationProvider) {
+        private popoverCtrl: PopoverController,
+        private toastCtrl: ToastController,
+        private logger: Logger,
+        private loadingCtrl: LoadingController,
+        private alertProvider: AlertProvider,
+        private notificationProvider: NotificationProvider,
+        private deviceProvider: DeviceProvider,
+        private alertCtrl: AlertController,) {
 
     }
 
@@ -43,8 +49,8 @@ export class AlertsAndNotificationsPage {
         try {
 
             await Promise.all([
-                this.loadAlerts({pagination: {page: 1, limit: this.pageLimit}}),
-                this.loadNotifications({pagination: {page: 1, limit: this.pageLimit}})
+                this.loadAlerts({ pagination: { page: 1, limit: this.pageLimit } }),
+                this.loadNotifications({ pagination: { page: 1, limit: this.pageLimit } })
             ]);
 
             this.alertsAndNotifications = [
@@ -129,6 +135,32 @@ export class AlertsAndNotificationsPage {
         infiniteScroll.complete();
     }
 
+    snoozeItem(item: IAlert, itemSliding: ItemSliding) {
+        this.alertCtrl.create({
+            title: 'Snooze For N hours',
+            message: 'Enter value in hours',
+            inputs: [{
+                name: 'hours',
+                placeholder: 'Hours',
+                value: '3'
+            }],
+            buttons: [{
+                text: 'Cancel'
+            }, {
+                text: 'Save',
+                handler: ({ hours }) => {
+                    this.deviceProvider.snoozeAlerts(item.device.id, Number(hours))
+                        .then(() => {
+                            console.log('OK');
+                            itemSliding.close();
+                        }).catch((err) => {
+                            this.logger.error(err);
+                        })
+                }
+            }]
+        }).present();
+    }
+
     public removeItem(item) {
 
         if (this.isAlert(item)) {
@@ -186,12 +218,12 @@ export class AlertsAndNotificationsPage {
 
     public goAlertPage(id) {
 
-        this.navCtrl.push(AlertPage, {id});
+        this.navCtrl.push(AlertPage, { id });
     }
 
     public goNotificationPage(id) {
 
-        this.navCtrl.push(NotificationPage, {id});
+        this.navCtrl.push(NotificationPage, { id });
     }
 
     public async ionViewDidEnter() {
@@ -199,8 +231,8 @@ export class AlertsAndNotificationsPage {
         try {
 
             await Promise.all([
-                this.loadAlerts({pagination: {page: 1, limit: this.pageLimit}}),
-                this.loadNotifications({pagination: {page: 1, limit: this.pageLimit}})
+                this.loadAlerts({ pagination: { page: 1, limit: this.pageLimit } }),
+                this.loadNotifications({ pagination: { page: 1, limit: this.pageLimit } })
             ]);
 
             this.alertsAndNotifications = [
@@ -225,7 +257,7 @@ export class AlertsAndNotificationsPage {
             clearAllCallback: () => {
                 this.clearAll();
             }
-        }).present({ev});
+        }).present({ ev });
     }
 
     public isAlert(item: IAlert | INotification) {
@@ -237,7 +269,7 @@ export class AlertsAndNotificationsPage {
 
         return new Promise((resolve, reject) => {
 
-            const loader = this.loadingCtrl.create({content: `Loading alerts`});
+            const loader = this.loadingCtrl.create({ content: `Loading alerts` });
 
             // noinspection JSIgnoredPromiseFromCall
             loader.present();
@@ -250,7 +282,7 @@ export class AlertsAndNotificationsPage {
                 this.alerts = data.items;
                 this.alertsPagination = data.pagination;
 
-                resolve();
+                resolve(true);
 
             }).catch((err) => {
                 // noinspection JSIgnoredPromiseFromCall
@@ -270,7 +302,7 @@ export class AlertsAndNotificationsPage {
                 this.notifications = data.items;
                 this.notificationsPagination = data.pagination;
 
-                resolve();
+                resolve(true);
 
             }).catch((err) => {
                 console.log(err);

@@ -14,7 +14,7 @@ export interface IRule {
     conditions?: any;
     actions?: any[];
     explanation?: string;
-    devicesType: DeviceType;
+    deviceType: DeviceType;
 }
 
 @Injectable()

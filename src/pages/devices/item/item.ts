@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import * as moment from 'moment';
 import { Subscription } from 'rxjs';
 import { IDevice, ITrack } from '../../../providers/device';
 import { ISettings, Settings } from '../../../providers/settings';
@@ -35,6 +36,12 @@ export class DevicesListItemComponent {
     public onRemove = new EventEmitter();
 
     public settingsSubscription: Subscription;
+
+    get snoozed() {
+        if (!this.device || !this.device.snoozeTo) return false;
+
+        return moment(this.device.snoozeTo).isAfter(moment());
+    }
 
     constructor(
         public settingsProvider: Settings

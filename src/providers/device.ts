@@ -60,6 +60,7 @@ export interface IDevice {
     sharedAccess?: boolean;
     firstAlert?: IFirstAlert;
     type: DeviceType;
+    snoozeTo?: string;
 }
 
 export interface IFirstAlert {
@@ -109,6 +110,14 @@ export interface SelectedRange {
 
 @Injectable()
 export class DeviceProvider extends BaseProvider {
+    static isGPS(type) {
+        return String(type).toLowerCase() === 'gps';
+    }
+
+    static isTHS(type) {
+        return String(type).toLowerCase() === 'ths';
+    }
+    
     private zoomChangeTemp = new BehaviorSubject<any>(undefined);
     $zoomChangeTemp = this.zoomChangeTemp.asObservable();
 
@@ -169,6 +178,12 @@ export class DeviceProvider extends BaseProvider {
 
         return this.applyActionV2(ApiProvider.obtainRequestUrl(`devices/${device.id}/stop-sharing-device`), {
             email
+        });
+    }
+
+    public snoozeAlerts(deviceId: string, snoozeFor: number) {
+        return this.applyActionV2(ApiProvider.obtainRequestUrl(`devices/${deviceId}/snooze-alerts`), {
+            snoozeFor
         });
     }
 

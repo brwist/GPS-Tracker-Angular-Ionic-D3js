@@ -29,7 +29,7 @@
           <p class="delimiter">/</p>
           <p class="battery">Battery: {{ measurement.battery | number: '1.1-1' }}%</p>
         </div>
-       
+
       </ion-label>
       <ion-note item-right>
         <div class="date">
@@ -43,4 +43,8 @@
       </ion-note>
     </ion-item>
   </ion-list>
+
+  <ion-infinite-scroll (ionInfinite)="doInfinite($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 </ion-content>

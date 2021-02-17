@@ -1,9 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { NavController, AlertController, LoadingController, ItemSliding } from 'ionic-angular';
-import { ApiProvider, IUserInfo, IExtraEmail, IAddExtraEmailData } from '../../../providers/api';
-import { SignUpPage } from '../signup';
-import { SigninPage } from '../signin';
-import { AccountEditPage } from './edit/account-edit';
+import { AlertController, ItemSliding, LoadingController, NavController } from 'ionic-angular';
+import { ApiProvider, IAddExtraEmailData, IExtraEmail, IUserInfo } from '../../../providers/api';
 import { AccountEmailPage } from '../email/email';
 
 @Component({
@@ -15,10 +12,10 @@ export class AccountEmailsPage implements OnInit {
     public user: IUserInfo;
 
     constructor(private nav: NavController,
-                private apiProvider: ApiProvider,
-                private alertCtrl: AlertController,
-                private loadingCtrl: LoadingController,
-                private navCtrl: NavController) {
+        private apiProvider: ApiProvider,
+        private alertCtrl: AlertController,
+        private loadingCtrl: LoadingController,
+        private navCtrl: NavController) {
 
         // -
     }
@@ -40,16 +37,20 @@ export class AccountEmailsPage implements OnInit {
             message: `Enter new E-mail address`,
             inputs: [{
                 name: 'email',
-                placeholder: 'E-mail'
+                placeholder: 'E-mail',
+                type: 'email'
             }],
             buttons: [{
                 text: 'Cancel'
             }, {
                 text: 'Save',
                 handler: (data) => {
+                    const email = String(data.email).trim();
+
+                    if (!email) return;
 
                     this.addExtraEmail({
-                        email: data.email
+                        email
                     });
                 }
             }]
@@ -77,7 +78,7 @@ export class AccountEmailsPage implements OnInit {
 
     private addExtraEmail(addExtraEmailData: IAddExtraEmailData) {
 
-        const loader = this.loadingCtrl.create({content: `Adding E-mail`});
+        const loader = this.loadingCtrl.create({ content: `Adding E-mail` });
 
         // noinspection JSIgnoredPromiseFromCall
         loader.present();
@@ -96,7 +97,7 @@ export class AccountEmailsPage implements OnInit {
 
     private removeExtraEmail(email: IExtraEmail) {
 
-        const loader = this.loadingCtrl.create({content: `Removing E-mail`});
+        const loader = this.loadingCtrl.create({ content: `Removing E-mail` });
 
         // noinspection JSIgnoredPromiseFromCall
         loader.present();

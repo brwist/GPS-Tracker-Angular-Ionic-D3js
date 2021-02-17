@@ -8,6 +8,7 @@ import { BatteryCondition } from './battery';
 import { SpeedCondition } from './speed';
 import { ReeferHoursCondition } from './reefer-hours';
 import { HumidityCondition } from './humidity';
+import { LoCCondition } from './loc';
 
 export interface IAbstractCondition {
     conditionType: string;
@@ -43,6 +44,8 @@ export class ConditionFactory {
                 return new BatteryCondition(conditionData);
             case 'reeferHours':
                 return new ReeferHoursCondition(conditionData);
+            case 'lossOfCommunication':
+                return new LoCCondition(conditionData);
             default:
                 throw new Error(`ConditionFactory::createCondition: Unexpected condition type ${conditionData.type}`);
         }

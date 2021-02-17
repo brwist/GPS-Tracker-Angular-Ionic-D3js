@@ -17,10 +17,10 @@
       <ng-template #THS>
         <div class="ths-preview">
           <ng-container *ngIf="device.lastMeasurement; else NoMeasurement">
-            <div class="temperature">{{ 
-              device.lastMeasurement.temperature 
+            <div class="temperature">{{
+              device.lastMeasurement.temperature
               | formatTemperature:settings.temperatureFormat
-            }} °{{ settings.temperatureFormat }}</div>
+              }} °{{ settings.temperatureFormat }}</div>
             <div class="line"></div>
             <div class="humidity">{{ device.lastMeasurement.humidity | number: '1.1-1'}}%</div>
           </ng-container>
@@ -58,6 +58,10 @@
       </p>
 
       <p *ngIf="device.lastSeen">Last seen: {{ device.lastSeen | amTimeAgo }}</p>
+      <div *ngIf="snoozed" class="snooze-msg">
+        <p>Alerts snoozed until</p>
+        <p>{{ device.snoozeTo | amDateFormat: 'MM/DD/YYYY, hh:mm a' }}</p>
+      </div>
     </ion-label>
   </button>
 

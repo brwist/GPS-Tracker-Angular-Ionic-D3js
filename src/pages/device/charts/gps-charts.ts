@@ -16,6 +16,7 @@ import { Subscription } from 'rxjs/Rx';
 import * as moment from 'moment';
 import * as momentTimezone from 'moment-timezone';
 import * as async from 'async';
+import { BaseComponent } from '../../../app/base-component';
 
 const DATE_SETTINGS_STORAGE_KEY     = 'device-date-settings-for-charts';
 const MAX_ITEMS_PER_DAY_STORAGE_KEY = 'max-items-per-day';
@@ -25,7 +26,7 @@ const SETTINGS_STORAGE_TOKEN = 'settings';
     selector: 'page-charts',
     templateUrl: 'charts.html'
 })
-export class DeviceGPSChartsPage implements OnInit {
+export class DeviceGPSChartsPage extends BaseComponent implements OnInit {
     public chartData: any = {};
     public groupedBy: string;
     public pointsTotal: number;
@@ -94,6 +95,7 @@ export class DeviceGPSChartsPage implements OnInit {
                 private deviceProvider: DeviceProvider,
                 private settingsProvider: Settings) {
 
+        super();
         this.isGps = true;
         this.deviceProvider.setChartType('gps');
         this.device = this.params.get('device');
@@ -171,8 +173,7 @@ export class DeviceGPSChartsPage implements OnInit {
             }
         });
 
-        this.storage.get(SETTINGS_STORAGE_TOKEN).then((settings: ISettings) => {
-            console.log(settings);
+        this.sub = this.settingsProvider.settings.subscribe((settings: ISettings) => {
             this.allSettings = settings;
             if (!settings.temperatureFormat) {
                 this.allSettings.temperatureFormat = 'F';
@@ -475,8 +476,7 @@ export class DeviceGPSChartsPage implements OnInit {
         if(this.tempUnit === type) {
             return;
         }
-        this.allSettings.temperatureFormat = 'C';
-        this.settingsProvider.saveSettings(this.allSettings);
+        this.settingsProvider.convertTemperature();
         this.deviceProvider.setTempType(type);
         this.tempUnit = type;
         const tempdata = JSON.stringify(this.chartData.temperature);
@@ -498,8 +498,7 @@ export class DeviceGPSChartsPage implements OnInit {
         if(this.tempUnit === type) {
             return;
         }
-        this.allSettings.temperatureFormat = 'F';
-        this.settingsProvider.saveSettings(this.allSettings);
+        this.settingsProvider.convertTemperature();
         this.deviceProvider.setTempType(type);
         this.tempUnit = type;
         const tempdata = JSON.stringify(this.chartData.temperature);
