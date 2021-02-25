@@ -13,7 +13,7 @@ import { Logger } from '../../providers/logger';
 import { INotification, NotificationProvider } from '../../providers/notification';
 
 import * as moment from 'moment';
-import { DeviceProvider } from '../../providers/device';
+import { DeviceProvider, IDevice } from '../../providers/device';
 
 @Component({
     selector: 'page-alerts-and-notifications',
@@ -135,6 +135,12 @@ export class AlertsAndNotificationsPage {
         infiniteScroll.complete();
     }
 
+    snoozed(device: IDevice) {
+        if (!device || !device.snoozeTo) return false;
+
+        return moment(device.snoozeTo).isSameOrAfter(moment());
+    }
+
     snoozeItem(item: IAlert, itemSliding: ItemSliding) {
         this.alertCtrl.create({
             title: 'Snooze For N hours',
@@ -149,7 +155,11 @@ export class AlertsAndNotificationsPage {
             }, {
                 text: 'Save',
                 handler: ({ hours }) => {
-                    this.deviceProvider.snoozeAlerts(item.device.id, Number(hours))
+                    hours = Number(hours);
+
+                    if (hours < 1) return;
+
+                    this.deviceProvider.snoozeAlerts(item.device.id, hours)
                         .then(() => {
                             console.log('OK');
                             itemSliding.close();

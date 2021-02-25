@@ -29,6 +29,28 @@
   <ion-list>
 
     <ion-item-sliding *ngFor="let item of alertsAndNotifications" #ItemSliding>
+      <ion-item-options
+        side="left"
+        (ionSwipe)="markAsSeen(item, ItemSliding)"
+      >
+        <button
+          ion-button
+          expandable
+          color="primary"
+        >
+          <ion-icon name="eye"></ion-icon>
+          Seen
+        </button>
+        
+        <button
+          ion-button
+          color="secondary"
+          *ngIf="!snoozed(item.device) && isTHS(item.device?.type)"
+          (click)="snoozeItem(item, ItemSliding)"
+        >
+          Snooze
+        </button>
+      </ion-item-options>
 
       <button *ngIf="isAlert(item)" ion-item (click)="goAlertPage(item.id)">
         <h2>
@@ -37,30 +59,16 @@
           <ng-container *ngIf="item.multipleAlerts">GPS Logs</ng-container>
         </h2>
         <p>{{ item.device.name }} ({{ item.createdAt | amTimeAgo }})</p>
+        <p class="slide-to-actions">Slide for Actions</p>
       </button>
 
       <button *ngIf="!isAlert(item)" ion-item (click)="goNotificationPage(item.id)">
         <h2>{{ item.data.title }}</h2>
         <p>{{ item.device.name }} ({{ item.createdAt | amTimeAgo }})</p>
+        <p class="slide-to-actions">Slide for Actions</p>
       </button>
 
-      <ion-item-options side="left" (ionSwipe)="markAsSeen(item, ItemSliding)">
-        <button ion-button expandable color="primary">
-          <ion-icon name="eye"></ion-icon>
-          Seen
-        </button>
-      </ion-item-options>
-
-      <ion-item-options side="right">
-        <button
-          *ngIf="!item.seen && isTHS(item.device?.type)"
-          ion-button
-          color="secondary"
-          (click)="snoozeItem(item, ItemSliding)"
-        >
-          Snooze
-        </button>
-      
+      <ion-item-options side="right"> 
         <button
           ion-button
           color="danger"

@@ -9,7 +9,6 @@ log.txt
 .vscode/
 npm-debug.log*
 
-.gradle/
 .idea/
 .sass-cache/
 .tmp/
@@ -18,7 +17,6 @@ coverage/
 dist/
 node_modules/
 tmp/
-www/
 temp/
 hooks/
 platforms/
@@ -33,3 +31,5 @@ UserInterfaceState.xcuserstate
 /.sourcemaps
 
 .secrets
+
+www

@@ -2,6 +2,19 @@
   *ngIf="device"
   #slidingItem
 >
+  <ion-item-options
+    side="left"
+    *ngIf="isTHS(device.type) && !snoozed"
+  >
+    <button
+      ion-button
+      color="secondary"
+      (click)="snoozeItem(device, slidingItem)"
+    >
+      Snooze
+    </button>
+  </ion-item-options>
+
   <button
     ion-item
     (click)="goDevicePage(device.id)"
@@ -58,11 +71,15 @@
       </p>
 
       <p *ngIf="device.lastSeen">Last seen: {{ device.lastSeen | amTimeAgo }}</p>
-      <div *ngIf="snoozed" class="snooze-msg">
-        <p>Alerts snoozed until</p>
-        <p>{{ device.snoozeTo | amDateFormat: 'MM/DD/YYYY, hh:mm a' }}</p>
-      </div>
-    </ion-label>
+      <div
+      *ngIf="snoozed"
+      class="snooze-msg"
+      >
+      <p>Alerts snoozed until</p>
+      <p>{{ device.snoozeTo | amDateFormat: 'MM/DD/YYYY, hh:mm a' }}</p>
+    </div>
+    <p class="slide-to-actions">Slide for Actions</p>
+  </ion-label>
   </button>
 
   <ion-item-options (ionSwipe)="onSwipe($event)">
