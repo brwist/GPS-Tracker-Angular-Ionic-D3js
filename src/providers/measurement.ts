@@ -20,7 +20,7 @@ export class MeasurementProvider extends BaseProvider {
         options.filter = {
             ...options.filter,
             sortingField: 'createdAt',
-            sortingOrder: 'asc'
+            sortingOrder: 'desc'
         };
 
         options.pagination = { page: 1, limit: 999999 };
