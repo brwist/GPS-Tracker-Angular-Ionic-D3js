@@ -208,7 +208,7 @@ export class HumidityChartComponent implements OnInit, OnDestroy {
       .append('path').data([this.data]).attr('class', 'line').attr('d', this.line).attr('transform', 'translate(-8,0)');
     this.chartBody
       .append('rect')
-      .attr('width', this.width - 4)
+      .attr('width', (this.width - 4))
       .attr('height', this.height)
       .attr('pointer-events', 'all')
       .style('fill', 'transparent')
