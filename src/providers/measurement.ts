@@ -23,11 +23,7 @@ export class MeasurementProvider extends BaseProvider {
             sortingOrder: 'asc'
         };
 
-<<<<<<< HEAD
-        options.pagination = { page: 1, limit: "All" };
-=======
         options.pagination = { page: 1, limit: 'All' };
->>>>>>> get all data for the period
 
         return super.getListV2(ApiProvider.obtainRequestUrl(`device/${deviceId}/measurements`, options));
     }
