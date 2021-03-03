@@ -205,10 +205,10 @@ export class TemperatureChartComponent implements OnInit, OnDestroy {
     this.chartBody = g.append('g').attr('class', 'chartbody').attr('clip-path', 'url(#clip)');
 
     this.chartBody
-      .append('path').data([this.data]).attr('class', 'line').attr('d', this.line);
+      .append('path').data([this.data]).attr('class', 'line').attr('d', this.line).attr('transform', 'translate(-8,0)');
     this.chartBody
       .append('rect')
-      .attr('width', this.width)
+      .attr('width', this.width - 4)
       .attr('height', this.height)
       .attr('pointer-events', 'all')
       .style('fill', 'transparent')
@@ -224,7 +224,7 @@ export class TemperatureChartComponent implements OnInit, OnDestroy {
         var d = this.data[idx];
         this.chartValueAround = this.formatDate(x0) + ' ' + this.decimalPipe.transform(d.temperature, '1.1-1') + '\u00B0';
 
-        const xCor = d3.event.x - 50;
+        const xCor = d3.event.x - 52;
         this.selectedDetailLeft = xCor;
       }));
 
