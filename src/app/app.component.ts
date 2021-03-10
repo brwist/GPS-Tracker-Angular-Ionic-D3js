@@ -338,21 +338,6 @@ export class MyApp {
       } catch (error) { }
     }
 
-    if (err.status === 400 && err.error && err.error.error) {
-      this.alertCtrl
-        .create({
-          title: err.error.error,
-          buttons: [
-            {
-              text: 'Ok'
-            }
-          ]
-        })
-        .present();
-
-      return;
-    }
-
     if (err.error === 'Internet is required.') {
       this.toastCtrl
         .create({
@@ -371,6 +356,21 @@ export class MyApp {
           message: `Could not connect to the server`,
           duration: 1000,
           position: 'bottom'
+        })
+        .present();
+
+      return;
+    }
+
+    if (err.error && err.error.error) {
+      this.alertCtrl
+        .create({
+          title: err.error.error,
+          buttons: [
+            {
+              text: 'Ok'
+            }
+          ]
         })
         .present();
 

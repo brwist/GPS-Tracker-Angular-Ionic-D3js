@@ -45,6 +45,7 @@ export class DevicesListItemComponent {
     }
 
     public isTHS = DeviceProvider.isTHS;
+    public isGPS = DeviceProvider.isGPS;
 
     constructor(
         public settingsProvider: Settings,

@@ -59,13 +59,13 @@
           <ng-container *ngIf="item.multipleAlerts">GPS Logs</ng-container>
         </h2>
         <p>{{ item.device.name }} ({{ item.createdAt | amTimeAgo }})</p>
-        <p class="slide-to-actions">Slide for Actions</p>
+        <p *ngIf="isTHS(item.device?.type)" class="slide-to-actions">Slide for Actions</p>
       </button>
 
       <button *ngIf="!isAlert(item)" ion-item (click)="goNotificationPage(item.id)">
         <h2>{{ item.data.title }}</h2>
         <p>{{ item.device.name }} ({{ item.createdAt | amTimeAgo }})</p>
-        <p class="slide-to-actions">Slide for Actions</p>
+        <p *ngIf="isTHS(item.device?.type)" class="slide-to-actions">Slide for Actions</p>
       </button>
 
       <ion-item-options side="right"> 

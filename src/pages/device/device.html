@@ -23,6 +23,7 @@
   <div
     *ngIf="firstAlert && firstAlert.seenAfter && firstAlert.enabled && !firstAlert.dismiss"
     class="first-alert"
+    [style.justify-content]="device.sharedAccess ? 'start' : 'space-between'"
   >
     <div class="description">
       <h6>First Alert</h6>
@@ -31,6 +32,7 @@
     </div>
 
     <div
+      *ngIf="!device.sharedAccess"
       class="dismiss"
       (click)="dismissAlert()"
     >Dismiss</div>

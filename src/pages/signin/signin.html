@@ -33,7 +33,7 @@
         Password is required
       </p>
 
-      <ion-item>
+      <ion-item no-lines>
         <ion-label>Remember password</ion-label>
         <ion-checkbox [(ngModel)]="rememberPassword" name="rememberPassword"></ion-checkbox>
       </ion-item>
@@ -42,15 +42,16 @@
         <div class="error">{{ error }}</div>
       </ion-item>
 
-      <div padding>
+      <div class="buttons-block" padding>
         <button ion-button color="primary" (click)="signIn(loginForm)" type="submit" [disabled]="signInInProgress">
           Sign In
         </button>
+
+        <a (click)="recoverAccess()">
+          Forgot your password?
+        </a>
       </div>
 
-      <button ion-item (click)="recoverAccess()">
-        Forgot a password?
-      </button>
 
     </form>
 

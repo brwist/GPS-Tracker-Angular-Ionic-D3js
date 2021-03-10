@@ -61,6 +61,8 @@ export interface IDevice {
     firstAlert?: IFirstAlert;
     type: DeviceType;
     snoozeTo?: string;
+
+    unseenAlertsCount?: number;
 }
 
 export interface IFirstAlert {

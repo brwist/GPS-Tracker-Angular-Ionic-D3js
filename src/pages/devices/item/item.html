@@ -4,7 +4,7 @@
 >
   <ion-item-options
     side="left"
-    *ngIf="isTHS(device.type) && !snoozed"
+    *ngIf="isTHS(device.type) && !snoozed && device.unseenAlertsCount > 0"
   >
     <button
       ion-button
@@ -23,7 +23,7 @@
 
     <ion-thumbnail item-left>
       <img
-        *ngIf="device.type === 'GPS'; else THS;"
+        *ngIf="isGPS(device.type); else THS;"
         [src]="getTrackMapUrl(device.lastTrack)"
       >
 
@@ -72,13 +72,13 @@
 
       <p *ngIf="device.lastSeen">Last seen: {{ device.lastSeen | amTimeAgo }}</p>
       <div
-      *ngIf="snoozed"
-      class="snooze-msg"
-      >
-      <p>Alerts snoozed until</p>
-      <p>{{ device.snoozeTo | amDateFormat: 'MM/DD/YYYY, hh:mm a' }}</p>
-    </div>
-    <p class="slide-to-actions">Slide for Actions</p>
+        *ngIf="snoozed"
+        class="snooze-msg"
+        >
+        <p>Alerts snoozed until</p>
+        <p>{{ device.snoozeTo | amDateFormat: 'MM/DD/YYYY, hh:mm a' }}</p>
+      </div>
+      <p *ngIf="isTHS(device.type) && device.unseenAlertsCount > 0" class="slide-to-actions">Slide for Actions</p>
   </ion-label>
   </button>
 

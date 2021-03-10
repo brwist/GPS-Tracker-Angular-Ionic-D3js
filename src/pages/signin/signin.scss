@@ -10,4 +10,10 @@ page-signin {
     color: color($colors, gray);
     text-align: center;
   }
+
+  .buttons-block {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 }

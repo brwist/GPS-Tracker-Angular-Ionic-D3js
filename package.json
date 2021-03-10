@@ -110,7 +110,7 @@
         "karma-jasmine": "1.1.1",
         "karma-mocha-reporter": "2.2.5",
         "karma-remap-istanbul": "0.6.0",
-        "trakkit-cordova-plugin": "git+https://github.com/kinergytech/trakkit-cordova-plugin.git",
+        "trakkit-cordova-plugin": "git+ssh://git@github.com/bushev/trakkit-cordova-plugin.git",
         "ts-node": "4.1.0",
         "tslint": "5.9.1",
         "tslint-eslint-rules": "5.1.0",

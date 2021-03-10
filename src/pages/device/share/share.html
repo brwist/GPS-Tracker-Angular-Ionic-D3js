@@ -18,7 +18,7 @@
 
     <ion-item-sliding *ngFor="let sharedWith of device.sharedWith" #slidingItem>
 
-      <button ion-item (click)="goEditRulePage(rule.id)">
+      <button ion-item>
         <h2>
           {{ sharedWith.user.email }}
         </h2>
