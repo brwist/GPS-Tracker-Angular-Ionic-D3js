@@ -23,7 +23,7 @@ export class MeasurementProvider extends BaseProvider {
             sortingOrder: 'asc'
         };
 
-        options.pagination = { page: 1, limit: 999999 };
+        options.pagination = { page: 1, limit: "All" };
 
         return super.getListV2(ApiProvider.obtainRequestUrl(`device/${deviceId}/measurements`, options));
     }
