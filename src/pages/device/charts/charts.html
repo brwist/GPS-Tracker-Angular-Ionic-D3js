@@ -6,7 +6,7 @@
 
 
 <ion-content [ngClass]="{'night-them-tab':isNightTheme}">
-  <div *ngIf="!dataYear || dataYear.length > 0; else noData">
+  <div *ngIf="!isNoData">
     <ion-card class="tabs-container-card">
       <ion-card-content>
         <div class="tabs-container">
@@ -86,9 +86,7 @@
       </ion-card-content>
     </ion-card>
   </div>
-  <ng-template #noData>
-    <div class="no-data-container">
-      <img src="assets/img/no-data.svg" alt="No data">
-    </div>
-  </ng-template>
+  <div class="no-data-container" *ngIf="isNoData">
+    <img src="assets/img/no-data.svg" alt="No data">
+  </div>
 </ion-content>

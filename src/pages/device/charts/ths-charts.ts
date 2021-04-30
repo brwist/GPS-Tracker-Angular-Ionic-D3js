@@ -69,6 +69,7 @@ export class DeviceTHSChartsPage extends BaseComponent implements OnInit {
   isNightTheme: boolean;
   allSettings: ISettings;
   noDataCounter = 0;
+  isNoData = false;
 
   constructor(
     private logger: Logger,
@@ -251,12 +252,14 @@ export class DeviceTHSChartsPage extends BaseComponent implements OnInit {
     if (!data || data.length <= 0) {
       this.noDataCounter++;
       if (this.noDataCounter > 1) {
+        this.isNoData = true;
         this.handleNoData();
       }
       console.log('no data');
       return;
     }
 
+    this.isNoData = false;
     this.groupedBy = null;
     points = data;
 

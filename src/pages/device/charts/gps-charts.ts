@@ -84,6 +84,7 @@ export class DeviceGPSChartsPage extends BaseComponent implements OnInit {
     isNightTheme: boolean;
     allSettings: ISettings;
     noDataCounter = 0;
+    isNoData = false;
 
     constructor(private logger: Logger,
                 private params: NavParams,
@@ -299,14 +300,16 @@ export class DeviceGPSChartsPage extends BaseComponent implements OnInit {
     loadData(data) {
         let points;
         if (!data || data.length <= 0) {
-            this.noDataCounter++;
-            if (this.noDataCounter > 1) {
-              this.handleNoData();
-            }
-            console.log('no data');
-            return;
+          this.noDataCounter++;
+          if (this.noDataCounter > 1) {
+            this.isNoData = true;
+            this.handleNoData();
           }
+          console.log('no data');
+          return;
+        }
       
+        this.isNoData = false;
         this.groupedBy = null;
         points = data;
 
